@@ -32,28 +32,25 @@ defmodule Teiserver.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_pubsub, "~> 2.1"},
-      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
-
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
 
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:timex, "~> 3.7.5"},
-      {:oban, "~> 2.15"},
-      {:parallel, "~> 0.0"},
-      {:ex_ulid, "~> 0.1.0"},
-      {:csv, "~> 2.4"},
+      {:argon2_elixir, "~> 3.0"},
 
-      # Test stuff
+      # Libs I expect to use
+      # {:timex, "~> 3.7.5"},
+      # {:parallel, "~> 0.0"},
+      # {:ex_ulid, "~> 0.1.0"},
+      # {:csv, "~> 2.4"},
+
+      # Dev and Test stuff
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:excoveralls, "~> 0.15.3", only: :test, runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:floki, ">= 0.34.0", only: :test},
-      {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
-
-
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:dialyxir, "~> 1.1", only: [:dev], runtime: false}
     ]
   end
 
