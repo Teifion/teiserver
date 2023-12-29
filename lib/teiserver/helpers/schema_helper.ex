@@ -3,7 +3,7 @@ defmodule Teiserver.Helpers.SchemaHelper do
   A set of functions for helping with schema files
   """
 
-  @spec trim_strings(Map.t(), List.t()) :: Map.t()
+  @spec trim_strings(map, list) :: map
   def trim_strings(params, names) do
     names = Enum.map(names, fn n -> Atom.to_string(n) end)
 
@@ -35,7 +35,7 @@ defmodule Teiserver.Helpers.SchemaHelper do
 
   > %{f1: 3, f2: 5}
   """
-  @spec min_and_max(Map.t(), [atom]) :: Map.t()
+  @spec min_and_max(map, [atom]) :: map
   def min_and_max(params, [field1, field2]) do
     field1 = Atom.to_string(field1)
     field2 = Atom.to_string(field2)
@@ -56,7 +56,7 @@ defmodule Teiserver.Helpers.SchemaHelper do
   @doc """
   Applied `Enum.uniq` to one or more fields in the params
   """
-  @spec uniq_lists(Map.t(), List.t()) :: Map.t()
+  @spec uniq_lists(map, list) :: map
   def uniq_lists(params, names) do
     names = Enum.map(names, fn n -> Atom.to_string(n) end)
 
@@ -82,7 +82,7 @@ defmodule Teiserver.Helpers.SchemaHelper do
   Given a list of fields and a list of patterns, will apply Regex.replace for every
   pattern to each field.
   """
-  @spec remove_characters(Map.t(), List.t(), List.t()) :: Map.t()
+  @spec remove_characters(map, list, list) :: map
   def remove_characters(params, names, patterns) do
     names = Enum.map(names, fn n -> Atom.to_string(n) end)
 

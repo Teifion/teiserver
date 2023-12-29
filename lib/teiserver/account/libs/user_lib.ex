@@ -1,5 +1,7 @@
 defmodule Teiserver.Account.UserLib do
-  @moduledoc false
+  @moduledoc """
+  Library of user related functions.
+  """
   use TeiserverMacros, :library
   alias Teiserver.Account.{User, UserQueries}
 
@@ -15,7 +17,6 @@ defmodule Teiserver.Account.UserLib do
   @spec list_users(list) :: list
   def list_users(args \\ []) do
     conf = Teiserver.config()
-
     query = UserQueries.query_users(args)
     Repo.all(conf, query)
   end
@@ -36,16 +37,30 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec get_user!(non_neg_integer()) :: User.t()
   def get_user!(user_id, args \\ []) do
-    (args ++ [id: user_id])
-    |> UserQueries.query_users()
-    |> Repo.one!()
+    conf = Teiserver.config()
+    query = UserQueries.query_users(args ++ [id: user_id])
+    Repo.one!(conf, query)
   end
 
+  @doc """
+  Gets a single user.
+
+  Returns nil if the User does not exist.
+
+  ## Examples
+
+      iex> get_user(123)
+      %User{}
+
+      iex> get_user(456)
+      nil
+
+  """
   @spec get_user(non_neg_integer(), list) :: User.t() | nil
   def get_user(user_id, args \\ []) do
-    (args ++ [id: user_id])
-    |> UserQueries.query_users()
-    |> Repo.one()
+    conf = Teiserver.config()
+    query = UserQueries.query_users(args ++ [id: user_id])
+    Repo.one(conf, query)
   end
 
   @doc """
@@ -60,16 +75,12 @@ defmodule Teiserver.Account.UserLib do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_user() :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec create_user(map) :: {:ok, User.t} | {:error, Ecto.Changeset}
   def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  def script_create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
+    conf = Teiserver.config()
+    changeset = User.changeset(%User{}, attrs, :full)
+    Repo.insert(conf, changeset)
   end
 
   @doc """
@@ -85,9 +96,9 @@ defmodule Teiserver.Account.UserLib do
 
   """
   def update_user(%User{} = user, attrs) do
-    user
-    |> User.changeset(attrs)
-    |> Repo.update()
+    conf = Teiserver.config()
+    changeset = User.changeset(user, attrs, :full)
+    Repo.update(conf, changeset)
   end
 
   @doc """
@@ -103,7 +114,8 @@ defmodule Teiserver.Account.UserLib do
 
   """
   def delete_user(%User{} = user) do
-    Repo.delete(user)
+    conf = Teiserver.config()
+    Repo.delete(conf, user)
   end
 
   @doc """
@@ -116,6 +128,6 @@ defmodule Teiserver.Account.UserLib do
 
   """
   def change_user(%User{} = user, attrs \\ %{}) do
-    User.changeset(user, attrs)
+    User.changeset(user, attrs, :full)
   end
 end
