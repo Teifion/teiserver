@@ -7,8 +7,8 @@ defmodule Teiserver.Account.ExtraUserData do
 
   @primary_key false
   schema "account_extra_user_data" do
-    belongs_to :user, Teiserver.Account.User, primary_key: true
-    field :data, :map, default: %{}
+    belongs_to(:user, Teiserver.Account.User, primary_key: true)
+    field(:data, :map, default: %{})
   end
 
   @doc false

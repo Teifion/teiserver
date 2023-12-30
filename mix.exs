@@ -19,7 +19,6 @@ defmodule Teiserver.MixProject do
         "test.setup": :test
       ],
 
-
       # Hex
       description: "Game middleware server",
       package: package(),
@@ -37,6 +36,7 @@ defmodule Teiserver.MixProject do
         extras: extras(),
         groups_for_extras: groups_for_extras(),
         groups_for_modules: groups_for_modules(),
+        groups_for_docs: groups_for_docs(),
         skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
       ]
     ]
@@ -76,7 +76,7 @@ defmodule Teiserver.MixProject do
 
   defp groups_for_extras do
     [
-      Guides: ~r{guides/[^\/]+\.md},
+      Guides: ~r{guides/[^\/]+\.md}
       # Recipes: ~r{guides/recipes/.?},
       # Testing: ~r{guides/testing/.?},
       # "Upgrade Guides": ~r{guides/upgrading/.*}
@@ -85,16 +85,28 @@ defmodule Teiserver.MixProject do
 
   defp groups_for_modules do
     [
-      "Contexts": [
+      Contexts: [
         Teiserver.Account,
         Teiserver.Settings
       ],
-      "Account": [
-        ~r"Teiserver.Account.*",
+      Account: [
+        ~r"Teiserver.Account.*"
       ],
-      "Settings": [
-        ~r"Teiserver.Settings.*",
+      Settings: [
+        ~r"Teiserver.Settings.*"
       ]
+    ]
+  end
+
+  def groups_for_docs do
+    [
+      # Accounts
+      Users: &(&1[:section] == :user),
+      "Extra user data": &(&1[:section] == :extra_user_data),
+
+      # Settings
+      "Site settings": &(&1[:section] == :site_setting),
+      "User settings": &(&1[:section] == :user_setting)
     ]
   end
 
@@ -114,7 +126,6 @@ defmodule Teiserver.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:argon2_elixir, "~> 3.0"},

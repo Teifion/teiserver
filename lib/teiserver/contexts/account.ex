@@ -5,39 +5,47 @@ defmodule Teiserver.Account do
 
   alias Teiserver.Account.{User, UserLib}
 
+  @doc section: :user
   @spec list_users() :: [User.t]
   defdelegate list_users(), to: UserLib
 
+  @doc section: :user
   @spec list_users(list) :: [User.t]
   defdelegate list_users(args), to: UserLib
 
-  @spec get_user!(non_neg_integer()) :: User.t
-  defdelegate get_user!(user_id), to: UserLib
+  @doc section: :user
+  @spec get_user!(non_neg_integer(), list) :: User.t
+  defdelegate get_user!(user_id, query_args \\ []), to: UserLib
 
-  @spec get_user!(non_neg_integer(), list) :: User.t | nil
-  defdelegate get_user!(user_id, args), to: UserLib
-
-  @spec get_user(non_neg_integer()) :: User.t | nil
-  defdelegate get_user(user_id), to: UserLib
-
+  @doc section: :user
   @spec get_user(non_neg_integer(), list) :: User.t | nil
-  defdelegate get_user(user_id, args), to: UserLib
+  defdelegate get_user(user_id, query_args \\ []), to: UserLib
 
-  @spec create_user() :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @doc section: :user
+  @spec get_user_by_id(non_neg_integer()) :: User.t | nil
+  defdelegate get_user_by_id(user_id), to: UserLib
+
+  @doc section: :user
+  @spec get_user_by_name(String.t) :: User.t | nil
+  defdelegate get_user_by_name(name), to: UserLib
+
+  @doc section: :user
   @spec create_user(map) :: {:ok, User.t} | {:error, Ecto.Changeset}
-  @doc delegate_to: {UserLib, :create_user, 1}
   defdelegate create_user(attrs \\ %{}), to: UserLib
 
+  @doc section: :user
   @spec update_user(User, map) :: {:ok, User.t} | {:error, Ecto.Changeset}
   defdelegate update_user(user, attrs), to: UserLib
 
+  @doc section: :user
   @spec delete_user(User.t) :: {:ok, User.t} | {:error, Ecto.Changeset}
-  @doc delegate_to: {UserLib, :delete_user, 1}
   defdelegate delete_user(user), to: UserLib
 
-  @spec change_user(User.t) :: Ecto.Changeset
-  defdelegate change_user(user), to: UserLib
-
+  @doc section: :user
   @spec change_user(User.t, map) :: Ecto.Changeset
-  defdelegate change_user(user, attrs), to: UserLib
+  defdelegate change_user(user, attrs \\ %{}), to: UserLib
+
+  @doc section: :user
+  @spec verify_user_password(User.t, String.t) :: boolean
+  defdelegate verify_user_password(user, plaintext_password), to: UserLib
 end

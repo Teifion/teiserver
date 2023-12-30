@@ -108,8 +108,12 @@ defmodule Teiserver.Registry do
   """
   @spec via(Teiserver.name(), role(), value()) :: {:via, Registry, {__MODULE__, key()}}
   def via(teiserver_name, role \\ nil, value \\ nil)
-  def via(teiserver_name, role, nil), do: {:via, Registry, {__MODULE__, key(teiserver_name, role)}}
-  def via(teiserver_name, role, value), do: {:via, Registry, {__MODULE__, key(teiserver_name, role), value}}
+
+  def via(teiserver_name, role, nil),
+    do: {:via, Registry, {__MODULE__, key(teiserver_name, role)}}
+
+  def via(teiserver_name, role, value),
+    do: {:via, Registry, {__MODULE__, key(teiserver_name, role), value}}
 
   defp key(teiserver_name, nil), do: teiserver_name
   defp key(teiserver_name, role), do: {teiserver_name, role}

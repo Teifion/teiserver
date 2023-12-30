@@ -34,7 +34,8 @@ defmodule Teiserver.Helpers.QueryHelper do
   def query_select(query, nil), do: query
 
   def query_select(query, fields) do
-    from stat_grids in query,
+    from(stat_grids in query,
       select: ^fields
+    )
   end
 end

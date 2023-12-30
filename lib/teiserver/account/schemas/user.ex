@@ -4,36 +4,37 @@ defmodule Teiserver.Account.User do
   alias Argon2
 
   schema "account_users" do
-    field :name, :string
-    field :email, :string
-    field :password, :string
+    field(:name, :string)
+    field(:email, :string)
+    field(:password, :string)
 
-    field :roles, {:array, :string}, default: []
-    field :permissions, {:array, :string}, default: []
+    field(:roles, {:array, :string}, default: [])
+    field(:permissions, {:array, :string}, default: [])
 
-    field :behaviour_score, :integer
-    field :trust_score, :integer
-    field :social_score, :integer
+    field(:behaviour_score, :integer)
+    field(:trust_score, :integer)
+    field(:social_score, :integer)
 
-    field :last_login_at, :utc_datetime
-    field :last_played_at, :utc_datetime
-    field :last_logout_at, :utc_datetime
+    field(:last_login_at, :utc_datetime)
+    field(:last_played_at, :utc_datetime)
+    field(:last_logout_at, :utc_datetime)
 
-    field :restrictions, {:array, :string}, default: []
-    field :restricted_until, :utc_datetime
+    field(:restrictions, {:array, :string}, default: [])
+    field(:restricted_until, :utc_datetime)
 
-    field :shadow_banned, :boolean, default: false
+    field(:shadow_banned, :boolean, default: false)
 
     # Extra user.ex relations go here
-    belongs_to :smurf_of, Teiserver.Account.User
+    belongs_to(:smurf_of, Teiserver.Account.User)
 
-    has_one :extra_data, Teiserver.Account.ExtraUserData
+    has_one(:extra_data, Teiserver.Account.ExtraUserData)
 
     timestamps()
   end
 
   @doc false
   def changeset(user), do: changeset(user, %{}, :full)
+
   def changeset(user, attrs, :full) do
     attrs =
       attrs
@@ -151,8 +152,11 @@ defmodule Teiserver.Account.User do
 
   defp put_password_hash(changeset), do: changeset
 
-  @spec verify_password(String.t(), String.t()) :: boolean
+  @spec verify_password(User.t, String.t) :: boolean
   def verify_password(plain_text_password, encrypted) do
+    IO.puts plain_text_password
+    IO.puts encrypted
+
     Argon2.verify_pass(plain_text_password, encrypted)
   end
 end
