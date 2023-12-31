@@ -19,7 +19,6 @@ defmodule TeiserverMacros do
 
   def library do
     quote do
-      alias Teiserver.Types, as: T
       alias Teiserver.Repo
     end
   end

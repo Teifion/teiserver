@@ -3,24 +3,23 @@ defmodule Teiserver.Helpers.SchemaHelper do
   A set of functions for helping with schema files
   """
 
-  @spec trim_strings(map, list) :: map
-  def trim_strings(params, names) do
-    names = Enum.map(names, fn n -> Atom.to_string(n) end)
+  @spec trim_strings(map, list | atom) :: map
+  def trim_strings(params, fields) do
+    fields =
+      fields
+      |> List.wrap()
+      |> Enum.map(&Atom.to_string/1)
 
     params
     |> Map.new(fn {k, v} ->
-      case Enum.member?(names, k) do
-        true ->
-          case v do
-            nil ->
-              {k, nil}
-
-            _ ->
-              {k, String.trim(v)}
-          end
-
-        false ->
-          {k, v}
+      if Enum.member?(fields, k) do
+        if v == nil do
+          {k, nil}
+        else
+          {k, String.trim(v)}
+        end
+      else
+        {k, v}
       end
     end)
   end

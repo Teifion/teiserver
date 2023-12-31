@@ -1,7 +1,7 @@
-# Teiserver
+# Installation
 A middleware server library.
 
-## Installation
+## Dependency
 First add to your dependencies in `mix.exs`.
 ```elixir
 def deps do
@@ -11,6 +11,7 @@ def deps do
 end
 ```
 
+## Migration
 Now add a migration
 ```bash
 mix ecto.gen.migration add_teiserver_tables
@@ -33,9 +34,18 @@ defmodule MyApp.Repo.Migrations.AddTeiserverTables do
 end
 ```
 
+## Supervision tree
 Add this to your Application supervision tree:
 ```elixir
 children = [
   {Teiserver, Application.get_env(:my_app, Teiserver)}
 ]
 ```
+
+## Config
+In `config.exs`
+```elixir
+config :hello_world_server, Teiserver,
+  repo: HelloWorldServer.Repo
+```
+

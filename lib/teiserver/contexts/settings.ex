@@ -1,6 +1,6 @@
 defmodule Teiserver.Settings do
   @moduledoc """
-  Module here
+  The contextual module for [SiteSetting](Teiserver.Settings.SiteSetting), [UserSetting](Teiserver.Settings.UserSetting)
   """
 
   alias Teiserver.Settings.{SiteSetting, SiteSettingLib}

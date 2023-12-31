@@ -35,7 +35,7 @@ defmodule Teiserver.Account.UserLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user!(non_neg_integer()) :: User.t
+  @spec get_user!(non_neg_integer()) :: User.t()
   def get_user!(user_id, query_args \\ []) do
     conf = Teiserver.config()
     query = UserQueries.query_users(query_args ++ [id: user_id])
@@ -56,28 +56,26 @@ defmodule Teiserver.Account.UserLib do
       nil
 
   """
-  @spec get_user(non_neg_integer(), list) :: User.t | nil
+  @spec get_user(non_neg_integer(), list) :: User.t() | nil
   def get_user(user_id, query_args \\ []) do
     conf = Teiserver.config()
     query = UserQueries.query_users(query_args ++ [id: user_id])
     Repo.one(conf, query)
   end
 
-  @spec get_user_by_id(non_neg_integer()) :: User.t | nil
+  @spec get_user_by_id(non_neg_integer()) :: User.t() | nil
   def get_user_by_id(user_id) do
     conf = Teiserver.config()
-    query = UserQueries.query_users([id: user_id, limit: 1])
+    query = UserQueries.query_users(id: user_id, limit: 1)
     Repo.one(conf, query)
   end
 
-  @spec get_user_by_name(String.t) :: User.t | nil
+  @spec get_user_by_name(String.t()) :: User.t() | nil
   def get_user_by_name(name) do
     conf = Teiserver.config()
-    query = UserQueries.query_users([where: [name_lower: name], limit: 1])
+    query = UserQueries.query_users(where: [name_lower: name], limit: 1)
     Repo.one(conf, query)
   end
-
-
 
   @doc """
   Creates a user.
@@ -91,8 +89,7 @@ defmodule Teiserver.Account.UserLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_user() :: {:ok, User.t} | {:error, Ecto.Changeset}
-  @spec create_user(map) :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def create_user(attrs \\ %{}) do
     conf = Teiserver.config()
     changeset = User.changeset(%User{}, attrs, :full)
@@ -111,7 +108,7 @@ defmodule Teiserver.Account.UserLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_user(User, map) :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec update_user(User.t(), map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def update_user(%User{} = user, attrs) do
     conf = Teiserver.config()
     changeset = User.changeset(user, attrs, :full)
@@ -130,7 +127,7 @@ defmodule Teiserver.Account.UserLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_user(User.t) :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def delete_user(%User{} = user) do
     conf = Teiserver.config()
     Repo.delete(conf, user)
@@ -145,7 +142,7 @@ defmodule Teiserver.Account.UserLib do
       %Ecto.Changeset{data: %User{}}
 
   """
-  @spec change_user(User.t, map) :: Ecto.Changeset
+  @spec change_user(User.t(), map) :: Ecto.Changeset.t()
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs, :full)
   end
@@ -155,7 +152,7 @@ defmodule Teiserver.Account.UserLib do
   correct for the user. Note it does this via a secure method to prevent timing
   attacks, never manually verify the password with standard string comparison.
   """
-  @spec verify_user_password(User.t, String.t) :: boolean
+  @spec verify_user_password(User.t(), String.t()) :: boolean
   def verify_user_password(user, plaintext_password) do
     User.verify_password(plaintext_password, user.password)
   end

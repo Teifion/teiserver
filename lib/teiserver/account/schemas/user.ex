@@ -152,11 +152,8 @@ defmodule Teiserver.Account.User do
 
   defp put_password_hash(changeset), do: changeset
 
-  @spec verify_password(User.t, String.t) :: boolean
+  @spec verify_password(User.t(), String.t()) :: boolean
   def verify_password(plain_text_password, encrypted) do
-    IO.puts plain_text_password
-    IO.puts encrypted
-
     Argon2.verify_pass(plain_text_password, encrypted)
   end
 end

@@ -6,46 +6,46 @@ defmodule Teiserver.Account do
   alias Teiserver.Account.{User, UserLib}
 
   @doc section: :user
-  @spec list_users() :: [User.t]
+  @spec list_users() :: [User.t()]
   defdelegate list_users(), to: UserLib
 
   @doc section: :user
-  @spec list_users(list) :: [User.t]
+  @spec list_users(list) :: [User.t()]
   defdelegate list_users(args), to: UserLib
 
   @doc section: :user
-  @spec get_user!(non_neg_integer(), list) :: User.t
+  @spec get_user!(non_neg_integer(), list) :: User.t()
   defdelegate get_user!(user_id, query_args \\ []), to: UserLib
 
   @doc section: :user
-  @spec get_user(non_neg_integer(), list) :: User.t | nil
+  @spec get_user(non_neg_integer(), list) :: User.t() | nil
   defdelegate get_user(user_id, query_args \\ []), to: UserLib
 
   @doc section: :user
-  @spec get_user_by_id(non_neg_integer()) :: User.t | nil
+  @spec get_user_by_id(non_neg_integer()) :: User.t() | nil
   defdelegate get_user_by_id(user_id), to: UserLib
 
   @doc section: :user
-  @spec get_user_by_name(String.t) :: User.t | nil
+  @spec get_user_by_name(String.t()) :: User.t() | nil
   defdelegate get_user_by_name(name), to: UserLib
 
   @doc section: :user
-  @spec create_user(map) :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset}
   defdelegate create_user(attrs \\ %{}), to: UserLib
 
   @doc section: :user
-  @spec update_user(User, map) :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec update_user(User, map) :: {:ok, User.t()} | {:error, Ecto.Changeset}
   defdelegate update_user(user, attrs), to: UserLib
 
   @doc section: :user
-  @spec delete_user(User.t) :: {:ok, User.t} | {:error, Ecto.Changeset}
+  @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset}
   defdelegate delete_user(user), to: UserLib
 
   @doc section: :user
-  @spec change_user(User.t, map) :: Ecto.Changeset
+  @spec change_user(User.t(), map) :: Ecto.Changeset.t()
   defdelegate change_user(user, attrs \\ %{}), to: UserLib
 
   @doc section: :user
-  @spec verify_user_password(User.t, String.t) :: boolean
+  @spec verify_user_password(User.t(), String.t()) :: boolean
   defdelegate verify_user_password(user, plaintext_password), to: UserLib
 end

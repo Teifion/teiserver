@@ -75,7 +75,7 @@ defmodule Teiserver.Settings.UserSettingLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_user_setting(map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset}
+  @spec create_user_setting(map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def create_user_setting(attrs \\ %{}) do
     conf = Teiserver.config()
     changeset = UserSetting.changeset(%UserSetting{}, attrs)
@@ -94,7 +94,8 @@ defmodule Teiserver.Settings.UserSettingLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_user_setting(UserSetting, map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset}
+  @spec update_user_setting(UserSetting.t(), map) ::
+          {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def update_user_setting(%UserSetting{} = user_setting, attrs) do
     conf = Teiserver.config()
     changeset = UserSetting.changeset(user_setting, attrs)
@@ -113,7 +114,8 @@ defmodule Teiserver.Settings.UserSettingLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_user_setting(UserSetting.t()) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset}
+  @spec delete_user_setting(UserSetting.t()) ::
+          {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def delete_user_setting(%UserSetting{} = user_setting) do
     conf = Teiserver.config()
     Repo.delete(conf, user_setting)

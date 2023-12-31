@@ -5,20 +5,16 @@ defmodule Teiserver.Application do
 
   @impl true
   def start(_type, _args) do
-    # children = [
-    #   {Registry, [keys: :unique, members: :auto, name: Teiserver.Registry]},
-    #   {Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
-    # ]
+    children = [
+      Teiserver.Registry,
 
-    # # See https://hexdocs.pm/elixir/Supervisor.html
-    # # for other strategies and supported options
-    # opts = [strategy: :one_for_one, name: Teiserver.Supervisor]
-    # Supervisor.start_link(children, opts)
+      # Clients and connections
+      {Registry, [keys: :duplicate, members: :auto, name: Teiserver.ConnectionRegistry]},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
+      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.ClientSupervisor}
+    ]
 
-    Supervisor.start_link(
-      [Teiserver.Registry],
-      strategy: :one_for_one,
-      name: __MODULE__
-    )
+    opts = [strategy: :one_for_one, name: __MODULE__]
+    Supervisor.start_link(children, opts)
   end
 end

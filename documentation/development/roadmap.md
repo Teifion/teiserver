@@ -1,6 +1,17 @@
-# v0.1 plan
+# Roadmap
+
+## v0.1 plan
+I want potential users to see the library and understand why they might want to use it and be able to use it.
+
 - Accounts
   - Users
+  - User settings
+
+- Connections
+  - Clients (connect, disconnect, update)
+
+- Settings
+  - Site settings
   - User settings
 
 - Telemetry
@@ -9,7 +20,7 @@
   - Lobby events
   - User events
 
-# Long term planned features
+## Planned/intended features
 - Administration
   - Moderation
   - Analytics and Reporting
@@ -17,7 +28,7 @@
   - Users
   - User settings
   - Achievements
-  - Accolades (layer awarded badges)
+  - Accolades (player awarded badges)
 - Communication
   - Chat rooms
   - Direct messages
@@ -36,8 +47,13 @@
   - Server events
   - Lobby events
   - User events
+- Integrations
+  - Steam
+  - Itch.io
 
-# Planned but might be their own library
+## Other desired features
+These might be placed into their own library.
+
 - Social media
   - Discord
 

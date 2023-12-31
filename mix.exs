@@ -37,7 +37,9 @@ defmodule Teiserver.MixProject do
         groups_for_extras: groups_for_extras(),
         groups_for_modules: groups_for_modules(),
         groups_for_docs: groups_for_docs(),
-        skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
+        skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+        before_closing_head_tag: &before_closing_head_tag/1,
+        before_closing_body_tag: &before_closing_body_tag/1
       ]
     ]
   end
@@ -45,41 +47,23 @@ defmodule Teiserver.MixProject do
   defp extras do
     [
       # Guides
-      "guides/installation.md",
-      "guides/hello_world.md",
-      # "guides/troubleshooting.md",
-      # "guides/release_configuration.md",
-      # "guides/writing_plugins.md",
-      # "guides/upgrading/v2.0.md",
-      # "guides/upgrading/v2.6.md",
-      # "guides/upgrading/v2.11.md",
-      # "guides/upgrading/v2.12.md",
-      # "guides/upgrading/v2.14.md",
-      # "guides/upgrading/v2.17.md",
+      "documentation/guides/installation.md",
+      "documentation/guides/hello_world.md",
+      "documentation/guides/program_schema.md",
+      "documentation/guides/snippets.md",
 
-      # # Recipes
-      # "guides/recipes/recursive-jobs.md",
-      # "guides/recipes/reliable-scheduling.md",
-      # "guides/recipes/reporting-progress.md",
-      # "guides/recipes/expected-failures.md",
-      # "guides/recipes/splitting-queues.md",
-      # "guides/recipes/migrating-from-other-languages.md",
+      # Development
+      "documentation/development/features.md",
+      "documentation/development/roadmap.md",
 
-      # # Testing
-      # "guides/testing/testing.md",
-      # "guides/testing/testing_workers.md",
-      # "guides/testing/testing_queues.md",
-      # "guides/testing/testing_config.md",
       "CHANGELOG.md": [title: "Changelog"]
     ]
   end
 
   defp groups_for_extras do
     [
-      Guides: ~r{guides/[^\/]+\.md}
-      # Recipes: ~r{guides/recipes/.?},
-      # Testing: ~r{guides/testing/.?},
-      # "Upgrade Guides": ~r{guides/upgrading/.*}
+      Guides: ~r{documentation/guides/[^\/]+\.md},
+      Development: ~r{documentation/development/[^\/]+\.md}
     ]
   end
 
@@ -87,13 +71,27 @@ defmodule Teiserver.MixProject do
     [
       Contexts: [
         Teiserver.Account,
+        Teiserver.Connections,
         Teiserver.Settings
       ],
       Account: [
         ~r"Teiserver.Account.*"
       ],
+      Connections: [
+        ~r"Teiserver.Connections.*"
+      ],
       Settings: [
         ~r"Teiserver.Settings.*"
+      ],
+      Helpers: [
+        ~r"Teiserver.Helpers.*"
+      ],
+      Internals: [
+        Teiserver.Config,
+        Teiserver.Migration,
+        Teiserver.Registry,
+        Teiserver.Repo,
+        TeiserverMacros
       ]
     ]
   end
@@ -109,6 +107,43 @@ defmodule Teiserver.MixProject do
       "User settings": &(&1[:section] == :user_setting)
     ]
   end
+
+  defp before_closing_head_tag(:html) do
+    """
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: document.body.className.includes("dark") ? "dark" : "default"
+        });
+        let id = 0;
+        for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
+          const preEl = codeEl.parentElement;
+          const graphDefinition = codeEl.textContent;
+          const graphEl = document.createElement("div");
+          const graphId = "mermaid-graph-" + id++;
+          mermaid.render(graphId, graphDefinition).then(({svg, bindFunctions}) => {
+            graphEl.innerHTML = svg;
+            bindFunctions?.(graphEl);
+            preEl.insertAdjacentElement("afterend", graphEl);
+            preEl.remove();
+          });
+        }
+      });
+    </script>
+    """
+  end
+
+  defp before_closing_head_tag(_), do: ""
+
+  defp before_closing_body_tag(:html) do
+    """
+    <!-- HTML injected at the end of the <body> element -->
+    """
+  end
+
+  defp before_closing_body_tag(_), do: ""
 
   # Run "mix help compile.app" to learn about applications.
   def application do

@@ -94,7 +94,8 @@ defmodule Teiserver.Settings.SiteSettingLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_site_setting(SiteSetting, map) :: {:ok, SiteSetting.t()} | {:error, Ecto.Changeset}
+  @spec update_site_setting(SiteSetting.t(), map) ::
+          {:ok, SiteSetting.t()} | {:error, Ecto.Changeset.t()}
   def update_site_setting(%SiteSetting{} = site_setting, attrs) do
     conf = Teiserver.config()
     changeset = SiteSetting.changeset(site_setting, attrs)
@@ -113,7 +114,8 @@ defmodule Teiserver.Settings.SiteSettingLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_site_setting(SiteSetting.t()) :: {:ok, SiteSetting.t()} | {:error, Ecto.Changeset}
+  @spec delete_site_setting(SiteSetting.t()) ::
+          {:ok, SiteSetting.t()} | {:error, Ecto.Changeset.t()}
   def delete_site_setting(%SiteSetting{} = site_setting) do
     conf = Teiserver.config()
     Repo.delete(conf, site_setting)
@@ -128,7 +130,7 @@ defmodule Teiserver.Settings.SiteSettingLib do
       %Ecto.Changeset{data: %SiteSetting{}}
 
   """
-  @spec change_site_setting(SiteSetting.t(), map) :: Ecto.Changeset
+  @spec change_site_setting(SiteSetting.t(), map) :: Ecto.Changeset.t()
   def change_site_setting(%SiteSetting{} = site_setting, attrs \\ %{}) do
     SiteSetting.changeset(site_setting, attrs)
   end

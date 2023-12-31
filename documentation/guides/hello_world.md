@@ -1,5 +1,5 @@
 # Hello World
-The purpose of this guide is to show you how to create a very basic server making with the commands `ping`, `register`, `login`, `whois` and `whoami`. We will be using ranch to provide a plain-text interface to our server though for real projects you'll typically want something more structured than just plain-text.
+The purpose of this guide is to show you how to create a very basic server implementing the commands `ping`, `register`, `login`, `whois`, `whoami`, `users` and `clients`. We will be using ranch to provide a plain-text interface to our server though for real projects you'll typically want something more structured than just plain-text.
 
 ## Create project
 ```bash
@@ -172,6 +172,7 @@ defmodule HelloWorldServer.TcpIn do
         {state, "Login failed (no user)"}
       user ->
         if Teiserver.Account.verify_user_password(user, password) do
+          Teiserver.Connections.login_user(user)
           {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
         else
           {state, "Login failed (bad password)"}
@@ -214,6 +215,24 @@ defmodule HelloWorldServer.TcpIn do
       user ->
         {state, "You are '#{user.name}'"}
     end
+  end
+
+  def data_in("users" <> _data, %{user_id: user_id} = state) do
+    names = Teiserver.Account.list_users(select: [:name])
+    |> Enum.map(fn %{name: name} -> name end)
+    |> Enum.join(", ")
+
+    {state, "User names: #{names}"}
+  end
+
+  def data_in("clients" <> _data, %{user_id: user_id} = state) do
+    client_ids = Teiserver.Connections.list_client_ids()
+
+    names = Teiserver.Account.list_users(where: [id_in: client_ids], select: [:name])
+    |> Enum.map(fn %{name: name} -> name end)
+    |> Enum.join(", ")
+
+    {state, "Client names: #{names}"}
   end
 end
 ```
@@ -265,4 +284,13 @@ login teifion password1
 
 whoami
 # You are 'Teifion'
+
+register bob password1
+# User created, you can now login with 'login name password'
+
+users
+# User names: teifion, bob
+
+clients
+# Client names: teifion
 ```

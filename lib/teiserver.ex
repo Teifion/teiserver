@@ -5,9 +5,21 @@ defmodule Teiserver do
 
   @moduledoc """
   Documentation for `Teiserver`.
+
   Copied from Oban and tweaked.
+
+  ## Main guides:
+  - [Installation](guides/installation.md)
+  - [Hello world](guides/hello_world.md)
+
+  ## Contexts
+  These are the main modules you will be interacting with in Teiserver. They typically delegate all their functions to something more specific but the context module will be the preferred point of contact with the Teiserver library.
   """
   @type name :: term()
+
+  @type user_id :: non_neg_integer()
+  @type lobby_id :: non_neg_integer()
+  @type party_id :: non_neg_integer()
 
   @type option ::
           {:log, false | Logger.level()}
@@ -82,10 +94,7 @@ defmodule Teiserver do
 
   @impl Supervisor
   def init(%Config{} = _conf) do
-    children = [
-      # All the Teiserver processes are going to go here
-    ]
-
+    children = []
     Supervisor.init(children, strategy: :one_for_one)
   end
 
