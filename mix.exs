@@ -49,7 +49,7 @@ defmodule Teiserver.MixProject do
       # Guides
       "documentation/guides/installation.md",
       "documentation/guides/hello_world.md",
-      "documentation/guides/program_schema.md",
+      "documentation/guides/program_structure.md",
       "documentation/guides/snippets.md",
 
       # Development
@@ -71,17 +71,41 @@ defmodule Teiserver.MixProject do
     [
       Contexts: [
         Teiserver.Account,
+        Teiserver.Communication,
         Teiserver.Connections,
-        Teiserver.Settings
+        Teiserver.Game,
+        Teiserver.Lobby,
+        Teiserver.Logging,
+        Teiserver.Moderation,
+        Teiserver.Settings,
+        Teiserver.Telemetry
       ],
       Account: [
         ~r"Teiserver.Account.*"
       ],
+      Communication: [
+        ~r"Teiserver.Communication.*"
+      ],
       Connections: [
         ~r"Teiserver.Connections.*"
       ],
+      Game: [
+        ~r"Teiserver.Game.*"
+      ],
+      Lobby: [
+        ~r"Teiserver.Lobby.*"
+      ],
+      Logging: [
+        ~r"Teiserver.Logging.*"
+      ],
+      Moderation: [
+        ~r"Teiserver.Moderation.*"
+      ],
       Settings: [
         ~r"Teiserver.Settings.*"
+      ],
+      Telemetry: [
+        ~r"Teiserver.Telemetry.*"
       ],
       Helpers: [
         ~r"Teiserver.Helpers.*"

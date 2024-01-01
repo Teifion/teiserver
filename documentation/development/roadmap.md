@@ -10,6 +10,14 @@ I want potential users to see the library and understand why they might want to 
 - Connections
   - Clients (connect, disconnect, update)
 
+- Communication
+  - Chat rooms
+  - Direct messages
+
+- Lobbies
+  - Opening/Closing
+  - Joining/Leaving
+
 - Settings
   - Site settings
   - User settings
