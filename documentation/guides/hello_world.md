@@ -1,5 +1,7 @@
 # Hello World
-The purpose of this guide is to show you how to create a very basic server implementing the commands `ping`, `register`, `login`, `whois`, `whoami`, `users` and `clients`. We will be using ranch to provide a plain-text interface to our server though for real projects you'll typically want something more structured than just plain-text.
+The purpose of this guide is to show you how to create a very basic server implementing the commands `ping`, `register`, `login`, `whois`, `whoami`, `users` and `clients`. We will be using [ranch](https://ninenines.eu/docs/en/ranch/1.8/manual/) to provide a plain-text interface to our server.
+
+Ranch is a tcp server and will allow us to provide an easy to test and prototype interface. For a more serious project you'll probably want to be looking at more structured data; for this example plain-text is fine.
 
 ## Create project
 ```bash
