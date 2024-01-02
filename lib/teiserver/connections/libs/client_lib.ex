@@ -4,7 +4,6 @@ defmodule Teiserver.Connections.ClientLib do
   """
   # use TeiserverMacros, :library
   alias Teiserver.Connections.Client
-  alias Teiserver.Account.User
 
   @doc """
   Returns the list of client ids.
@@ -40,16 +39,22 @@ defmodule Teiserver.Connections.ClientLib do
   end
 
   @doc """
-  Given a user, log them in. If the user already exists as a client then no new
-  login process is performed but the client details are still returned.
+  Given a user_id, log them in. If the user already exists as a client then the existing
+  client is returned.
+
+  The calling process will be listed as a connection for the client
+  the client will monitor it for the purposes of tracking if the
+  given client is still connected.
   """
-  @spec login_user(User.t()) :: Client.t()
-  def login_user(%User{} = user) do
-    if client_exists?(user.id) do
-      get_client(user.id)
+  @spec connect_user(Teiserver.user_id()) :: Client.t()
+  def connect_user(user_id) do
+    if client_exists?(user_id) do
+      cast_client(user_id, {:add_connection, self()})
+      get_client(user_id)
     else
-      client = Client.new(user.id)
+      client = Client.new(user_id)
       _pid = start_client_server(client)
+      cast_client(user_id, {:add_connection, self()})
       client
     end
   end
@@ -60,7 +65,7 @@ defmodule Teiserver.Connections.ClientLib do
   def start_client_server(%Client{} = client) do
     {:ok, server_pid} =
       DynamicSupervisor.start_child(Teiserver.ClientSupervisor, {
-        Teiserver.Account.ClientServer,
+        Teiserver.Connections.ClientServer,
         name: "client_#{client.id}",
         data: %{
           client: client

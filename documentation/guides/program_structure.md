@@ -6,9 +6,8 @@ The expectation is your users will have an application running on their machine,
 ```mermaid
 graph TD;
     app[User application] <--> Endpoint;
-    Endpoint --> CommandIn[Command dispatch];
-    CommandIn --> HandleIn[Command handler];
-    HandleIn --> Teiserver;
+    Endpoint --> CommandIn[Command handler];
+    CommandIn --> Teiserver[Teiserver library];
     Teiserver --> HandleOut[Response handler];
     HandleOut --> Endpoint;
 ```
@@ -32,4 +31,45 @@ sequenceDiagram
     Note right of User: Server event
     Teiserver->>Endpoint: Pubsub message
     Endpoint->>User: Message/Command
+```
+
+## Login through to playing a game
+The expected flow of events for a user logging into your application and playing a game is expected to look something like this. Note depending on protocols and features you may end up with slightly different steps.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Server
+    participant Game
+    
+    Game->>+Server: Login
+    Server->>Game: Accept login
+    Game->>Server: Open lobby
+    
+    User->>Server: Login
+    Server->>User: Accept login
+    Server->>User: Send client info
+    
+    User->>Server: Request lobby list
+    Server->>User: Send lobby list
+    
+    User->>Server: Join lobby
+    Server->>Game: User joined
+    Game->>Server: Start match
+    Server->>-User: Start match
+    
+    Note right of Server: Server not needed now
+    
+    User->>Game: Match events
+    Game->>User: Match events
+    User->>Game: Match events
+    Game->>User: Match events
+    
+    Game->>+Server: Match ended
+    
+    Note right of Server: Server becomes relevant
+    
+    User->>Server: Update client state
+    User->>Server: Leave lobby
+    Server->>-Game: User left
 ```

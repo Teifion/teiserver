@@ -2,6 +2,7 @@ defmodule Teiserver do
   use Supervisor
 
   alias Teiserver.{Config, Registry}
+  alias Teiserver.Helpers.PubSubHelper
 
   @type name :: term()
 
@@ -48,6 +49,7 @@ defmodule Teiserver do
   ### Context overview
   - **Accounts**: Users
   - **Communication**: Chat
+  - **Community**: Social interactions between players
   - **Connections**: User activity
   - **Game**: Game functionality (e.g. matchmaking)
   - **Lobby**: Game lobbies
@@ -140,4 +142,9 @@ defmodule Teiserver do
   @doc since: "0.2.0"
   @spec config(name()) :: Config.t()
   def config(name \\ __MODULE__), do: Registry.config(name)
+
+  # PubSub delegations
+  @doc false
+  @spec broadcast(String.t(), map()) :: :ok
+  defdelegate broadcast(channel, message), to: PubSubHelper
 end

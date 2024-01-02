@@ -7,6 +7,8 @@ defmodule Teiserver.Application do
   def start(_type, _args) do
     children = [
       Teiserver.Registry,
+      {Phoenix.PubSub, name: Teiserver.PubSub},
+
 
       # Clients and connections
       {Registry, [keys: :duplicate, members: :auto, name: Teiserver.ConnectionRegistry]},

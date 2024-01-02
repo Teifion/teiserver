@@ -1,9 +1,17 @@
 defmodule Teiserver.Connections do
   @moduledoc """
   The context for all things connection related (mostly clients).
+
+  # Clients
+  Clients are represented by a process holding their state, this process controls all updates to their state.
+
+  ## Creating a client
+  Clients are created using `connect_user/1`, this will create (if it doesn't already exist) a client process. Any process connecting a user will be subscribed to the `Teiserver.ClientUpdates:{user_id}` channel.
+
+  ## Destroying clients
+
   """
 
-  alias Teiserver.Account.User
   alias Teiserver.Connections.{Client, ClientLib}
 
   @doc section: :client
@@ -15,8 +23,8 @@ defmodule Teiserver.Connections do
   defdelegate get_client(user_id), to: ClientLib
 
   @doc section: :client
-  @spec login_user(User.t()) :: Client.t()
-  defdelegate login_user(user), to: ClientLib
+  @spec connect_user(Teiserver.user_id()) :: Client.t()
+  defdelegate connect_user(user_id), to: ClientLib
 
   @doc section: :client
   @spec client_exists?(Teiserver.user_id()) :: pid() | boolean

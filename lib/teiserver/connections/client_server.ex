@@ -1,15 +1,15 @@
-defmodule Teiserver.Account.ClientServer do
+defmodule Teiserver.Connections.ClientServer do
   @moduledoc """
-  A process representing the state of a client.
+  A process representing the state of a client. In the normal usage of Teiserver
+  you are not expected to interact with it directly.
   """
   use GenServer
   require Logger
-  alias Phoenix.PubSub
+  alias Teiserver.Connections.Client
 
   defmodule State do
     @moduledoc false
-
-    defstruct [:client, :user_id]
+    defstruct [:client, :user_id, :connections, :update_id]
   end
 
   @impl true
@@ -18,61 +18,71 @@ defmodule Teiserver.Account.ClientServer do
   end
 
   @impl true
+  def handle_cast({:add_connection, conn_pid}, state) when is_pid(conn_pid) do
+    Process.monitor(conn_pid)
+    new_connections = [conn_pid | state.connections]
+
+    if state.client.connected? do
+      {:noreply, %State{state | connections: new_connections}}
+    else
+      new_client = %{state.client | connected?: true}
+      {:noreply, %State{state | connections: new_connections, client: new_client}}
+    end
+  end
+
   def handle_cast({:update_values, partial_client}, state) do
     new_client = Map.merge(state.client, partial_client)
-
-    PubSub.broadcast(
-      Teiserver.PubSub,
-      "teiserver_client_messages:#{state.user_id}",
-      %{
-        channel: "teiserver_client_messages:#{state.user_id}",
-        event: :client_updated,
-        user_id: state.user_id,
-        client: new_client
-      }
-    )
-
-    if state.client.lobby_id do
-      PubSub.broadcast(
-        Teiserver.PubSub,
-        "teiserver_lobby_updates:#{state.client.lobby_id}",
-        %{
-          channel: "teiserver_lobby_updates",
-          event: :updated_client_battlestatus,
-          lobby_id: state.client.lobby_id,
-          user_id: state.user_id,
-          client: partial_client
-        }
-      )
-    end
-
-    {:noreply, %{state | client: new_client}}
+    new_state = update_client(state, new_client)
+    {:noreply, new_state}
   end
 
   @impl true
-  def handle_info(:heartbeat, %{client: _client} = state) do
-    # cond do
-    #   client_state.tcp_pid == nil ->
-    #     DynamicSupervisor.terminate_child(Teiserver.ClientSupervisor, self())
-
-    #   Process.alive?(client_state.tcp_pid) == false ->
-    #     DynamicSupervisor.terminate_child(Teiserver.ClientSupervisor, self())
-
-    #   true ->
-    #     :ok
-    # end
-
+  def handle_info(:heartbeat, state) do
     {:noreply, state}
   end
 
+  def handle_info({:DOWN, _ref, :process, pid, _normal}, state) do
+    new_connections = if Enum.member?(state.connections, pid) do
+      List.delete(state.connections, pid)
+    else
+      Logger.error("#{__MODULE__} got :DOWN message but did not have it as a connection")
+      state.connections
+    end
+
+    if Enum.empty?(new_connections) do
+      new_client = %{state.client | connected?: false}
+
+      {:noreply, %State{state | connections: new_connections, client: new_client}}
+    else
+      {:noreply, %State{state | connections: new_connections}}
+    end
+  end
+
+  @doc false
   @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts[:data], [])
   end
 
+  @spec update_client(State.t(), Client.t()) :: State.t()
+  defp update_client(%State{} = state, %Client{} = new_client) do
+    new_update_id = state.update_id
+
+    Teiserver.broadcast(
+      "Teiserver.ClientServer:#{state.user_id}",
+      %{
+        event: :client_updated,
+        update_id: new_update_id,
+        client: new_client
+      }
+    )
+
+    %{state | client: new_client, update_id: new_update_id}
+  end
+
   @impl true
   @spec init(map) :: {:ok, map}
-  def init(%{client: %{id: id}} = state) do
+  def init(%{client: %Client{id: id} = client}) do
     # Logger.metadata(request_id: "ClientServer##{id}")
     :timer.send_interval(6_000, :heartbeat)
 
@@ -83,9 +93,11 @@ defmodule Teiserver.Account.ClientServer do
       id
     )
 
-    {:ok,
-     Map.merge(state, %{
-       user_id: id
-     })}
+    {:ok, %State{
+      client: client,
+      connections: [],
+      user_id: id,
+      update_id: 0
+    }}
   end
 end

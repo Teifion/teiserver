@@ -1,22 +1,33 @@
 # Roadmap
 
 ## v0.1 plan
-I want potential users to see the library and understand why they might want to use it and be able to use it.
+I want potential users to see the library and understand why they might want to use it and be able to use it. Broadly speaking this will involve basic user and lobby functionality.
 
+## v1.0 planned features
 - Accounts
   - Users
   - User settings
-
-- Connections
-  - Clients (connect, disconnect, update)
 
 - Communication
   - Chat rooms
   - Direct messages
 
-- Lobbies
+- Community
+  - Player relationships (friend and avoid)
+
+- Connections
+  - Clients (connect, disconnect, update)
+
+- Lobby
   - Opening/Closing
   - Joining/Leaving
+
+- Logging
+  - Daily numbers
+  - Aggregated numbers for weeks, months, quarters and years
+
+- Moderation
+  - Ability to apply restrictions
 
 - Settings
   - Site settings

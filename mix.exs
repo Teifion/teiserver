@@ -56,6 +56,9 @@ defmodule Teiserver.MixProject do
       "documentation/development/features.md",
       "documentation/development/roadmap.md",
 
+      # PubSubs
+      "documentation/pubsubs/client.md",
+
       "CHANGELOG.md": [title: "Changelog"]
     ]
   end
@@ -63,6 +66,7 @@ defmodule Teiserver.MixProject do
   defp groups_for_extras do
     [
       Guides: ~r{documentation/guides/[^\/]+\.md},
+      PubSubs: ~r{documentation/pubsubs/[^\/]+\.md},
       Development: ~r{documentation/development/[^\/]+\.md}
     ]
   end

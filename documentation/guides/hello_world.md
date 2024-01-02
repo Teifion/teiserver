@@ -172,7 +172,7 @@ defmodule HelloWorldServer.TcpIn do
         {state, "Login failed (no user)"}
       user ->
         if Teiserver.Account.verify_user_password(user, password) do
-          Teiserver.Connections.login_user(user)
+          Teiserver.Connections.connect_user(user)
           {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
         else
           {state, "Login failed (bad password)"}
