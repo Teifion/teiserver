@@ -1,7 +1,5 @@
 defmodule Teiserver.Helpers.SchemaHelper do
-  @moduledoc """
-  A set of functions for helping with schema files
-  """
+  @moduledoc false
 
   @spec trim_strings(map, list | atom) :: map
   def trim_strings(params, fields) do

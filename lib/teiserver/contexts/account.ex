@@ -1,6 +1,6 @@
 defmodule Teiserver.Account do
   @moduledoc """
-  The contextual module for [Users](Teiserver.Account.User), [ExtraUserData](Teiserver.Account.ExtraUserData)
+  The contextual module for `Teiserver.Account.User`, `Teiserver.Account.ExtraUserData`
   """
 
   alias Teiserver.Account.{User, UserLib}

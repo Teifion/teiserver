@@ -1,5 +1,28 @@
 defmodule Teiserver.Account.User do
-  @moduledoc false
+  @moduledoc """
+  # User
+  The database representation of a person using/playing your game; not to be confused with `Teiserver.Connections.Client` which represents their logged in and online state.
+
+  ### Attributes
+
+  * `:name` - The name of the user
+  * `:email` - The email of the user
+  * `:password` - The encrypted password of the user; if you ever want to compare the password please make user of `verify_password/2` (which can be called from `Teiserver.Account`).
+  * `:roles` - A list of the roles possessed by the user, these are used to inform permissions
+  * `:permissions` - A list of the things the user is allowed to do, typically derived from a combination of roles and restrictions
+  * `:behaviour_score` - Numerical score representing the behaviour of the user, a high score means they are better behaved
+  * `:trust_score` - Numerical score representing the trustworthiness and accuracy of their reporting of other users
+  * `:social_score` - Numerical score representing how much the user is liked or disliked by other players in general
+  * `:last_login_at` - DateTime of the last time they logged in when already logged out (so a user who is already logged in will not get this updated if they login with a 2nd application)
+  * `:last_played_at` - DateTime of the last time they played
+  * `:last_logout_at` - DateTime of the last time they logged out
+  * `:restrictions` - A list of the restrictions applied to the user account
+  * `:restricted_until` - DateTime of when the restrictions to the user may need to be revised (e.g. when a moderation action expires)
+  * `:shadow_banned` - Boolean flag for spambots and trolls, when set to true the user should be allowed to see things as if fully logged in and be sent "success" type messages. In reality they are not able to effect change.
+
+  """
+
+
   use TeiserverMacros, :schema
   alias Argon2
 
@@ -32,9 +55,33 @@ defmodule Teiserver.Account.User do
     timestamps()
   end
 
+  @type t :: %__MODULE__{
+    name: String.t(),
+    email: String.t(),
+    password: String.t(),
+    roles: [String.t()],
+    permissions: [String.t()],
+    behaviour_score: integer() | nil,
+    trust_score: integer() | nil,
+    social_score: integer() | nil,
+    last_login_at: DateTime.t() | nil,
+    last_played_at: DateTime.t() | nil,
+    last_logout_at: DateTime.t() | nil,
+    restrictions: [String.t()],
+    restricted_until: DateTime.t() | nil,
+    shadow_banned: boolean(),
+
+    smurf_of_id: integer() | nil,
+    extra_data: map() | nil,
+
+    inserted_at: DateTime.t() | nil,
+    updated_at: DateTime.t() | nil
+  }
+
   @doc false
   def changeset(user), do: changeset(user, %{}, :full)
 
+  @doc false
   def changeset(user, attrs, :full) do
     attrs =
       attrs
@@ -152,6 +199,17 @@ defmodule Teiserver.Account.User do
 
   defp put_password_hash(changeset), do: changeset
 
+  @doc """
+  Provides a secure way to verify a password to prevent timing attacks.
+
+  ## Examples
+
+      iex> verify_password(plaintext, user.password)
+      true
+
+      iex> verify_password("bad_password", user.password)
+      false
+  """
   @spec verify_password(User.t(), String.t()) :: boolean
   def verify_password(plain_text_password, encrypted) do
     Argon2.verify_pass(plain_text_password, encrypted)

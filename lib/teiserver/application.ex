@@ -6,14 +6,27 @@ defmodule Teiserver.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      Teiserver.Registry,
+      # Teiserver.Repo,
+      # Teiserver.Registry,
       {Phoenix.PubSub, name: Teiserver.PubSub},
 
-
-      # Clients and connections
-      {Registry, [keys: :duplicate, members: :auto, name: Teiserver.ConnectionRegistry]},
+      # Clients and connections,
+      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.ClientSupervisor},
       {Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
-      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.ClientSupervisor}
+      # Teiserver.Connections.LoginThrottleServer,
+
+      # Parties
+      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.PartySupervisor},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.PartyRegistry]},
+
+      # Lobbies
+      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
+
+      # Matchmaking
+      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.MMSupervisor},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.MMQueueRegistry]},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.MMMatchRegistry]}
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]

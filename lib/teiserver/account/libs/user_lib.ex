@@ -16,9 +16,8 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec list_users(list) :: list
   def list_users(query_args \\ []) do
-    conf = Teiserver.config()
-    query = UserQueries.query_users(query_args)
-    Repo.all(conf, query)
+    UserQueries.query_users(query_args)
+    |> Teiserver.repo.all
   end
 
   @doc """
@@ -37,9 +36,9 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec get_user!(non_neg_integer()) :: User.t()
   def get_user!(user_id, query_args \\ []) do
-    conf = Teiserver.config()
-    query = UserQueries.query_users(query_args ++ [id: user_id])
-    Repo.one!(conf, query)
+    (query_args ++ [id: user_id])
+    |> UserQueries.query_users()
+    |> Teiserver.repo.one!()
   end
 
   @doc """
@@ -58,23 +57,26 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec get_user(non_neg_integer(), list) :: User.t() | nil
   def get_user(user_id, query_args \\ []) do
-    conf = Teiserver.config()
-    query = UserQueries.query_users(query_args ++ [id: user_id])
-    Repo.one(conf, query)
+    UserQueries.query_users(query_args ++ [id: user_id])
+    |> Teiserver.repo.one()
   end
 
   @spec get_user_by_id(non_neg_integer()) :: User.t() | nil
   def get_user_by_id(user_id) do
-    conf = Teiserver.config()
-    query = UserQueries.query_users(id: user_id, limit: 1)
-    Repo.one(conf, query)
+    UserQueries.query_users(id: user_id, limit: 1)
+    |> Teiserver.repo.one()
   end
 
   @spec get_user_by_name(String.t()) :: User.t() | nil
   def get_user_by_name(name) do
-    conf = Teiserver.config()
-    query = UserQueries.query_users(where: [name_lower: name], limit: 1)
-    Repo.one(conf, query)
+    UserQueries.query_users(where: [name_lower: name], limit: 1)
+    |> Teiserver.repo.one()
+  end
+
+  @spec get_user_by_email(String.t()) :: User.t() | nil
+  def get_user_by_email(email) do
+    UserQueries.query_users(where: [email: email], limit: 1)
+    |> Teiserver.repo.one()
   end
 
   @doc """
@@ -91,9 +93,8 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def create_user(attrs \\ %{}) do
-    conf = Teiserver.config()
-    changeset = User.changeset(%User{}, attrs, :full)
-    Repo.insert(conf, changeset)
+    User.changeset(%User{}, attrs, :full)
+    |> Teiserver.repo.insert()
   end
 
   @doc """
@@ -110,9 +111,8 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec update_user(User.t(), map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def update_user(%User{} = user, attrs) do
-    conf = Teiserver.config()
-    changeset = User.changeset(user, attrs, :full)
-    Repo.update(conf, changeset)
+    User.changeset(user, attrs, :full)
+    |> Teiserver.repo.update()
   end
 
   @doc """
@@ -129,8 +129,7 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def delete_user(%User{} = user) do
-    conf = Teiserver.config()
-    Repo.delete(conf, user)
+    Teiserver.repo.delete(user)
   end
 
   @doc """

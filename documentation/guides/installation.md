@@ -6,7 +6,7 @@ First add to your dependencies in `mix.exs`.
 ```elixir
 def deps do
   [
-    {:teiserver, "~> 0.0.1"}
+    {:teiserver, "~> 0.0.2"}
   ]
 end
 ```
@@ -45,7 +45,7 @@ children = [
 ## Config
 In `config.exs`
 ```elixir
-config :hello_world_server, Teiserver,
-  repo: HelloWorldServer.Repo
+config :teiserver,
+  repo: MyApp.Repo
 ```
 

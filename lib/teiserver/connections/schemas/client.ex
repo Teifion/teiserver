@@ -1,5 +1,6 @@
 defmodule Teiserver.Connections.Client do
   @moduledoc """
+  # Client
   A client represents the logged in instance of a user. Clients are not persisted in the database, instead they are present only in the `Teiserver.Connections.ClientServer` processes.
 
   ### Attributes

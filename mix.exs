@@ -2,17 +2,23 @@ defmodule Teiserver.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/Teifion/teiserver"
-  @version "0.0.1"
+  @version "0.0.2"
 
   def project do
     [
       app: :teiserver,
       version: @version,
       elixir: "~> 1.14",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      # aliases: aliases(),
+      aliases: aliases(),
+      test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
         bench: :test,
         "test.ci": :test,
         "test.reset": :test,
@@ -76,6 +82,7 @@ defmodule Teiserver.MixProject do
       Contexts: [
         Teiserver.Account,
         Teiserver.Communication,
+        Teiserver.Community,
         Teiserver.Connections,
         Teiserver.Game,
         Teiserver.Lobby,
@@ -89,6 +96,9 @@ defmodule Teiserver.MixProject do
       ],
       Communication: [
         ~r"Teiserver.Communication.*"
+      ],
+      Community: [
+        ~r"Teiserver.Community.*"
       ],
       Connections: [
         ~r"Teiserver.Connections.*"
@@ -117,7 +127,7 @@ defmodule Teiserver.MixProject do
       Internals: [
         Teiserver.Config,
         Teiserver.Migration,
-        Teiserver.Registry,
+        # Teiserver.Registry,
         Teiserver.Repo,
         TeiserverMacros
       ]
@@ -181,6 +191,9 @@ defmodule Teiserver.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_env), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -221,25 +234,26 @@ defmodule Teiserver.MixProject do
     ]
   end
 
-  # Oban has these and seems to do a really nice job so we're going to use them too
-  # defp aliases do
-  #   [
-  #     bench: "run bench/bench_helper.exs",
-  #     release: [
-  #       "cmd git tag v#{@version}",
-  #       "cmd git push",
-  #       "cmd git push --tags",
-  #       "hex.publish --yes"
-  #     ],
-  #     "test.reset": ["ecto.drop --quiet", "test.setup"],
-  #     "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
-  #     "test.ci": [
-  #       "format --check-formatted",
-  #       "deps.unlock --check-unused",
-  #       "credo --strict",
-  #       "test --raise",
-  #       "dialyzer"
-  #     ]
-  #   ]
-  # end
+  defp aliases do
+    [
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      # Oban has these and seems to do a really nice job so we're going to use them too
+      # bench: "run bench/bench_helper.exs",
+      # release: [
+      #   "cmd git tag v#{@version}",
+      #   "cmd git push",
+      #   "cmd git push --tags",
+      #   "hex.publish --yes"
+      # ],
+      # "test.reset": ["ecto.drop --quiet", "test.setup"],
+      # "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
+      # "test.ci": [
+      #   "format --check-formatted",
+      #   "deps.unlock --check-unused",
+      #   "credo --strict",
+      #   "test --raise",
+      #   "dialyzer"
+      # ]
+    ]
+  end
 end

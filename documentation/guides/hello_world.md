@@ -70,7 +70,7 @@ config :hello_world_server, HelloWorldServer.Repo,
   password: "postgres",
   hostname: "localhost"
 
-config :hello_world_server, Teiserver,
+config :teiserver,
   repo: HelloWorldServer.Repo
 ```
 
@@ -174,7 +174,7 @@ defmodule HelloWorldServer.TcpIn do
         {state, "Login failed (no user)"}
       user ->
         if Teiserver.Account.verify_user_password(user, password) do
-          Teiserver.Connections.connect_user(user)
+          Teiserver.Connections.connect_user(user.id)
           {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
         else
           {state, "Login failed (bad password)"}
@@ -219,7 +219,7 @@ defmodule HelloWorldServer.TcpIn do
     end
   end
 
-  def data_in("users" <> _data, %{user_id: user_id} = state) do
+  def data_in("users" <> _data, state) do
     names = Teiserver.Account.list_users(select: [:name])
     |> Enum.map(fn %{name: name} -> name end)
     |> Enum.join(", ")
@@ -227,7 +227,7 @@ defmodule HelloWorldServer.TcpIn do
     {state, "User names: #{names}"}
   end
 
-  def data_in("clients" <> _data, %{user_id: user_id} = state) do
+  def data_in("clients" <> _data, state) do
     client_ids = Teiserver.Connections.list_client_ids()
 
     names = Teiserver.Account.list_users(where: [id_in: client_ids], select: [:name])
@@ -253,9 +253,16 @@ end
 Get deps
 We now need to run our application.
 ```bash
-mix run --no-halt
+iex -S mix run --no-halt
 ```
 
+This will open up a REPL into the application and we can run queries manually if we want to such as:
+```elixir
+Teisever.Account.list_users()
+Teisever.Account.list_clients()
+```
+
+### Telnet
 In another terminal we can then do:
 ```bash
 telnet localhost 8200

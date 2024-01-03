@@ -16,9 +16,9 @@ defmodule Teiserver.Settings.UserSettingLib do
   """
   @spec list_user_settings(list) :: list
   def list_user_settings(query_args \\ []) do
-    conf = Teiserver.config()
-    query = UserSettingQueries.query_user_settings(query_args)
-    Repo.all(conf, query)
+    query_args
+    |> UserSettingQueries.query_user_settings()
+    |> Teiserver.repo.all()
   end
 
   @doc """
@@ -37,9 +37,9 @@ defmodule Teiserver.Settings.UserSettingLib do
   """
   @spec get_user_setting!(non_neg_integer()) :: UserSetting.t()
   def get_user_setting!(user_setting_id, query_args \\ []) do
-    conf = Teiserver.config()
-    query = UserSettingQueries.query_user_settings(query_args ++ [id: user_setting_id])
-    Repo.one!(conf, query)
+    (query_args ++ [id: user_setting_id])
+    |> UserSettingQueries.query_user_settings()
+    |> Teiserver.repo.one!()
   end
 
   @doc """
@@ -58,9 +58,9 @@ defmodule Teiserver.Settings.UserSettingLib do
   """
   @spec get_user_setting(non_neg_integer(), list) :: UserSetting.t() | nil
   def get_user_setting(user_setting_id, query_args \\ []) do
-    conf = Teiserver.config()
-    query = UserSettingQueries.query_user_settings(query_args ++ [id: user_setting_id])
-    Repo.one(conf, query)
+    (query_args ++ [id: user_setting_id])
+    |> UserSettingQueries.query_user_settings()
+    |> Teiserver.repo.one()
   end
 
   @doc """
@@ -77,9 +77,9 @@ defmodule Teiserver.Settings.UserSettingLib do
   """
   @spec create_user_setting(map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def create_user_setting(attrs \\ %{}) do
-    conf = Teiserver.config()
-    changeset = UserSetting.changeset(%UserSetting{}, attrs)
-    Repo.insert(conf, changeset)
+    %UserSetting{}
+    |> UserSetting.changeset(attrs)
+    |> Teiserver.repo.insert()
   end
 
   @doc """
@@ -97,9 +97,9 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec update_user_setting(UserSetting.t(), map) ::
           {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def update_user_setting(%UserSetting{} = user_setting, attrs) do
-    conf = Teiserver.config()
-    changeset = UserSetting.changeset(user_setting, attrs)
-    Repo.update(conf, changeset)
+    user_setting
+    |> UserSetting.changeset(attrs)
+    |> Teiserver.repo.update()
   end
 
   @doc """
@@ -117,8 +117,7 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec delete_user_setting(UserSetting.t()) ::
           {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def delete_user_setting(%UserSetting{} = user_setting) do
-    conf = Teiserver.config()
-    Repo.delete(conf, user_setting)
+    Teiserver.repo.delete(user_setting)
   end
 
   @doc """
