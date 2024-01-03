@@ -18,6 +18,14 @@ defmodule Teiserver.Settings.ServerSetting do
     timestamps()
   end
 
+  @type t :: %__MODULE__{
+    key: String.t(),
+    value: String.t(),
+
+    inserted_at: DateTime.t() | nil,
+    updated_at: DateTime.t() | nil
+  }
+
   @doc false
   def changeset(server_setting, attrs \\ %{}) do
     server_setting

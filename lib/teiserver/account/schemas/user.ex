@@ -56,6 +56,7 @@ defmodule Teiserver.Account.User do
   end
 
   @type t :: %__MODULE__{
+    id: non_neg_integer(),
     name: String.t(),
     email: String.t(),
     password: String.t(),
