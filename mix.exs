@@ -141,7 +141,7 @@ defmodule Teiserver.MixProject do
       "Extra user data": &(&1[:section] == :extra_user_data),
 
       # Settings
-      "Site settings": &(&1[:section] == :site_setting),
+      "Site settings": &(&1[:section] == :server_setting),
       "User settings": &(&1[:section] == :user_setting)
     ]
   end

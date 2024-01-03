@@ -47,7 +47,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     end
 
     # Config
-    create_if_not_exists table(:settings_site, primary_key: false, prefix: prefix) do
+    create_if_not_exists table(:settings_server, primary_key: false, prefix: prefix) do
       add(:key, :string, primary_key: true)
       add(:value, :string)
 
@@ -73,7 +73,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     drop_if_exists(table(:account_extra_user_data, prefix: prefix))
 
     # Config
-    drop_if_exists(table(:settings_site, prefix: prefix))
+    drop_if_exists(table(:settings_server, prefix: prefix))
     drop_if_exists(table(:settings_user, prefix: prefix))
   end
 end

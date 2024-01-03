@@ -1,12 +1,12 @@
-defmodule Teiserver.Settings.SiteSettingQueries do
+defmodule Teiserver.Settings.ServerSettingQueries do
   @moduledoc false
   use TeiserverMacros, :queries
-  alias Teiserver.Settings.SiteSetting
+  alias Teiserver.Settings.ServerSetting
   require Logger
 
-  @spec query_site_settings(list) :: Ecto.Query.t()
-  def query_site_settings(args) do
-    query = from(site_settings in SiteSetting)
+  @spec query_server_settings(list) :: Ecto.Query.t()
+  def query_server_settings(args) do
+    query = from(server_settings in ServerSetting)
 
     query
     |> do_where(id: args[:id])
@@ -34,32 +34,32 @@ defmodule Teiserver.Settings.SiteSettingQueries do
   def _where(query, _, "Any"), do: query
 
   def _where(query, :id, id) do
-    from(site_settings in query,
-      where: site_settings.id == ^id
+    from(server_settings in query,
+      where: server_settings.id == ^id
     )
   end
 
   def _where(query, :id_in, id_list) do
-    from(site_settings in query,
-      where: site_settings.id in ^id_list
+    from(server_settings in query,
+      where: server_settings.id in ^id_list
     )
   end
 
   def _where(query, :name, name) do
-    from(site_settings in query,
-      where: site_settings.name == ^name
+    from(server_settings in query,
+      where: server_settings.name == ^name
     )
   end
 
   def _where(query, :inserted_after, timestamp) do
-    from(site_settings in query,
-      where: site_settings.inserted_at >= ^timestamp
+    from(server_settings in query,
+      where: server_settings.inserted_at >= ^timestamp
     )
   end
 
   def _where(query, :inserted_before, timestamp) do
-    from(site_settings in query,
-      where: site_settings.inserted_at < ^timestamp
+    from(server_settings in query,
+      where: server_settings.inserted_at < ^timestamp
     )
   end
 
@@ -75,26 +75,26 @@ defmodule Teiserver.Settings.SiteSettingQueries do
   end
 
   def _order_by(query, "Name (A-Z)") do
-    from(site_settings in query,
-      order_by: [asc: site_settings.name]
+    from(server_settings in query,
+      order_by: [asc: server_settings.name]
     )
   end
 
   def _order_by(query, "Name (Z-A)") do
-    from(site_settings in query,
-      order_by: [desc: site_settings.name]
+    from(server_settings in query,
+      order_by: [desc: server_settings.name]
     )
   end
 
   def _order_by(query, "Newest first") do
-    from(site_settings in query,
-      order_by: [desc: site_settings.inserted_at]
+    from(server_settings in query,
+      order_by: [desc: server_settings.inserted_at]
     )
   end
 
   def _order_by(query, "Oldest first") do
-    from(site_settings in query,
-      order_by: [asc: site_settings.inserted_at]
+    from(server_settings in query,
+      order_by: [asc: server_settings.inserted_at]
     )
   end
 
@@ -111,8 +111,8 @@ defmodule Teiserver.Settings.SiteSettingQueries do
   # end
 
   # def _preload(query, :relation) do
-  #   from site_setting in query,
-  #     left_join: relations in assoc(site_setting, :relation),
+  #   from server_setting in query,
+  #     left_join: relations in assoc(server_setting, :relation),
   #     preload: [relation: relations]
   # end
 end

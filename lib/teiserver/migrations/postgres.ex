@@ -83,7 +83,7 @@ defmodule Teiserver.Migrations.Postgres do
   defp record_version(_opts, 0), do: :ok
 
   defp record_version(%{prefix: prefix}, version) do
-    execute("COMMENT ON TABLE #{inspect(prefix)}.settings_site IS '#{version}'")
+    execute("COMMENT ON TABLE #{inspect(prefix)}.settings_server IS '#{version}'")
   end
 
   defp with_defaults(opts, version) do

@@ -1,9 +1,17 @@
-defmodule Teiserver.Settings.SiteSetting do
-  @moduledoc false
+defmodule Teiserver.Settings.ServerSetting do
+  @moduledoc """
+  # Site setting
+  A key/value storage of settings used as part of the server.
+
+  ### Attributes
+
+  * `:key` - The key of the setting
+  * `:email` - The value of the setting
+  """
   use TeiserverMacros, :schema
 
   @primary_key false
-  schema "settings_site" do
+  schema "settings_server" do
     field(:key, :string, primary_key: true)
     field(:value, :string)
 
@@ -11,8 +19,8 @@ defmodule Teiserver.Settings.SiteSetting do
   end
 
   @doc false
-  def changeset(site_setting, attrs \\ %{}) do
-    site_setting
+  def changeset(server_setting, attrs \\ %{}) do
+    server_setting
     |> cast(attrs, ~w(key value)a)
     |> validate_required(~w(key value)a)
   end

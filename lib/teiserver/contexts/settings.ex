@@ -1,41 +1,41 @@
 defmodule Teiserver.Settings do
   @moduledoc """
-  The contextual module for [SiteSetting](Teiserver.Settings.SiteSetting), [UserSetting](Teiserver.Settings.UserSetting)
+  The contextual module for `Teiserver.Settings.ServerSetting`, `Teiserver.Settings.UserSetting`
   """
 
-  alias Teiserver.Settings.{SiteSetting, SiteSettingLib}
+  alias Teiserver.Settings.{ServerSetting, ServerSettingLib}
 
-  @doc section: :site_setting
-  @spec list_site_settings() :: [SiteSetting.t()]
-  defdelegate list_site_settings(), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec list_server_settings() :: [ServerSetting.t()]
+  defdelegate list_server_settings(), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec list_site_settings(list) :: [SiteSetting.t()]
-  defdelegate list_site_settings(args), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec list_server_settings(list) :: [ServerSetting.t()]
+  defdelegate list_server_settings(args), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec get_site_setting!(non_neg_integer(), list) :: SiteSetting.t()
-  defdelegate get_site_setting!(site_setting_id, query_args \\ []), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec get_server_setting!(non_neg_integer(), list) :: ServerSetting.t()
+  defdelegate get_server_setting!(server_setting_id, query_args \\ []), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec get_site_setting(non_neg_integer(), list) :: SiteSetting.t() | nil
-  defdelegate get_site_setting(site_setting_id, query_args \\ []), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec get_server_setting(non_neg_integer(), list) :: ServerSetting.t() | nil
+  defdelegate get_server_setting(server_setting_id, query_args \\ []), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec create_site_setting(map) :: {:ok, SiteSetting.t()} | {:error, Ecto.Changeset}
-  defdelegate create_site_setting(attrs \\ %{}), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec create_server_setting(map) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset}
+  defdelegate create_server_setting(attrs \\ %{}), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec update_site_setting(SiteSetting, map) :: {:ok, SiteSetting.t()} | {:error, Ecto.Changeset}
-  defdelegate update_site_setting(site_setting, attrs), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec update_server_setting(ServerSetting, map) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset}
+  defdelegate update_server_setting(server_setting, attrs), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec delete_site_setting(SiteSetting.t()) :: {:ok, SiteSetting.t()} | {:error, Ecto.Changeset}
-  defdelegate delete_site_setting(site_setting), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec delete_server_setting(ServerSetting.t()) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset}
+  defdelegate delete_server_setting(server_setting), to: ServerSettingLib
 
-  @doc section: :site_setting
-  @spec change_site_setting(SiteSetting.t(), map) :: Ecto.Changeset
-  defdelegate change_site_setting(site_setting, attrs \\ %{}), to: SiteSettingLib
+  @doc section: :server_setting
+  @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset
+  defdelegate change_server_setting(server_setting, attrs \\ %{}), to: ServerSettingLib
 
   alias Teiserver.Settings.{UserSetting, UserSettingLib}
 

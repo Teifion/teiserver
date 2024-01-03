@@ -1,136 +1,136 @@
-defmodule Teiserver.Settings.SiteSettingLib do
+defmodule Teiserver.Settings.ServerSettingLib do
   @moduledoc """
-  Library of site_setting related functions.
+  Library of server_setting related functions.
   """
   use TeiserverMacros, :library
-  alias Teiserver.Settings.{SiteSetting, SiteSettingQueries}
+  alias Teiserver.Settings.{ServerSetting, ServerSettingQueries}
 
   @doc """
-  Returns the list of site_settings.
+  Returns the list of server_settings.
 
   ## Examples
 
-      iex> list_site_settings()
-      [%SiteSetting{}, ...]
+      iex> list_server_settings()
+      [%ServerSetting{}, ...]
 
   """
-  @spec list_site_settings(list) :: list
-  def list_site_settings(query_args \\ []) do
+  @spec list_server_settings(list) :: list
+  def list_server_settings(query_args \\ []) do
     query_args
-    |> SiteSettingQueries.query_site_settings()
+    |> ServerSettingQueries.query_server_settings()
     |> Teiserver.repo.all()
   end
 
   @doc """
-  Gets a single site_setting.
+  Gets a single server_setting.
 
-  Raises `Ecto.NoResultsError` if the SiteSetting does not exist.
+  Raises `Ecto.NoResultsError` if the ServerSetting does not exist.
 
   ## Examples
 
-      iex> get_site_setting!(123)
-      %SiteSetting{}
+      iex> get_server_setting!(123)
+      %ServerSetting{}
 
-      iex> get_site_setting!(456)
+      iex> get_server_setting!(456)
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_site_setting!(non_neg_integer()) :: SiteSetting.t()
-  def get_site_setting!(site_setting_id, query_args \\ []) do
-    (query_args ++ [id: site_setting_id])
-    |> SiteSettingQueries.query_site_settings()
+  @spec get_server_setting!(non_neg_integer()) :: ServerSetting.t()
+  def get_server_setting!(server_setting_id, query_args \\ []) do
+    (query_args ++ [id: server_setting_id])
+    |> ServerSettingQueries.query_server_settings()
     |> Teiserver.repo.one!()
   end
 
   @doc """
-  Gets a single site_setting.
+  Gets a single server_setting.
 
-  Returns nil if the SiteSetting does not exist.
+  Returns nil if the ServerSetting does not exist.
 
   ## Examples
 
-      iex> get_site_setting(123)
-      %SiteSetting{}
+      iex> get_server_setting(123)
+      %ServerSetting{}
 
-      iex> get_site_setting(456)
+      iex> get_server_setting(456)
       nil
 
   """
-  @spec get_site_setting(non_neg_integer(), list) :: SiteSetting.t() | nil
-  def get_site_setting(site_setting_id, query_args \\ []) do
-    (query_args ++ [id: site_setting_id])
-    |> SiteSettingQueries.query_site_settings()
+  @spec get_server_setting(non_neg_integer(), list) :: ServerSetting.t() | nil
+  def get_server_setting(server_setting_id, query_args \\ []) do
+    (query_args ++ [id: server_setting_id])
+    |> ServerSettingQueries.query_server_settings()
     |> Teiserver.repo.one()
   end
 
   @doc """
-  Creates a site_setting.
+  Creates a server_setting.
 
   ## Examples
 
-      iex> create_site_setting(%{field: value})
-      {:ok, %SiteSetting{}}
+      iex> create_server_setting(%{field: value})
+      {:ok, %ServerSetting{}}
 
-      iex> create_site_setting(%{field: bad_value})
+      iex> create_server_setting(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_site_setting(map) :: {:ok, SiteSetting.t()} | {:error, Ecto.Changeset.t()}
-  def create_site_setting(attrs \\ %{}) do
-    %SiteSetting{}
-    |> SiteSetting.changeset(attrs)
+  @spec create_server_setting(map) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
+  def create_server_setting(attrs \\ %{}) do
+    %ServerSetting{}
+    |> ServerSetting.changeset(attrs)
     |> Teiserver.repo.insert()
   end
 
   @doc """
-  Updates a site_setting.
+  Updates a server_setting.
 
   ## Examples
 
-      iex> update_site_setting(site_setting, %{field: new_value})
-      {:ok, %SiteSetting{}}
+      iex> update_server_setting(server_setting, %{field: new_value})
+      {:ok, %ServerSetting{}}
 
-      iex> update_site_setting(site_setting, %{field: bad_value})
+      iex> update_server_setting(server_setting, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_site_setting(SiteSetting.t(), map) ::
-          {:ok, SiteSetting.t()} | {:error, Ecto.Changeset.t()}
-  def update_site_setting(%SiteSetting{} = site_setting, attrs) do
-    site_setting
-    |> SiteSetting.changeset(attrs)
+  @spec update_server_setting(ServerSetting.t(), map) ::
+          {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
+  def update_server_setting(%ServerSetting{} = server_setting, attrs) do
+    server_setting
+    |> ServerSetting.changeset(attrs)
     |> Teiserver.repo.update()
   end
 
   @doc """
-  Deletes a site_setting.
+  Deletes a server_setting.
 
   ## Examples
 
-      iex> delete_site_setting(site_setting)
-      {:ok, %SiteSetting{}}
+      iex> delete_server_setting(server_setting)
+      {:ok, %ServerSetting{}}
 
-      iex> delete_site_setting(site_setting)
+      iex> delete_server_setting(server_setting)
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_site_setting(SiteSetting.t()) ::
-          {:ok, SiteSetting.t()} | {:error, Ecto.Changeset.t()}
-  def delete_site_setting(%SiteSetting{} = site_setting) do
-    Teiserver.repo.delete(site_setting)
+  @spec delete_server_setting(ServerSetting.t()) ::
+          {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
+  def delete_server_setting(%ServerSetting{} = server_setting) do
+    Teiserver.repo.delete(server_setting)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking site_setting changes.
+  Returns an `%Ecto.Changeset{}` for tracking server_setting changes.
 
   ## Examples
 
-      iex> change_site_setting(site_setting)
-      %Ecto.Changeset{data: %SiteSetting{}}
+      iex> change_server_setting(server_setting)
+      %Ecto.Changeset{data: %ServerSetting{}}
 
   """
-  @spec change_site_setting(SiteSetting.t(), map) :: Ecto.Changeset
-  def change_site_setting(%SiteSetting{} = site_setting, attrs \\ %{}) do
-    SiteSetting.changeset(site_setting, attrs)
+  @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset
+  def change_server_setting(%ServerSetting{} = server_setting, attrs \\ %{}) do
+    ServerSetting.changeset(server_setting, attrs)
   end
 end
