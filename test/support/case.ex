@@ -4,7 +4,7 @@ defmodule Teiserver.Case do
   use ExUnit.CaseTemplate
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Teiserver.Test.{Repo, UnboxedRepo}
+  alias Teiserver.Test.Repo
 
   using do
     quote do
@@ -14,7 +14,7 @@ defmodule Teiserver.Case do
       import Teiserver.Case
 
       alias Teiserver.Config
-      alias Teiserver.Test.{Repo, UnboxedRepo}
+      alias Teiserver.Test.Repo
     end
   end
 

@@ -30,10 +30,14 @@ defmodule Teiserver.AccountTest do
     test "list_users/0 returns users" do
       # No users yet
       assert Account.list_users() == []
+      assert Account.list_users([]) == []
 
       # Add a user
       AccountFixtures.user_fixture()
       assert Account.list_users() != []
+
+      # Add a user
+      assert Account.list_users([]) != []
     end
 
     test "get_user!/1 returns the user with given id" do
