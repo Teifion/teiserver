@@ -15,6 +15,7 @@ defmodule Teiserver.Case do
 
       alias Teiserver.Config
       alias Teiserver.Test.Repo
+      alias Teiserver.TestSupport.TestConn
     end
   end
 

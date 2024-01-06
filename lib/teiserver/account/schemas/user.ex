@@ -75,8 +75,8 @@ defmodule Teiserver.Account.User do
     smurf_of_id: integer() | nil,
     extra_data: map() | nil,
 
-    inserted_at: DateTime.t() | nil,
-    updated_at: DateTime.t() | nil
+    inserted_at: DateTime.t(),
+    updated_at: DateTime.t()
   }
 
   @doc false

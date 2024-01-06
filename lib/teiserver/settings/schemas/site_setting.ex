@@ -22,8 +22,8 @@ defmodule Teiserver.Settings.ServerSetting do
     key: String.t(),
     value: String.t(),
 
-    inserted_at: DateTime.t() | nil,
-    updated_at: DateTime.t() | nil
+    inserted_at: DateTime.t(),
+    updated_at: DateTime.t()
   }
 
   @doc false

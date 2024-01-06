@@ -1,5 +1,26 @@
-# Teiserver
-A middleware server library.
+<p align="center">
+  Elixir middleware server designed for running games.<br />
+  Focused on facilitating connectivity, the library is engine and game agnostic.
+</p>
+
+<p align="center">
+  <a href="https://hex.pm/packages/teiserver">
+    <img alt="Hex Version" src="https://img.shields.io/hexpm/v/teiserver.svg">
+  </a>
+
+  <a href="https://hexdocs.pm/teiserver">
+    <img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat">
+  </a>
+
+  <a href="https://opensource.org/licenses/Apache-2.0">
+    <img alt="Apache 2 License" src="https://img.shields.io/hexpm/l/teiserver">
+  </a>
+</p>
+
+_Note: This README is for the unreleased main branch, please reference the
+[official documentation on hexdocs][hexdoc] for the latest stable release._
+
+[hexdoc]: https://hexdocs.pm/teiserver/Teiserver.html
 
 ## Installation
 First add to your dependencies in `mix.exs`.

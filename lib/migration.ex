@@ -1,7 +1,6 @@
 defmodule Teiserver.Migrations do
   @moduledoc false
   # Credit to the Oban library for their superb migration code
-  # Copied and tweaked from Oban.
 
   defdelegate up(opts \\ []), to: Teiserver.Migration
   defdelegate down(opts \\ []), to: Teiserver.Migration

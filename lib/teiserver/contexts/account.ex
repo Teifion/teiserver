@@ -30,6 +30,10 @@ defmodule Teiserver.Account do
   defdelegate get_user_by_name(name), to: UserLib
 
   @doc section: :user
+  @spec get_user_by_email(String.t()) :: User.t() | nil
+  defdelegate get_user_by_email(email), to: UserLib
+
+  @doc section: :user
   @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset}
   defdelegate create_user(attrs \\ %{}), to: UserLib
 

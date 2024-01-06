@@ -10,8 +10,7 @@ defmodule Teiserver.AccountFixtures do
       %{
         name: data["name"] || "name_#{r}",
         email: data["email"] || "email_#{r}",
-        colour: data["colour"] || "colour",
-        icon: data["icon"] || "icon"
+        password: data["password"] || "password_#{r}",
       },
       :full
     )
