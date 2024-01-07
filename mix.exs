@@ -237,15 +237,15 @@ defmodule Teiserver.MixProject do
 
   defp aliases do
     [
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       # Oban has these and seems to do a really nice job so we're going to use them too
       # bench: "run bench/bench_helper.exs",
-      # release: [
-      #   "cmd git tag v#{@version}",
-      #   "cmd git push",
-      #   "cmd git push --tags",
-      #   "hex.publish --yes"
-      # ],
+      release: [
+        "cmd git tag v#{@version}",
+        "cmd git push",
+        "cmd git push --tags",
+        "hex.publish --yes"
+      ]
       # "test.reset": ["ecto.drop --quiet", "test.setup"],
       # "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
       # "test.ci": [
