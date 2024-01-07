@@ -19,12 +19,11 @@ defmodule Teiserver.Settings.ServerSetting do
   end
 
   @type t :: %__MODULE__{
-    key: String.t(),
-    value: String.t(),
-
-    inserted_at: DateTime.t(),
-    updated_at: DateTime.t()
-  }
+          key: String.t(),
+          value: String.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
 
   @doc false
   def changeset(server_setting, attrs \\ %{}) do

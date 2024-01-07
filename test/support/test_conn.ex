@@ -36,12 +36,12 @@ defmodule Teiserver.TestSupport.TestConn do
     GenServer.call(pid, :get)
   end
 
-  @spec subscribe(pid, String.t | [String.t]) :: :ok
+  @spec subscribe(pid, String.t() | [String.t()]) :: :ok
   def subscribe(pid, items) do
     GenServer.cast(pid, {:subscribe, items})
   end
 
-  @spec unsubscribe(pid, String.t | [String.t]) :: :ok
+  @spec unsubscribe(pid, String.t() | [String.t()]) :: :ok
   def unsubscribe(pid, items) do
     GenServer.cast(pid, {:unsubscribe, items})
   end

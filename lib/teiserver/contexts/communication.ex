@@ -3,4 +3,8 @@ defmodule Teiserver.Communication do
   The contextual module for `Teiserver.Communication.ChatMessage`, `Teiserver.Communication.DirectMessage`
   """
 
+  # Room chat
+  # Lobby chat
+  # Party chat
+  # Direct messages
 end

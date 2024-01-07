@@ -52,4 +52,11 @@ defmodule Teiserver.Account do
   @doc section: :user
   @spec verify_user_password(User.t(), String.t()) :: boolean
   defdelegate verify_user_password(user, plaintext_password), to: UserLib
+
+  # Relationships
+  # Friends
+  # FriendRequests
+
+  # AchievementTypes
+  # Achievements
 end

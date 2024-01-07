@@ -3,4 +3,14 @@ defmodule Teiserver.Community do
   The contextual module for....
   """
 
+  # Parties
+  # Clans
+  # Clan memberships
+  # Clan invites
+
+  # Accolade Types
+  # Accolades
+
+  # News/Microblog?
+  # Feature requests?
 end

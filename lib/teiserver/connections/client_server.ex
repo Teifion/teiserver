@@ -42,12 +42,13 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _normal}, state) do
-    new_connections = if Enum.member?(state.connections, pid) do
-      List.delete(state.connections, pid)
-    else
-      Logger.error("#{__MODULE__} got :DOWN message but did not have it as a connection")
-      state.connections
-    end
+    new_connections =
+      if Enum.member?(state.connections, pid) do
+        List.delete(state.connections, pid)
+      else
+        Logger.error("#{__MODULE__} got :DOWN message but did not have it as a connection")
+        state.connections
+      end
 
     if Enum.empty?(new_connections) do
       new_client = %{state.client | connected?: false}
@@ -98,11 +99,12 @@ defmodule Teiserver.Connections.ClientServer do
       id
     )
 
-    {:ok, %State{
-      client: client,
-      connections: [],
-      user_id: id,
-      update_id: 0
-    }}
+    {:ok,
+     %State{
+       client: client,
+       connections: [],
+       user_id: id,
+       update_id: 0
+     }}
   end
 end

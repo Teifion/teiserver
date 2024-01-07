@@ -3,4 +3,11 @@ defmodule Teiserver.Moderation do
   The contextual module for `Teiserver.Moderation.Report`, `Teiserver.Moderation.Action`, `Teiserver.Moderation.Ban`
   """
 
+  # Report
+  # ReportGroup
+  # ReportResponse
+  # Action
+  # Ban
+  # Appeal
+  # Appeal response
 end

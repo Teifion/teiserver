@@ -11,7 +11,9 @@ config :teiserver, Teiserver.Test.Repo,
   name: Teiserver.Test.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   priv: "test/support/postgres",
-  url: System.get_env("DATABASE_URL") || "postgres://teiserver_test:123456789@localhost/teiserver_test"
+  url:
+    System.get_env("DATABASE_URL") ||
+      "postgres://teiserver_test:123456789@localhost/teiserver_test"
 
 config :teiserver,
   ecto_repos: [Teiserver.Test.Repo]

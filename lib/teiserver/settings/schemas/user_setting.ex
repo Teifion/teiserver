@@ -20,15 +20,13 @@ defmodule Teiserver.Settings.UserSetting do
   end
 
   @type t :: %__MODULE__{
-    id: non_neg_integer(),
-    user_id: Teiserver.user_id(),
-    key: String.t(),
-    value: String.t(),
-
-    inserted_at: DateTime.t(),
-    updated_at: DateTime.t()
-  }
-
+          id: non_neg_integer(),
+          user_id: Teiserver.user_id(),
+          key: String.t(),
+          value: String.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
 
   @doc false
   def changeset(server_setting, attrs \\ %{}) do

@@ -10,10 +10,10 @@ defmodule Teiserver.AccountFixtures do
       %{
         name: data["name"] || "name_#{r}",
         email: data["email"] || "email_#{r}",
-        password: data["password"] || "password_#{r}",
+        password: data["password"] || "password_#{r}"
       },
       :full
     )
-    |> Teiserver.repo.insert!
+    |> Teiserver.repo().insert!
   end
 end

@@ -1,14 +1,12 @@
 defmodule Teiserver do
   alias Teiserver.Helpers.PubSubHelper
 
-  @type name :: term()
-
   @type user_id :: non_neg_integer()
   @type lobby_id :: non_neg_integer()
   @type party_id :: non_neg_integer()
 
   @moduledoc """
-  Teiserver is a game middleware server library. Its role is to handle the common and game-agnostic issues (chat, searching for games, match history) while allowing you to implement the game-specific items you care about. Teiserver has generic handlers for users, lobbies, chat and more.
+  Teiserver is a middleware server library; designed for usage with games. Its role is to handle the common and game-agnostic issues (chat, searching for games, match history) while allowing you to implement the game-specific items you care about. Teiserver has generic handling for users, lobbies, chat and more.
 
   In a peer-to-peer setting each client will communicate to each other client as and when they need to. With a middleware server every client communicates via the middleware server and the server acts as a single source of truth.
 
@@ -24,6 +22,8 @@ defmodule Teiserver do
     Bot1 <--> srv;
     Bot2 <--> srv;
   ```
+
+  To use Teiserver you write an endpoint which your game connects to over a network. The endpoint handles the messages from client apps and makes calls to Teiserver; acting as wrapper around the Teiserver API.
 
   ## Main guides:
   - [Installation](guides/installation.md)
@@ -55,7 +55,7 @@ defmodule Teiserver do
     Application.get_env(:teiserver, :repo)
   end
 
-  # PubSub delegations
+  # PubSub delegation
   @doc false
   @spec broadcast(String.t(), map()) :: :ok
   defdelegate broadcast(channel, message), to: PubSubHelper

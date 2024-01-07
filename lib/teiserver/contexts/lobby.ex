@@ -3,4 +3,5 @@ defmodule Teiserver.Lobby do
   The contextual module for everything related to lobbies.
   """
 
+  # Lobbies (including consul and balancer)
 end

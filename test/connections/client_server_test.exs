@@ -117,28 +117,29 @@ defmodule Connections.ClientServerTest do
 
       # Should have gotten a new message too
       msgs = TestConn.get(conn)
+
       assert msgs == [
-        %{
-          topic: "Teiserver.ClientServer:#{user.id}",
-          event: :client_updated,
-          client: %Teiserver.Connections.Client{
-            id: user.id,
-            connected?: true,
-            lobby_id: nil,
-            in_game?: false,
-            afk?: false,
-            ready?: false,
-            player?: false,
-            player_number: 123,
-            team_number: nil,
-            team_colour: nil,
-            sync: nil,
-            lobby_host?: false,
-            party_id: nil
-          },
-          update_id: 1
-        }
-      ]
+               %{
+                 topic: "Teiserver.ClientServer:#{user.id}",
+                 event: :client_updated,
+                 client: %Teiserver.Connections.Client{
+                   id: user.id,
+                   connected?: true,
+                   lobby_id: nil,
+                   in_game?: false,
+                   afk?: false,
+                   ready?: false,
+                   player?: false,
+                   player_number: 123,
+                   team_number: nil,
+                   team_colour: nil,
+                   sync: nil,
+                   lobby_host?: false,
+                   party_id: nil
+                 },
+                 update_id: 1
+               }
+             ]
 
       # Now try to update with the same details, should result in no change
       Connections.update_client(user.id, %{player_number: 123})

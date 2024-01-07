@@ -22,7 +22,6 @@ defmodule Teiserver.Account.User do
 
   """
 
-
   use TeiserverMacros, :schema
   alias Argon2
 
@@ -56,28 +55,26 @@ defmodule Teiserver.Account.User do
   end
 
   @type t :: %__MODULE__{
-    id: non_neg_integer(),
-    name: String.t(),
-    email: String.t(),
-    password: String.t(),
-    roles: [String.t()],
-    permissions: [String.t()],
-    behaviour_score: integer() | nil,
-    trust_score: integer() | nil,
-    social_score: integer() | nil,
-    last_login_at: DateTime.t() | nil,
-    last_played_at: DateTime.t() | nil,
-    last_logout_at: DateTime.t() | nil,
-    restrictions: [String.t()],
-    restricted_until: DateTime.t() | nil,
-    shadow_banned: boolean(),
-
-    smurf_of_id: integer() | nil,
-    extra_data: map() | nil,
-
-    inserted_at: DateTime.t(),
-    updated_at: DateTime.t()
-  }
+          id: non_neg_integer(),
+          name: String.t(),
+          email: String.t(),
+          password: String.t(),
+          roles: [String.t()],
+          permissions: [String.t()],
+          behaviour_score: integer() | nil,
+          trust_score: integer() | nil,
+          social_score: integer() | nil,
+          last_login_at: DateTime.t() | nil,
+          last_played_at: DateTime.t() | nil,
+          last_logout_at: DateTime.t() | nil,
+          restrictions: [String.t()],
+          restricted_until: DateTime.t() | nil,
+          shadow_banned: boolean(),
+          smurf_of_id: integer() | nil,
+          extra_data: map() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
 
   @doc false
   def changeset(user), do: changeset(user, %{}, :full)

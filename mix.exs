@@ -66,7 +66,6 @@ defmodule Teiserver.MixProject do
       "documentation/pubsubs/client.md",
       "documentation/pubsubs/lobby.md",
       "documentation/pubsubs/user.md",
-
       "CHANGELOG.md": [title: "Changelog"]
     ]
   end
@@ -238,7 +237,7 @@ defmodule Teiserver.MixProject do
 
   defp aliases do
     [
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
       # Oban has these and seems to do a really nice job so we're going to use them too
       # bench: "run bench/bench_helper.exs",
       # release: [
