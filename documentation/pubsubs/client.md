@@ -1,7 +1,8 @@
 `Teiserver.ClientServer:{user_id}`
+The pubsub messages received by anybody watching this account. By default logging in will subscribe you to these messages.
 
 ### Updated client
-Fired whenever the client is updated.
+Sent whenever the client in question is updated.
 
 - `:update_id` - An incremental number to allow for out of order messages
 - `:client` - A `Teiserver.Connections.Client` of the new client values

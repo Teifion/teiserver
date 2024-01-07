@@ -5,12 +5,20 @@ defmodule Teiserver.TestSupport.TestConn do
     ## Examples
     ```
     # Create
-    conn1 = Conn.new()
-    conn2 = Conn.new(["channel1", "channel2"])
+    conn1 = TestConn.new()
+    conn2 = TestConn.new(["channel1", "channel2"])
 
     # Check mailbox
-    messages = Conn.get(conn1)
-    messages = Conn.get(conn2)
+    messages = TestConn.get(conn1)
+    messages = TestConn.get(conn2)
+
+    # Run code
+    TestConn.run(conn1, fn ->
+      Connections.connect_user(user_id)
+    end)
+
+    # Terminate the process
+    TestConn.stop(conn1)
     ```
   """
 

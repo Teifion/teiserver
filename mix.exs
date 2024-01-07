@@ -64,6 +64,8 @@ defmodule Teiserver.MixProject do
 
       # PubSubs
       "documentation/pubsubs/client.md",
+      "documentation/pubsubs/lobby.md",
+      "documentation/pubsubs/user.md",
 
       "CHANGELOG.md": [title: "Changelog"]
     ]

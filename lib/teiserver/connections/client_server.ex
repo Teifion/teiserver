@@ -66,18 +66,23 @@ defmodule Teiserver.Connections.ClientServer do
 
   @spec update_client(State.t(), Client.t()) :: State.t()
   defp update_client(%State{} = state, %Client{} = new_client) do
-    new_update_id = state.update_id
+    if new_client == state.client do
+      # Nothing changed, we don't do anything
+      state
+    else
+      new_update_id = state.update_id
 
-    Teiserver.broadcast(
-      "Teiserver.ClientServer:#{state.user_id}",
-      %{
-        event: :client_updated,
-        update_id: new_update_id,
-        client: new_client
-      }
-    )
+      Teiserver.broadcast(
+        "Teiserver.ClientServer:#{state.user_id}",
+        %{
+          event: :client_updated,
+          update_id: new_update_id,
+          client: new_client
+        }
+      )
 
-    %{state | client: new_client, update_id: new_update_id}
+      %{state | client: new_client, update_id: new_update_id}
+    end
   end
 
   @impl true
