@@ -1,20 +1,14 @@
 <p align="center">
   Elixir middleware server designed for running games.<br />
-  Focused on facilitating connectivity, the library is engine and game agnostic.
+  Game and engine agnostic, the library focuses on solving common issues.
 </p>
 
 <p align="center">
-  <a href="https://hex.pm/packages/teiserver">
-    <img alt="Hex Version" src="https://img.shields.io/hexpm/v/teiserver.svg">
-  </a>
-
-  <a href="https://hexdocs.pm/teiserver">
-    <img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat">
-  </a>
-
-  <a href="https://opensource.org/licenses/Apache-2.0">
-    <img alt="Apache 2 License" src="https://img.shields.io/hexpm/l/teiserver">
-  </a>
+  <a href="https://hex.pm/packages/teiserver"><img alt="Hex Version" src="https://img.shields.io/hexpm/v/teiserver.svg"></a>
+  &nbsp;
+  <a href="https://hexdocs.pm/teiserver"><img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat"></a>
+  &nbsp;
+  <a href="https://opensource.org/licenses/Apache-2.0"><img alt="Apache 2 License" src="https://img.shields.io/hexpm/l/teiserver"></a>
 </p>
 
 _Note: This README is for the unreleased main branch, please reference the
@@ -22,12 +16,20 @@ _Note: This README is for the unreleased main branch, please reference the
 
 [hexdoc]: https://hexdocs.pm/teiserver/Teiserver.html
 
+## Feature highlights
+- User authentication and authorization
+- Tracking online users
+- Lobby management
+- Telemetry
+- Community management tools
+- Steam integration (planned)
+
 ## Installation
 First add to your dependencies in `mix.exs`.
 ```elixir
 def deps do
   [
-    {:teiserver, "~> 0.1.0"}
+    {:teiserver, "~> 0.0.2"}
   ]
 end
 ```

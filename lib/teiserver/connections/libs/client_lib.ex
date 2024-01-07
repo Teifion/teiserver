@@ -39,6 +39,25 @@ defmodule Teiserver.Connections.ClientLib do
   end
 
   @doc """
+  Updates a client with the new data. If changes are made then it will also generate a `Teiserver.ClientServer:{user_id}` pubsub message.
+
+  Returns nil if the Client does not exist, :ok if the client does.
+
+  ## Examples
+
+      iex> update_client(123, %{player_number: 123})
+      :ok
+
+      iex> update_client(456, %{player_number: 123})
+      nil
+
+  """
+  @spec update_client(Teiserver.user_id(), map) :: :ok | nil
+  def update_client(user_id, data) do
+    cast_client(user_id, {:update_client, data})
+  end
+
+  @doc """
   Given a user_id, log them in. If the user already exists as a client then the existing
   client is returned.
 

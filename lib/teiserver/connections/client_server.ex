@@ -30,7 +30,7 @@ defmodule Teiserver.Connections.ClientServer do
     end
   end
 
-  def handle_cast({:update_values, partial_client}, state) do
+  def handle_cast({:update_client, partial_client}, state) do
     new_client = Map.merge(state.client, partial_client)
     new_state = update_client(state, new_client)
     {:noreply, new_state}
@@ -70,7 +70,7 @@ defmodule Teiserver.Connections.ClientServer do
       # Nothing changed, we don't do anything
       state
     else
-      new_update_id = state.update_id
+      new_update_id = state.update_id + 1
 
       Teiserver.broadcast(
         "Teiserver.ClientServer:#{state.user_id}",
