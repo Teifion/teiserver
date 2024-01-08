@@ -49,12 +49,6 @@ defmodule Teiserver do
   - **Telemetry**: Moment to moment events
   """
 
-  @doc false
-  @spec repo() :: Module
-  def repo() do
-    Application.get_env(:teiserver, :repo)
-  end
-
   # PubSub delegation
   @doc false
   @spec broadcast(String.t(), map()) :: :ok

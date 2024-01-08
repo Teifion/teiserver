@@ -1,3 +1,6 @@
+## v0.0.3 (in progress)
+- Added schemas for Rooms, RoomMessages and DirectMessages
+
 ## v0.0.2
 - Client connectivity functionality
 - Expanded docs significantly

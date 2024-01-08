@@ -31,7 +31,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:restrictions, {:array, :string}, default: [])
       add(:restricted_until, :utc_datetime)
 
-      add(:shadow_banned, :boolean, default: false)
+      add(:shadow_banned?, :boolean, default: false)
 
       add(:smurf_of_id, references(:account_users, on_delete: :nothing))
 
@@ -44,6 +44,30 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     create_if_not_exists table(:account_extra_user_data, primary_key: false, prefix: prefix) do
       add(:user_id, references(:account_users, on_delete: :nothing), primary_key: true)
       add(:data, :jsonb)
+    end
+
+    # Communications
+    create_if_not_exists table(:communication_rooms, prefix: prefix) do
+      add :name, :string
+      timestamps()
+    end
+
+    create_if_not_exists table(:communication_room_messages, prefix: prefix) do
+      add(:content, :text)
+      add(:inserted_at, :utc_datetime)
+
+      add(:from_id, references(:account_users, on_delete: :nothing))
+      add(:room_id, references(:communication_rooms, on_delete: :nothing))
+    end
+
+    create_if_not_exists table(:communication_direct_messages, prefix: prefix) do
+      add(:content, :text)
+      add(:inserted_at, :utc_datetime)
+      add(:delivered?, :boolean)
+      add(:read?, :boolean)
+
+      add(:from_id, references(:account_users, on_delete: :nothing))
+      add(:to_id, references(:account_users, on_delete: :nothing))
     end
 
     # Config

@@ -4,8 +4,8 @@ defmodule Teiserver.Account.UserQueries do
   alias Teiserver.Account.User
   require Logger
 
-  @spec query_users(list) :: Ecto.Query.t()
-  def query_users(args) do
+  @spec user_query(list) :: Ecto.Query.t()
+  def user_query(args) do
     query = from(users in User)
 
     query
@@ -207,6 +207,7 @@ defmodule Teiserver.Account.UserQueries do
     end)
   end
 
+  @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
   def _order_by(query, "Name (A-Z)") do
     from(users in query,
       order_by: [asc: users.name]

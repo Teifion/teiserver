@@ -18,7 +18,7 @@ defmodule Teiserver.Account.User do
   * `:last_logout_at` - DateTime of the last time they logged out
   * `:restrictions` - A list of the restrictions applied to the user account
   * `:restricted_until` - DateTime of when the restrictions to the user may need to be revised (e.g. when a moderation action expires)
-  * `:shadow_banned` - Boolean flag for spambots and trolls, when set to true the user should be allowed to see things as if fully logged in and be sent "success" type messages. In reality they are not able to effect change.
+  * `:shadow_banned?` - Boolean flag for spambots and trolls, when set to true the user should be allowed to see things as if fully logged in and be sent "success" type messages. In reality they are not able to effect change.
 
   """
 
@@ -44,7 +44,7 @@ defmodule Teiserver.Account.User do
     field(:restrictions, {:array, :string}, default: [])
     field(:restricted_until, :utc_datetime)
 
-    field(:shadow_banned, :boolean, default: false)
+    field(:shadow_banned?, :boolean, default: false)
 
     # Extra user.ex relations go here
     belongs_to(:smurf_of, Teiserver.Account.User)
@@ -69,7 +69,7 @@ defmodule Teiserver.Account.User do
           last_logout_at: DateTime.t() | nil,
           restrictions: [String.t()],
           restricted_until: DateTime.t() | nil,
-          shadow_banned: boolean(),
+          shadow_banned?: boolean(),
           smurf_of_id: integer() | nil,
           extra_data: map() | nil,
           inserted_at: DateTime.t(),
@@ -91,7 +91,7 @@ defmodule Teiserver.Account.User do
       user
       |> cast(
         attrs,
-        ~w(name email roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned smurf_of_id)a
+        ~w(name email roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
       |> validate_required(~w(name email permissions)a)
       |> unique_constraint(:email)
@@ -99,7 +99,7 @@ defmodule Teiserver.Account.User do
       user
       |> cast(
         attrs,
-        ~w(name email password roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned smurf_of_id)a
+        ~w(name email password roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
       |> validate_required(~w(name email permissions)a)
       |> unique_constraint(:email)

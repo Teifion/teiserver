@@ -17,8 +17,8 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec list_user_settings(list) :: list
   def list_user_settings(query_args \\ []) do
     query_args
-    |> UserSettingQueries.query_user_settings()
-    |> Teiserver.repo().all()
+    |> UserSettingQueries.user_setting_query()
+    |> Teiserver.Repo.all()
   end
 
   @doc """
@@ -38,8 +38,8 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec get_user_setting!(non_neg_integer()) :: UserSetting.t()
   def get_user_setting!(user_setting_id, query_args \\ []) do
     (query_args ++ [id: user_setting_id])
-    |> UserSettingQueries.query_user_settings()
-    |> Teiserver.repo().one!()
+    |> UserSettingQueries.user_setting_query()
+    |> Teiserver.Repo.one!()
   end
 
   @doc """
@@ -59,8 +59,8 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec get_user_setting(non_neg_integer(), list) :: UserSetting.t() | nil
   def get_user_setting(user_setting_id, query_args \\ []) do
     (query_args ++ [id: user_setting_id])
-    |> UserSettingQueries.query_user_settings()
-    |> Teiserver.repo().one()
+    |> UserSettingQueries.user_setting_query()
+    |> Teiserver.Repo.one()
   end
 
   @doc """
@@ -79,7 +79,7 @@ defmodule Teiserver.Settings.UserSettingLib do
   def create_user_setting(attrs \\ %{}) do
     %UserSetting{}
     |> UserSetting.changeset(attrs)
-    |> Teiserver.repo().insert()
+    |> Teiserver.Repo.insert()
   end
 
   @doc """
@@ -99,7 +99,7 @@ defmodule Teiserver.Settings.UserSettingLib do
   def update_user_setting(%UserSetting{} = user_setting, attrs) do
     user_setting
     |> UserSetting.changeset(attrs)
-    |> Teiserver.repo().update()
+    |> Teiserver.Repo.update()
   end
 
   @doc """
@@ -117,7 +117,7 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec delete_user_setting(UserSetting.t()) ::
           {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def delete_user_setting(%UserSetting{} = user_setting) do
-    Teiserver.repo().delete(user_setting)
+    Teiserver.Repo.delete(user_setting)
   end
 
   @doc """

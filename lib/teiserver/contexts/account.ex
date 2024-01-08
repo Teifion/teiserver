@@ -3,7 +3,11 @@ defmodule Teiserver.Account do
   The contextual module for `Teiserver.Account.User`, `Teiserver.Account.ExtraUserData`
   """
 
-  alias Teiserver.Account.{User, UserLib}
+  alias Teiserver.Account.{User, UserLib, UserQueries}
+
+  @doc false
+  @spec user_query(list) :: Ecto.Query.t()
+  defdelegate user_query(args), to: UserQueries
 
   @doc section: :user
   @spec list_users() :: [User.t()]

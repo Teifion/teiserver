@@ -17,8 +17,8 @@ defmodule Teiserver.Settings.ServerSettingLib do
   @spec list_server_settings(list) :: list
   def list_server_settings(query_args \\ []) do
     query_args
-    |> ServerSettingQueries.query_server_settings()
-    |> Teiserver.repo().all()
+    |> ServerSettingQueries.server_setting_query()
+    |> Teiserver.Repo.all()
   end
 
   @doc """
@@ -38,8 +38,8 @@ defmodule Teiserver.Settings.ServerSettingLib do
   @spec get_server_setting!(non_neg_integer()) :: ServerSetting.t()
   def get_server_setting!(server_setting_id, query_args \\ []) do
     (query_args ++ [id: server_setting_id])
-    |> ServerSettingQueries.query_server_settings()
-    |> Teiserver.repo().one!()
+    |> ServerSettingQueries.server_setting_query()
+    |> Teiserver.Repo.one!()
   end
 
   @doc """
@@ -59,8 +59,8 @@ defmodule Teiserver.Settings.ServerSettingLib do
   @spec get_server_setting(non_neg_integer(), list) :: ServerSetting.t() | nil
   def get_server_setting(server_setting_id, query_args \\ []) do
     (query_args ++ [id: server_setting_id])
-    |> ServerSettingQueries.query_server_settings()
-    |> Teiserver.repo().one()
+    |> ServerSettingQueries.server_setting_query()
+    |> Teiserver.Repo.one()
   end
 
   @doc """
@@ -79,7 +79,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
   def create_server_setting(attrs \\ %{}) do
     %ServerSetting{}
     |> ServerSetting.changeset(attrs)
-    |> Teiserver.repo().insert()
+    |> Teiserver.Repo.insert()
   end
 
   @doc """
@@ -99,7 +99,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
   def update_server_setting(%ServerSetting{} = server_setting, attrs) do
     server_setting
     |> ServerSetting.changeset(attrs)
-    |> Teiserver.repo().update()
+    |> Teiserver.Repo.update()
   end
 
   @doc """
@@ -117,7 +117,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
   @spec delete_server_setting(ServerSetting.t()) ::
           {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
   def delete_server_setting(%ServerSetting{} = server_setting) do
-    Teiserver.repo().delete(server_setting)
+    Teiserver.Repo.delete(server_setting)
   end
 
   @doc """

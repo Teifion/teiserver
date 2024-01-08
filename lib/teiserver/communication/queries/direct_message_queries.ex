@@ -1,12 +1,12 @@
-defmodule Teiserver.Settings.ServerSettingQueries do
+defmodule Teiserver.Communication.DirectMessageQueries do
   @moduledoc false
   use TeiserverMacros, :queries
-  alias Teiserver.Settings.ServerSetting
+  alias Teiserver.Communication.DirectMessage
   require Logger
 
-  @spec server_setting_query(list) :: Ecto.Query.t()
-  def server_setting_query(args) do
-    query = from(server_settings in ServerSetting)
+  @spec direct_message_query(list) :: Ecto.Query.t()
+  def direct_message_query(args) do
+    query = from(direct_messages in DirectMessage)
 
     query
     |> do_where(id: args[:id])
@@ -34,41 +34,38 @@ defmodule Teiserver.Settings.ServerSettingQueries do
   def _where(query, _, "Any"), do: query
 
   def _where(query, :id, id) do
-    from(server_settings in query,
-      where: server_settings.id == ^id
-    )
+    from direct_messages in query,
+      where: direct_messages.id == ^id
   end
 
   def _where(query, :id_in, id_list) do
-    from(server_settings in query,
-      where: server_settings.id in ^id_list
-    )
+    from direct_messages in query,
+      where: direct_messages.id in ^id_list
   end
 
   def _where(query, :name, name) do
-    from(server_settings in query,
-      where: server_settings.name == ^name
-    )
+    from direct_messages in query,
+      where: direct_messages.name == ^name
   end
 
+
   def _where(query, :inserted_after, timestamp) do
-    from(server_settings in query,
-      where: server_settings.inserted_at >= ^timestamp
-    )
+    from direct_messages in query,
+      where: direct_messages.inserted_at >= ^timestamp
   end
 
   def _where(query, :inserted_before, timestamp) do
-    from(server_settings in query,
-      where: server_settings.inserted_at < ^timestamp
-    )
+    from direct_messages in query,
+      where: direct_messages.inserted_at < ^timestamp
   end
+
 
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
   defp do_order_by(query, params) when is_list(params) do
     params
-    |> List.wrap()
+    |> List.wrap
     |> Enum.reduce(query, fn key, query_acc ->
       _order_by(query_acc, key)
     end)
@@ -76,44 +73,47 @@ defmodule Teiserver.Settings.ServerSettingQueries do
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
   def _order_by(query, "Name (A-Z)") do
-    from(server_settings in query,
-      order_by: [asc: server_settings.name]
-    )
+    from direct_messages in query,
+      order_by: [asc: direct_messages.name]
   end
 
   def _order_by(query, "Name (Z-A)") do
-    from(server_settings in query,
-      order_by: [desc: server_settings.name]
-    )
+    from direct_messages in query,
+      order_by: [desc: direct_messages.name]
   end
 
   def _order_by(query, "Newest first") do
-    from(server_settings in query,
-      order_by: [desc: server_settings.inserted_at]
-    )
+    from direct_messages in query,
+      order_by: [desc: direct_messages.inserted_at]
   end
 
   def _order_by(query, "Oldest first") do
-    from(server_settings in query,
-      order_by: [asc: server_settings.inserted_at]
-    )
+    from direct_messages in query,
+      order_by: [asc: direct_messages.inserted_at]
   end
+
 
   @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
-  defp do_preload(query, _), do: query
-  # defp do_preload(query, preloads) do
-  #   preloads
-  #   |> List.wrap
-  #   |> Enum.reduce(query, fn key, query_acc ->
-  #     _preload(query_acc, key)
-  #   end)
-  # end
+  defp do_preload(query, preloads) do
+    preloads
+    |> List.wrap
+    |> Enum.reduce(query, fn key, query_acc ->
+      _preload(query_acc, key)
+    end)
+  end
 
-  # def _preload(query, :relation) do
-  #   from server_setting in query,
-  #     left_join: relations in assoc(server_setting, :relation),
-  #     preload: [relation: relations]
-  # end
+  @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
+  def _preload(query, :from) do
+    from direct_message in query,
+      left_join: froms in assoc(direct_message, :from),
+      preload: [from: froms]
+  end
+
+  def _preload(query, :to) do
+    from direct_message in query,
+      left_join: tos in assoc(direct_message, :to),
+      preload: [to: tos]
+  end
 end

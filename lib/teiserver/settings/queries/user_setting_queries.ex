@@ -4,8 +4,8 @@ defmodule Teiserver.Settings.UserSettingQueries do
   alias Teiserver.Settings.UserSetting
   require Logger
 
-  @spec query_user_settings(list) :: Ecto.Query.t()
-  def query_user_settings(args) do
+  @spec user_setting_query(list) :: Ecto.Query.t()
+  def user_setting_query(args) do
     query = from(user_settings in UserSetting)
 
     query
@@ -74,6 +74,7 @@ defmodule Teiserver.Settings.UserSettingQueries do
     end)
   end
 
+  @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
   def _order_by(query, "Name (A-Z)") do
     from(user_settings in query,
       order_by: [asc: user_settings.name]

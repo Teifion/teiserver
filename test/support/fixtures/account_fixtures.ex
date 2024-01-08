@@ -14,6 +14,6 @@ defmodule Teiserver.AccountFixtures do
       },
       :full
     )
-    |> Teiserver.repo().insert!
+    |> Teiserver.Repo.insert!
   end
 end

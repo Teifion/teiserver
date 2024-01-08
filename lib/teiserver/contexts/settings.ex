@@ -3,7 +3,12 @@ defmodule Teiserver.Settings do
   The contextual module for `Teiserver.Settings.ServerSetting`, `Teiserver.Settings.UserSetting`
   """
 
-  alias Teiserver.Settings.{ServerSetting, ServerSettingLib}
+  # ServerSettings
+  alias Teiserver.Settings.{ServerSetting, ServerSettingLib, ServerSettingQueries}
+
+  @doc false
+  @spec server_setting_query(list) :: Ecto.Query.t()
+  defdelegate server_setting_query(args), to: ServerSettingQueries
 
   @doc section: :server_setting
   @spec list_server_settings() :: [ServerSetting.t()]
@@ -39,7 +44,12 @@ defmodule Teiserver.Settings do
   @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset
   defdelegate change_server_setting(server_setting, attrs \\ %{}), to: ServerSettingLib
 
-  alias Teiserver.Settings.{UserSetting, UserSettingLib}
+  # UserSettings
+  alias Teiserver.Settings.{UserSetting, UserSettingLib, UserSettingQueries}
+
+  @doc false
+  @spec user_setting_query(list) :: Ecto.Query.t()
+  defdelegate user_setting_query(args), to: UserSettingQueries
 
   @doc section: :user_setting
   @spec list_user_settings() :: [UserSetting.t()]
