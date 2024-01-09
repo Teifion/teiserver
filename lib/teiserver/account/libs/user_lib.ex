@@ -34,7 +34,7 @@ defmodule Teiserver.Account.UserLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user!(non_neg_integer()) :: User.t()
+  @spec get_user!(Teiserver.user_id()) :: User.t()
   def get_user!(user_id, query_args \\ []) do
     (query_args ++ [id: user_id])
     |> UserQueries.user_query()
@@ -42,7 +42,7 @@ defmodule Teiserver.Account.UserLib do
   end
 
   @doc """
-  Gets a single user.
+  Gets a single user. Can take additional arguments for the query.
 
   Returns nil if the User does not exist.
 
@@ -54,25 +54,61 @@ defmodule Teiserver.Account.UserLib do
       iex> get_user(456)
       nil
 
+      iex> get_user(123, preload: [:extra_user_data])
+      %User{}
+
   """
-  @spec get_user(non_neg_integer(), list) :: User.t() | nil
+  @spec get_user(Teiserver.user_id(), list) :: User.t() | nil
   def get_user(user_id, query_args \\ []) do
     UserQueries.user_query(query_args ++ [id: user_id])
     |> Teiserver.Repo.one()
   end
 
-  @spec get_user_by_id(non_neg_integer()) :: User.t() | nil
+  @doc """
+  Gets a single user by their user_id. If no user is found, returns `nil`.
+
+  ## Examples
+
+    iex> get_user(123)
+    %User{}
+
+    iex> get_user(456)
+    nil
+  """
+  @spec get_user_by_id(Teiserver.user_id()) :: User.t() | nil
   def get_user_by_id(user_id) do
     UserQueries.user_query(id: user_id, limit: 1)
     |> Teiserver.Repo.one()
   end
 
+  @doc """
+  Gets a single user by their name. If no user is found, returns `nil`.
+
+  ## Examples
+
+    iex> get_user("noodle")
+    %User{}
+
+    iex> get_user("nobody")
+    nil
+  """
   @spec get_user_by_name(String.t()) :: User.t() | nil
   def get_user_by_name(name) do
     UserQueries.user_query(where: [name_lower: name], limit: 1)
     |> Teiserver.Repo.one()
   end
 
+  @doc """
+  Gets a single user by their email. If no user is found, returns `nil`.
+
+  ## Examples
+
+    iex> get_user("noodle@teiserver")
+    %User{}
+
+    iex> get_user("nobody@nowhere")
+    nil
+  """
   @spec get_user_by_email(String.t()) :: User.t() | nil
   def get_user_by_email(email) do
     UserQueries.user_query(where: [email: email], limit: 1)
@@ -183,7 +219,7 @@ defmodule Teiserver.Account.UserLib do
     false
   """
   @spec allow?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
-  def allow?(user_id, p) when is_integer(user_id), do: allow?(get_user_by_id(user_id), p)
+  def allow?(user_or_user_id, permissions) when is_integer(user_or_user_id), do: allow?(get_user_by_id(user_or_user_id), permissions)
   def allow?(%User{} = user, permissions) do
     permissions
     |> List.wrap
@@ -208,7 +244,7 @@ defmodule Teiserver.Account.UserLib do
     false
   """
   @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
-  def restricted?(user_id, p) when is_integer(user_id), do: restricted?(get_user_by_id(user_id), p)
+  def restricted?(user_or_user_id, permissions) when is_integer(user_or_user_id), do: restricted?(get_user_by_id(user_or_user_id), permissions)
   def restricted?(%User{} = user, permissions) do
     permissions
     |> List.wrap

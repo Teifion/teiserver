@@ -88,6 +88,7 @@ defmodule Teiserver.MixProject do
         Teiserver.Game,
         Teiserver.Lobby,
         Teiserver.Logging,
+        Teiserver.Matchmaking,
         Teiserver.Moderation,
         Teiserver.Settings,
         Teiserver.Telemetry
@@ -112,6 +113,9 @@ defmodule Teiserver.MixProject do
       ],
       Logging: [
         ~r"Teiserver.Logging.*"
+      ],
+      Matchmaking: [
+        ~r"Teiserver.Matchmaking.*"
       ],
       Moderation: [
         ~r"Teiserver.Moderation.*"

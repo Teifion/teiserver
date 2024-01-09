@@ -1,6 +1,6 @@
 defmodule Teiserver.Connections do
   @moduledoc """
-  The context for all things connection related (mostly clients).
+  The context for all things connection related, mostly `Teiserver.Connections.Client`
 
   # Clients
   Clients are represented by a process holding their state, this process controls all updates to their state.
@@ -9,7 +9,7 @@ defmodule Teiserver.Connections do
   Clients are created using `connect_user/1`, this will create (if it doesn't already exist) a client process. Any process connecting a user will be subscribed to the `Teiserver.ClientUpdates:{user_id}` channel.
 
   ## Destroying clients
-
+  TODO: Implement and document
   """
 
   alias Teiserver.Connections.{Client, ClientLib}

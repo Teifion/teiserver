@@ -1,6 +1,10 @@
 defmodule Teiserver.Communication do
   @moduledoc """
-  The contextual module for `Teiserver.Communication.ChatMessage`, `Teiserver.Communication.DirectMessage`
+  The contextual module for:
+  - `Teiserver.Communication.ChatMessage`
+  - `Teiserver.Communication.DirectMessage`
+  - `Teiserver.Communication.LobbyMessage`
+  - `Teiserver.Communication.PartyMessage`
   """
 
   alias Teiserver.Communication.{Room, RoomLib, RoomQueries}
@@ -81,12 +85,6 @@ defmodule Teiserver.Communication do
   defdelegate change_room_message(room_message, attrs \\ %{}), to: RoomMessageLib
 
 
-
-
-  # Lobby chat
-  # Party chat
-
-
   alias Teiserver.Communication.{DirectMessage, DirectMessageLib, DirectMessageQueries}
 
   @doc false
@@ -124,5 +122,10 @@ defmodule Teiserver.Communication do
   @doc section: :direct_message
   @spec change_direct_message(DirectMessage.t, map) :: Ecto.Changeset
   defdelegate change_direct_message(direct_message, attrs \\ %{}), to: DirectMessageLib
+
+
+
+  # Lobby chat
+  # Party chat
 
 end

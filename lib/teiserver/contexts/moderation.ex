@@ -1,11 +1,18 @@
 defmodule Teiserver.Moderation do
   @moduledoc """
-  The contextual module for `Teiserver.Moderation.Report`, `Teiserver.Moderation.Action`, `Teiserver.Moderation.Ban`
+  The contextual module for:
+  - `Teiserver.Moderation.Report`
+  - `Teiserver.Moderation.ReportGroup`
+  - `Teiserver.Moderation.ReportGroupResponse`
+  - `Teiserver.Moderation.Action`
+  - `Teiserver.Moderation.Ban`
+  - `Teiserver.Moderation.Appeal`
+  - `Teiserver.Moderation.AppealResponse`
   """
 
   # Report
   # ReportGroup
-  # ReportResponse
+  # ReportGroupResponse
   # Action
   # Ban
   # Appeal

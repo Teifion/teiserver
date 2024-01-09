@@ -1,6 +1,8 @@
 defmodule Teiserver.Settings do
   @moduledoc """
-  The contextual module for `Teiserver.Settings.ServerSetting`, `Teiserver.Settings.UserSetting`
+  The contextual module for:
+  - `Teiserver.Settings.ServerSetting`
+  - `Teiserver.Settings.UserSetting`
   """
 
   # ServerSettings

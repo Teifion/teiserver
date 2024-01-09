@@ -1,6 +1,13 @@
 defmodule Teiserver.Logging do
   @moduledoc """
-  The contextual module for `Teiserver.Logging.UsageLogs`, `Teiserver.Logging.MatchLogs`
+  The contextual module for:
+  - `Teiserver.Logging.AuditLog`
+  - `Teiserver.Logging.CrashLog`
+  - `Teiserver.Logging.UserLog`
+  - `Teiserver.Logging.UsageLog`
+  - `Teiserver.Logging.LobbyLog`
+  - `Teiserver.Logging.MatchLog`
+  - `Teiserver.Logging.EventLog`
   """
 
   # AuditLogs

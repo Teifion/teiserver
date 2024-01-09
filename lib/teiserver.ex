@@ -6,7 +6,7 @@ defmodule Teiserver do
   @type party_id :: non_neg_integer()
 
   @moduledoc """
-  Teiserver is a middleware server library; designed for usage with games. Its role is to handle the common and game-agnostic issues (chat, searching for games, match history) while allowing you to implement the game-specific items you care about. Teiserver has generic handling for users, lobbies, chat and more.
+  Teiserver is a middleware server library; designed for usage with games. It handles game-agnostic issues (chat, searching for games, match history) and allows you to implement the game-specific items you care about.
 
   In a peer-to-peer setting each client will communicate to each other client as and when they need to. With a middleware server every client communicates via the middleware server and the server acts as a single source of truth.
 
