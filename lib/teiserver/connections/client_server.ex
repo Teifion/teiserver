@@ -31,7 +31,7 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   def handle_cast({:update_client, partial_client}, state) do
-    new_client = Map.merge(state.client, partial_client)
+    new_client = struct(state.client, partial_client)
     new_state = update_client(state, new_client)
     {:noreply, new_state}
   end

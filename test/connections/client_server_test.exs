@@ -163,5 +163,24 @@ defmodule Connections.ClientServerTest do
       assert update_msg.client.player_number == 456
       assert update_msg.update_id == 2
     end
+
+    test "updating with a bad key" do
+      {conn, user} = ConnectionFixtures.client_fixture()
+      TestConn.subscribe(conn, "Teiserver.ClientServer:#{user.id}")
+
+      msgs = TestConn.get(conn)
+      assert msgs == []
+
+      # Now update it
+      Connections.update_client(user.id, %{not_a_key: "abc"})
+
+      # Check the client has updated
+      client = Connections.get_client(user.id)
+      refute Map.has_key?(client, :not_a_key)
+
+      # No messages either, client should be the same
+      msgs = TestConn.get(conn)
+      assert msgs == []
+    end
   end
 end
