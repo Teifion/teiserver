@@ -155,4 +155,65 @@ defmodule Teiserver.Account.UserLib do
   def verify_user_password(user, plaintext_password) do
     User.verify_password(plaintext_password, user.password)
   end
+
+  @doc """
+  Generates a strong, though not very human readable, password.
+
+  ## Examples
+
+    iex> generate_password()
+    "d52r8i5BhA6xBtmp7ElHI3Y/U/qztw2jUkgdeoZijWBEYzTf5DSBR5N87283WDiA"
+  """
+  @spec generate_password() :: String.t()
+  def generate_password() do
+    :crypto.strong_rand_bytes(64) |> Base.encode64(padding: false) |> binary_part(0, 64)
+  end
+
+  @doc """
+  Tests if a User or user_id has all of the required permissions.
+
+  If the user doesn't exist you will get back a failure.
+
+  ## Examples
+
+    iex> allow?(123, "Permission")
+    true
+
+    iex> allow?(123, "NotPermission")
+    false
+  """
+  @spec allow?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
+  def allow?(user_id, p) when is_integer(user_id), do: allow?(get_user_by_id(user_id), p)
+  def allow?(%User{} = user, permissions) do
+    permissions
+    |> List.wrap
+    |> Enum.map(fn p -> Enum.member?(user.permissions, p) end)
+    |> Enum.all?
+  end
+  def allow?(_not_a_user, _), do: false
+
+  @doc """
+  Tests if a User or user_id has any of the listed restrictions applied to their account.
+  - Returns `true` to indicate the user is restricted
+  - Returns `false` to indicate the user is not restricted
+
+  If the user doesn't exist you will get back a true.
+
+  ## Examples
+
+    iex> restricted?(123, "Banned")
+    true
+
+    iex> restricted?(123, "NotRestriction")
+    false
+  """
+  @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
+  def restricted?(user_id, p) when is_integer(user_id), do: restricted?(get_user_by_id(user_id), p)
+  def restricted?(%User{} = user, permissions) do
+    permissions
+    |> List.wrap
+    |> Enum.map(fn p -> Enum.member?(user.restrictions, p) end)
+    |> Enum.any?
+  end
+  def restricted?(_not_a_user, _), do: true
 end

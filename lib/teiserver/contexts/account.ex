@@ -57,6 +57,18 @@ defmodule Teiserver.Account do
   @spec verify_user_password(User.t(), String.t()) :: boolean
   defdelegate verify_user_password(user, plaintext_password), to: UserLib
 
+  @doc section: :user
+  @spec generate_password() :: String.t()
+  defdelegate generate_password(), to: UserLib
+
+  @doc section: :user
+  @spec allow?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
+  defdelegate allow?(user_or_user_id, permission_or_permissions), to: UserLib
+
+  @doc section: :user
+  @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
+  defdelegate restricted?(user_or_user_id, permission_or_permissions), to: UserLib
+
   # Relationships
   # Friends
   # FriendRequests
