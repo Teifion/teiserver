@@ -34,38 +34,41 @@ defmodule Teiserver.Communication.DirectMessageQueries do
   def _where(query, _, "Any"), do: query
 
   def _where(query, :id, id) do
-    from direct_messages in query,
+    from(direct_messages in query,
       where: direct_messages.id == ^id
+    )
   end
 
   def _where(query, :id_in, id_list) do
-    from direct_messages in query,
+    from(direct_messages in query,
       where: direct_messages.id in ^id_list
+    )
   end
 
   def _where(query, :name, name) do
-    from direct_messages in query,
+    from(direct_messages in query,
       where: direct_messages.name == ^name
+    )
   end
 
-
   def _where(query, :inserted_after, timestamp) do
-    from direct_messages in query,
+    from(direct_messages in query,
       where: direct_messages.inserted_at >= ^timestamp
+    )
   end
 
   def _where(query, :inserted_before, timestamp) do
-    from direct_messages in query,
+    from(direct_messages in query,
       where: direct_messages.inserted_at < ^timestamp
+    )
   end
-
 
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
   defp do_order_by(query, params) when is_list(params) do
     params
-    |> List.wrap
+    |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
       _order_by(query_acc, key)
     end)
@@ -73,32 +76,35 @@ defmodule Teiserver.Communication.DirectMessageQueries do
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
   def _order_by(query, "Name (A-Z)") do
-    from direct_messages in query,
+    from(direct_messages in query,
       order_by: [asc: direct_messages.name]
+    )
   end
 
   def _order_by(query, "Name (Z-A)") do
-    from direct_messages in query,
+    from(direct_messages in query,
       order_by: [desc: direct_messages.name]
+    )
   end
 
   def _order_by(query, "Newest first") do
-    from direct_messages in query,
+    from(direct_messages in query,
       order_by: [desc: direct_messages.inserted_at]
+    )
   end
 
   def _order_by(query, "Oldest first") do
-    from direct_messages in query,
+    from(direct_messages in query,
       order_by: [asc: direct_messages.inserted_at]
+    )
   end
-
 
   @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
   defp do_preload(query, preloads) do
     preloads
-    |> List.wrap
+    |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
       _preload(query_acc, key)
     end)
@@ -106,14 +112,16 @@ defmodule Teiserver.Communication.DirectMessageQueries do
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
   def _preload(query, :from) do
-    from direct_message in query,
+    from(direct_message in query,
       left_join: froms in assoc(direct_message, :from),
       preload: [from: froms]
+    )
   end
 
   def _preload(query, :to) do
-    from direct_message in query,
+    from(direct_message in query,
       left_join: tos in assoc(direct_message, :to),
       preload: [to: tos]
+    )
   end
 end

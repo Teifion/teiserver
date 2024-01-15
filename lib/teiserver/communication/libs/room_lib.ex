@@ -60,7 +60,27 @@ defmodule Teiserver.Communication.RoomLib do
   def get_room(room_id, query_args \\ []) do
     (query_args ++ [id: room_id])
     |> RoomQueries.room_query()
-    |> Repo.one
+    |> Repo.one()
+  end
+
+  @doc """
+  Gets a single room by name.
+
+  Returns nil if the Room does not exist.
+
+  ## Examples
+
+      iex> get_room_by_name("main")
+      %Room{}
+
+      iex> get_room_by_name("not a name")
+      nil
+
+  """
+  @spec get_room_by_name(String.t()) :: Room.t() | nil
+  def get_room_by_name(room_name) do
+    RoomQueries.room_query(where: [name: room_name])
+    |> Repo.one()
   end
 
   @doc """
@@ -75,11 +95,35 @@ defmodule Teiserver.Communication.RoomLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_room(map) :: {:ok, Room.t} | {:error, Ecto.Changeset.t}
+  @spec create_room(map) :: {:ok, Room.t()} | {:error, Ecto.Changeset.t()}
   def create_room(attrs \\ %{}) do
     %Room{}
     |> Room.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Gets a room of a given name, if the room does not exist it is created.
+
+  ## Examples
+
+      iex> get_or_create_room("name")
+      %Room{}
+
+      iex> get_or_create_room("not a room"")
+      %Room{}
+
+  """
+  @spec get_or_create_room(String.t()) :: Room.t()
+  def get_or_create_room(room_name) do
+    case get_room_by_name(room_name) do
+      nil ->
+        {:ok, room} = create_room(%{name: room_name})
+        room
+
+      room ->
+        room
+    end
   end
 
   @doc """
@@ -94,7 +138,7 @@ defmodule Teiserver.Communication.RoomLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_room(Room.t, map) :: {:ok, Room.t} | {:error, Ecto.Changeset.t}
+  @spec update_room(Room.t(), map) :: {:ok, Room.t()} | {:error, Ecto.Changeset.t()}
   def update_room(%Room{} = room, attrs) do
     room
     |> Room.changeset(attrs)
@@ -113,7 +157,7 @@ defmodule Teiserver.Communication.RoomLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_room(Room.t) :: {:ok, Room.t} | {:error, Ecto.Changeset.t}
+  @spec delete_room(Room.t()) :: {:ok, Room.t()} | {:error, Ecto.Changeset.t()}
   def delete_room(%Room{} = room) do
     Repo.delete(room)
   end
@@ -127,7 +171,7 @@ defmodule Teiserver.Communication.RoomLib do
       %Ecto.Changeset{data: %Room{}}
 
   """
-  @spec change_room(Room.t, map) :: Ecto.Changeset.t
+  @spec change_room(Room.t(), map) :: Ecto.Changeset.t()
   def change_room(%Room{} = room, attrs \\ %{}) do
     Room.changeset(room, attrs)
   end

@@ -1,5 +1,6 @@
 ## v0.0.3 (in progress)
 - Added schemas for Rooms, RoomMessages and DirectMessages
+- Added `UserLib.allow?/2` and `UserLib.restricted?/2`
 
 ## v0.0.2
 - Client connectivity functionality

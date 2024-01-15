@@ -210,9 +210,9 @@ defmodule Teiserver.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:argon2_elixir, "~> 3.0"},
+      {:timex, "~> 3.7.5"},
 
       # Libs I expect to use
-      # {:timex, "~> 3.7.5"},
       # {:parallel, "~> 0.0"},
       # {:ex_ulid, "~> 0.1.0"},
       # {:csv, "~> 2.4"},
@@ -249,9 +249,9 @@ defmodule Teiserver.MixProject do
         "cmd git push",
         "cmd git push --tags",
         "hex.publish --yes"
-      ]
-      # "test.reset": ["ecto.drop --quiet", "test.setup"],
-      # "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
+      ],
+      "test.reset": ["ecto.drop --quiet", "test.setup"],
+      "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
       # "test.ci": [
       #   "format --check-formatted",
       #   "deps.unlock --check-unused",

@@ -1,13 +1,13 @@
 defmodule Teiserver.Communication.RoomMessage do
   @moduledoc """
   # RoomMessage
-  A message sent from a user into a chat room.
+  A message sent sender a user into a chat room.
 
   ### Attributes
 
   * `:content` - The (textual) contents of the message
   * `:inserted_at` - The time the message was inserted
-  * `:from_id` - The `Teiserver.Account.User` who sent the message
+  * `:sender_id` - The `Teiserver.Account.User` who sent the message
   * `:room_id` - The id of the `Teiserver.Communication.Room` the message was sent in
   """
   use TeiserverMacros, :schema
@@ -16,25 +16,24 @@ defmodule Teiserver.Communication.RoomMessage do
     field(:content, :string)
     field(:inserted_at, :utc_datetime)
 
-    belongs_to(:from, Teiserver.Account.User)
+    belongs_to(:sender, Teiserver.Account.User)
     belongs_to(:room, Teiserver.Communication.Room)
   end
 
   @type id :: non_neg_integer()
 
   @type t :: %__MODULE__{
-    id: id(),
-    content: String.t(),
-    inserted_at: DateTime.t(),
-
-    from_id: Teiserver.user_id(),
-    room_id: Teiserver.Communication.Room.id()
-  }
+          id: id(),
+          content: String.t(),
+          inserted_at: DateTime.t(),
+          sender_id: Teiserver.user_id(),
+          room_id: Teiserver.Communication.Room.id()
+        }
 
   @doc false
   def changeset(server_setting, attrs \\ %{}) do
     server_setting
-    |> cast(attrs, ~w(content inserted_at from_id room_id)a)
-    |> validate_required(~w(content inserted_at from_id room_id)a)
+    |> cast(attrs, ~w(content inserted_at sender_id room_id)a)
+    |> validate_required(~w(content inserted_at sender_id room_id)a)
   end
 end

@@ -60,7 +60,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
   def get_direct_message(direct_message_id, query_args \\ []) do
     (query_args ++ [id: direct_message_id])
     |> DirectMessageQueries.direct_message_query()
-    |> Repo.one
+    |> Repo.one()
   end
 
   @doc """
@@ -75,7 +75,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_direct_message(map) :: {:ok, DirectMessage.t} | {:error, Ecto.Changeset.t}
+  @spec create_direct_message(map) :: {:ok, DirectMessage.t()} | {:error, Ecto.Changeset.t()}
   def create_direct_message(attrs \\ %{}) do
     %DirectMessage{}
     |> DirectMessage.changeset(attrs)
@@ -94,7 +94,8 @@ defmodule Teiserver.Communication.DirectMessageLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_direct_message(DirectMessage.t, map) :: {:ok, DirectMessage.t} | {:error, Ecto.Changeset.t}
+  @spec update_direct_message(DirectMessage.t(), map) ::
+          {:ok, DirectMessage.t()} | {:error, Ecto.Changeset.t()}
   def update_direct_message(%DirectMessage{} = direct_message, attrs) do
     direct_message
     |> DirectMessage.changeset(attrs)
@@ -113,7 +114,8 @@ defmodule Teiserver.Communication.DirectMessageLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_direct_message(DirectMessage.t) :: {:ok, DirectMessage.t} | {:error, Ecto.Changeset.t}
+  @spec delete_direct_message(DirectMessage.t()) ::
+          {:ok, DirectMessage.t()} | {:error, Ecto.Changeset.t()}
   def delete_direct_message(%DirectMessage{} = direct_message) do
     Repo.delete(direct_message)
   end
@@ -127,7 +129,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
       %Ecto.Changeset{data: %DirectMessage{}}
 
   """
-  @spec change_direct_message(DirectMessage.t, map) :: Ecto.Changeset.t
+  @spec change_direct_message(DirectMessage.t(), map) :: Ecto.Changeset.t()
   def change_direct_message(%DirectMessage{} = direct_message, attrs \\ %{}) do
     DirectMessage.changeset(direct_message, attrs)
   end

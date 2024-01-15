@@ -8,5 +8,4 @@ defmodule Teiserver.Matchmaking do
 
   # ELO/MMR/Skill Ratings
   # Rating logs
-
 end

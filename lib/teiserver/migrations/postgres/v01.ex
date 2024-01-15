@@ -48,7 +48,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     # Communications
     create_if_not_exists table(:communication_rooms, prefix: prefix) do
-      add :name, :string
+      add(:name, :string)
       timestamps()
     end
 
@@ -56,7 +56,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:content, :text)
       add(:inserted_at, :utc_datetime)
 
-      add(:from_id, references(:account_users, on_delete: :nothing))
+      add(:sender_id, references(:account_users, on_delete: :nothing))
       add(:room_id, references(:communication_rooms, on_delete: :nothing))
     end
 

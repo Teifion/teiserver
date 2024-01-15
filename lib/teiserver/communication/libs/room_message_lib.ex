@@ -60,7 +60,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
   def get_room_message(room_message_id, query_args \\ []) do
     (query_args ++ [id: room_message_id])
     |> RoomMessageQueries.room_message_query()
-    |> Repo.one
+    |> Repo.one()
   end
 
   @doc """
@@ -75,7 +75,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_room_message(map) :: {:ok, RoomMessage.t} | {:error, Ecto.Changeset.t}
+  @spec create_room_message(map) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   def create_room_message(attrs \\ %{}) do
     %RoomMessage{}
     |> RoomMessage.changeset(attrs)
@@ -94,7 +94,8 @@ defmodule Teiserver.Communication.RoomMessageLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_room_message(RoomMessage.t, map) :: {:ok, RoomMessage.t} | {:error, Ecto.Changeset.t}
+  @spec update_room_message(RoomMessage.t(), map) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   def update_room_message(%RoomMessage{} = room_message, attrs) do
     room_message
     |> RoomMessage.changeset(attrs)
@@ -113,7 +114,8 @@ defmodule Teiserver.Communication.RoomMessageLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_room_message(RoomMessage.t) :: {:ok, RoomMessage.t} | {:error, Ecto.Changeset.t}
+  @spec delete_room_message(RoomMessage.t()) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   def delete_room_message(%RoomMessage{} = room_message) do
     Repo.delete(room_message)
   end
@@ -127,7 +129,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
       %Ecto.Changeset{data: %RoomMessage{}}
 
   """
-  @spec change_room_message(RoomMessage.t, map) :: Ecto.Changeset.t
+  @spec change_room_message(RoomMessage.t(), map) :: Ecto.Changeset.t()
   def change_room_message(%RoomMessage{} = room_message, attrs \\ %{}) do
     RoomMessage.changeset(room_message, attrs)
   end

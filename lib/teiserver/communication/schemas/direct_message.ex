@@ -9,7 +9,6 @@ defmodule Teiserver.Communication.DirectMessage do
   * `:inserted_at` - The datetime the message was sent
   * `:delivered?` - Tracks if the message has been delivered to the user or not
   * `:read?` - Tracks if the message has been read by the user or not
-
   * `:from_id` - The `Teiserver.Account.User` who sent the message
   * `:to_id` - The `Teiserver.Account.User` the message was sent to
   """
@@ -28,16 +27,14 @@ defmodule Teiserver.Communication.DirectMessage do
   @type id :: non_neg_integer()
 
   @type t :: %__MODULE__{
-    id: id(),
-    content: String.t(),
-    inserted_at: DateTime.t(),
-
-    delivered?: boolean,
-    read?: boolean,
-
-    from_id: Teiserver.user_id(),
-    to_id: Teiserver.user_id()
-  }
+          id: id(),
+          content: String.t(),
+          inserted_at: DateTime.t(),
+          delivered?: boolean,
+          read?: boolean,
+          from_id: Teiserver.user_id(),
+          to_id: Teiserver.user_id()
+        }
 
   @doc false
   def changeset(server_setting, attrs \\ %{}) do

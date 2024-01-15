@@ -17,7 +17,7 @@ defmodule Teiserver.Account.UserLib do
   @spec list_users(list) :: list
   def list_users(query_args \\ []) do
     UserQueries.user_query(query_args)
-    |> Teiserver.Repo.all
+    |> Teiserver.Repo.all()
   end
 
   @doc """
@@ -219,13 +219,16 @@ defmodule Teiserver.Account.UserLib do
     false
   """
   @spec allow?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
-  def allow?(user_or_user_id, permissions) when is_integer(user_or_user_id), do: allow?(get_user_by_id(user_or_user_id), permissions)
+  def allow?(user_or_user_id, permissions) when is_integer(user_or_user_id),
+    do: allow?(get_user_by_id(user_or_user_id), permissions)
+
   def allow?(%User{} = user, permissions) do
     permissions
-    |> List.wrap
+    |> List.wrap()
     |> Enum.map(fn p -> Enum.member?(user.permissions, p) end)
-    |> Enum.all?
+    |> Enum.all?()
   end
+
   def allow?(_not_a_user, _), do: false
 
   @doc """
@@ -244,12 +247,15 @@ defmodule Teiserver.Account.UserLib do
     false
   """
   @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
-  def restricted?(user_or_user_id, permissions) when is_integer(user_or_user_id), do: restricted?(get_user_by_id(user_or_user_id), permissions)
+  def restricted?(user_or_user_id, permissions) when is_integer(user_or_user_id),
+    do: restricted?(get_user_by_id(user_or_user_id), permissions)
+
   def restricted?(%User{} = user, permissions) do
     permissions
-    |> List.wrap
+    |> List.wrap()
     |> Enum.map(fn p -> Enum.member?(user.restrictions, p) end)
-    |> Enum.any?
+    |> Enum.any?()
   end
+
   def restricted?(_not_a_user, _), do: true
 end

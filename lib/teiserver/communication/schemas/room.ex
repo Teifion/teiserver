@@ -18,12 +18,11 @@ defmodule Teiserver.Communication.Room do
   @type id :: non_neg_integer()
 
   @type t :: %__MODULE__{
-    id: id(),
-    name: String.t(),
-
-    inserted_at: DateTime.t(),
-    updated_at: DateTime.t()
-  }
+          id: id(),
+          name: String.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
 
   @doc false
   def changeset(server_setting, attrs \\ %{}) do
