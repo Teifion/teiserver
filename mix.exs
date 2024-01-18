@@ -145,6 +145,15 @@ defmodule Teiserver.MixProject do
       Users: &(&1[:section] == :user),
       "Extra user data": &(&1[:section] == :extra_user_data),
 
+      # Connections
+      "Clients": &(&1[:section] == :client),
+
+      # Communication
+      "Room messages": &(&1[:section] == :room_message),
+      "Party messages": &(&1[:section] == :party_message),
+      "Lobby messages": &(&1[:section] == :lobby_message),
+      "Direct messages": &(&1[:section] == :direct_message),
+
       # Settings
       "Site settings": &(&1[:section] == :server_setting),
       "User settings": &(&1[:section] == :user_setting)

@@ -1,7 +1,7 @@
 defmodule Teiserver do
   alias Teiserver.Helpers.PubSubHelper
 
-  @type user_id :: non_neg_integer()
+  @type user_id :: Teiserver.Account.User.id()
   @type lobby_id :: non_neg_integer()
   @type party_id :: non_neg_integer()
 

@@ -42,8 +42,12 @@ defmodule Teiserver.RoomLibTest do
       room2 = CommunicationFixtures.room_fixture()
 
       # Name
-      assert RoomLib.get_room_by_name(room1.name) == room1
-      assert RoomLib.get_room_by_name(room2.name) == room2
+      assert RoomLib.get_room_by_name_or_id(room1.name) == room1
+      assert RoomLib.get_room_by_name_or_id(room2.name) == room2
+
+      # ID
+      assert RoomLib.get_room_by_name_or_id(room1.id) == room1
+      assert RoomLib.get_room_by_name_or_id(room2.id) == room2
     end
 
     test "create_room/1 with valid data creates a room" do

@@ -4,7 +4,7 @@ defmodule Teiserver.Helpers.PubSubHelper do
 
   @doc false
   @spec broadcast(String.t(), map()) :: :ok
-  def broadcast(topic, message) do
+  def broadcast(topic, %{event: _} = message) do
     PubSub.broadcast(
       Teiserver.PubSub,
       topic,

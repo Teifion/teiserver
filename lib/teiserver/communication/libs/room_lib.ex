@@ -93,6 +93,7 @@ defmodule Teiserver.Communication.RoomLib do
     |> Repo.one()
   end
 
+
   @doc """
   Creates a room.
 

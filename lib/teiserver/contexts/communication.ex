@@ -31,11 +31,7 @@ defmodule Teiserver.Communication do
   defdelegate get_room(room_id, query_args \\ []), to: RoomLib
 
   @doc section: :room
-  @spec get_room_by_name(String.t()) :: Room.t() | nil
-  defdelegate get_room_by_name(room_name), to: RoomLib
-
-  @doc section: :room
-  @spec get_room_by_name_or_id(String.t() | Room.id()) :: Room.t() | nil
+  @spec get_room_by_name_or_id(Room.name_or_id()) :: Room.t() | nil
   defdelegate get_room_by_name_or_id(room_name_or_id), to: RoomLib
 
   @doc section: :room
@@ -43,7 +39,7 @@ defmodule Teiserver.Communication do
   defdelegate create_room(attrs \\ %{}), to: RoomLib
 
   @doc section: :room
-  @spec get_or_create_room(String.t()) :: Room.t()
+  @spec get_or_create_room(Room.name()) :: Room.t()
   defdelegate get_or_create_room(room_name), to: RoomLib
 
   @doc section: :room
@@ -59,6 +55,14 @@ defmodule Teiserver.Communication do
   defdelegate change_room(room, attrs \\ %{}), to: RoomLib
 
   alias Teiserver.Communication.{RoomMessage, RoomMessageLib, RoomMessageQueries}
+
+  @doc section: :room_message
+  @spec send_room_message(Teiserver.user_id(), Room.id(), String.t(), map()) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset}
+  defdelegate send_room_message(sender_id, room_id, content, attrs \\ %{}), to: RoomMessageLib
+
+  @doc section: :room_message
+  @spec list_recent_room_messages(Room.id(), non_neg_integer()) :: [RoomMessage.t()]
+  defdelegate list_recent_room_messages(room_name_or_id, limit \\ 50), to: RoomMessageLib
 
   @doc false
   @spec room_message_query(list) :: Ecto.Query.t()
@@ -95,10 +99,6 @@ defmodule Teiserver.Communication do
   @doc section: :room_message
   @spec change_room_message(RoomMessage.t(), map) :: Ecto.Changeset
   defdelegate change_room_message(room_message, attrs \\ %{}), to: RoomMessageLib
-
-  @doc section: :room_message
-  @spec list_recent_room_messages(String.t() | Room.id(), non_neg_integer()) :: [RoomMessage.t()]
-  defdelegate list_recent_room_messages(room_name_or_id, limit \\ 50), to: RoomMessageLib
 
 
 
@@ -141,6 +141,10 @@ defmodule Teiserver.Communication do
   @doc section: :direct_message
   @spec change_direct_message(DirectMessage.t(), map) :: Ecto.Changeset
   defdelegate change_direct_message(direct_message, attrs \\ %{}), to: DirectMessageLib
+
+  @doc section: :direct_message
+  @spec send_direct_message(Teiserver.user_id(), Teiserver.user_id(), String.t(), map()) :: {:ok, DirectMessage.t()} | {:error, Ecto.Changeset}
+  defdelegate send_direct_message(from_id, to_id, content, attrs \\ %{}), to: DirectMessageLib
 
   # Lobby chat
   # Party chat

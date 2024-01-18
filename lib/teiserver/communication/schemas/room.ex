@@ -16,10 +16,12 @@ defmodule Teiserver.Communication.Room do
   end
 
   @type id :: non_neg_integer()
+  @type name :: String.t()
+  @type name_or_id :: name() | id()
 
   @type t :: %__MODULE__{
           id: id(),
-          name: String.t(),
+          name: name(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t()
         }

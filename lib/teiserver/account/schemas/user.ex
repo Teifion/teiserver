@@ -54,8 +54,11 @@ defmodule Teiserver.Account.User do
     timestamps()
   end
 
+
+  @type id :: non_neg_integer()
+
   @type t :: %__MODULE__{
-          id: non_neg_integer(),
+          id: id(),
           name: String.t(),
           email: String.t(),
           password: String.t(),

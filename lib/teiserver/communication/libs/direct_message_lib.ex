@@ -5,6 +5,52 @@ defmodule Teiserver.Communication.DirectMessageLib do
   use TeiserverMacros, :library
   alias Teiserver.Communication.{DirectMessage, DirectMessageQueries}
 
+
+  @doc """
+  - Creates a direct message
+  - If successful generate a pubsub message
+
+  ## Examples
+
+      iex> send_direct_message(123, 124, "Message content")
+      {:ok, %DirectMessage{}}
+
+      iex> send_direct_message(456, 457, "Message content")
+      {:error, %Ecto.Changeset{}}
+  """
+  @spec send_direct_message(Teiserver.user_id(), Room.id(), String.t(), map()) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset}
+  def send_direct_message(from_id, to_id, content, attrs \\ %{}) do
+    attrs = Map.merge(%{
+      from_id: from_id,
+      to_id: to_id,
+      content: content,
+      inserted_at: Timex.now()
+    }, attrs)
+
+    case create_direct_message(attrs) do
+      {:ok, direct_message} ->
+        Teiserver.broadcast(
+          "Teiserver.Communication:User.#{direct_message.from_id}",
+          %{
+            event: :message_sent,
+            direct_message: direct_message
+          }
+        )
+
+        Teiserver.broadcast(
+          "Teiserver.Communication:User.#{direct_message.to_id}",
+          %{
+            event: :message_received,
+            direct_message: direct_message
+          }
+        )
+
+        {:ok, direct_message}
+      err ->
+        err
+    end
+  end
+
   @doc """
   Returns the list of direct_messages.
 

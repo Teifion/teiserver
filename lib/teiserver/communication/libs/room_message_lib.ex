@@ -3,7 +3,64 @@ defmodule Teiserver.Communication.RoomMessageLib do
   Library of room_message related functions.
   """
   use TeiserverMacros, :library
-  alias Teiserver.Communication.{RoomMessage, RoomMessageQueries}
+  alias Teiserver.Communication.{Room, RoomMessage, RoomMessageQueries}
+
+
+  @doc """
+  Returns a list of messages from a room ordered as the most recent first.
+
+  In the event of there being ne messages for a room of that ID the function will return an empty list.
+
+  ## Examples
+
+      iex> list_recent_room_messages(123)
+      [%RoomMessage{}, ...]
+
+      iex> list_recent_room_messages(456)
+      []
+  """
+  @spec list_recent_room_messages(Room.id(), non_neg_integer()) :: [RoomMessage.t()]
+  def list_recent_room_messages(room_id, limit \\ 50) when is_integer(room_id) do
+    list_room_messages(where: [room_id: room_id], limit: limit, order_by: ["Most recent first"])
+  end
+
+  @doc """
+    - Creates a room message
+    - If successful generate a pubsub message
+
+    ## Examples
+
+        iex> send_room_message(123, 123, "Message content")
+        {:ok, %RoomMessage{}}
+
+        iex> send_room_message(456, 456, "Message content")
+        {:error, %Ecto.Changeset{}}
+  """
+  @spec send_room_message(Teiserver.user_id(), Room.id(), String.t(), map()) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset}
+  def send_room_message(sender_id, room_id, content, attrs \\ %{}) do
+    attrs = Map.merge(%{
+      sender_id: sender_id,
+      room_id: room_id,
+      content: content,
+      inserted_at: Timex.now()
+    }, attrs)
+
+    case create_room_message(attrs) do
+      {:ok, room_message} ->
+        Teiserver.broadcast(
+          "Teiserver.Communication:Room.#{room_message.room_id}",
+          %{
+            event: :message_received,
+            room_message: room_message
+          }
+        )
+
+        {:ok, room_message}
+      err ->
+        err
+    end
+  end
+
 
   @doc """
   Returns the list of room_messages.
@@ -132,16 +189,6 @@ defmodule Teiserver.Communication.RoomMessageLib do
   @spec change_room_message(RoomMessage.t(), map) :: Ecto.Changeset.t()
   def change_room_message(%RoomMessage{} = room_message, attrs \\ %{}) do
     RoomMessage.changeset(room_message, attrs)
-  end
-
-  @spec list_recent_room_messages(String.t() | Room.id(), non_neg_integer()) :: [RoomMessage.t()]
-  def list_recent_room_messages(room_name_or_id, limit \\ 50) do
-    room = Teiserver.Communication.get_room_by_name_or_id(room_name_or_id)
-    if room do
-      list_room_messages(where: [room_id: room.id], limit: limit)
-    else
-      []
-    end
   end
 
 end
