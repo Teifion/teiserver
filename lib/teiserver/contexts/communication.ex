@@ -35,6 +35,10 @@ defmodule Teiserver.Communication do
   defdelegate get_room_by_name(room_name), to: RoomLib
 
   @doc section: :room
+  @spec get_room_by_name_or_id(String.t() | Room.id()) :: Room.t() | nil
+  defdelegate get_room_by_name_or_id(room_name_or_id), to: RoomLib
+
+  @doc section: :room
   @spec create_room(map) :: {:ok, Room.t()} | {:error, Ecto.Changeset}
   defdelegate create_room(attrs \\ %{}), to: RoomLib
 
@@ -91,6 +95,12 @@ defmodule Teiserver.Communication do
   @doc section: :room_message
   @spec change_room_message(RoomMessage.t(), map) :: Ecto.Changeset
   defdelegate change_room_message(room_message, attrs \\ %{}), to: RoomMessageLib
+
+  @doc section: :room_message
+  @spec list_recent_room_messages(String.t() | Room.id(), non_neg_integer()) :: [RoomMessage.t()]
+  defdelegate list_recent_room_messages(room_name_or_id, limit \\ 50), to: RoomMessageLib
+
+
 
   alias Teiserver.Communication.{DirectMessage, DirectMessageLib, DirectMessageQueries}
 

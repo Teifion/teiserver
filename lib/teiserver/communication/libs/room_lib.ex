@@ -64,21 +64,31 @@ defmodule Teiserver.Communication.RoomLib do
   end
 
   @doc """
-  Gets a single room by name.
+  Gets a single room by name or id (must be an integer).
 
   Returns nil if the Room does not exist.
 
   ## Examples
 
-      iex> get_room_by_name("main")
+      iex> get_room_by_name_or_id("main")
       %Room{}
 
-      iex> get_room_by_name("not a name")
+      iex> get_room_by_name_or_id(123)
+      %Room{}
+
+      iex> get_room_by_name_or_id("not a name")
+      nil
+
+      iex> get_room_by_name_or_id(456)
       nil
 
   """
-  @spec get_room_by_name(String.t()) :: Room.t() | nil
-  def get_room_by_name(room_name) do
+  @spec get_room_by_name_or_id(String.t() | Room.id()) :: Room.t() | nil
+  def get_room_by_name_or_id(room_id) when is_integer(room_id) do
+    get_room(room_id)
+  end
+
+  def get_room_by_name_or_id(room_name) do
     RoomQueries.room_query(where: [name: room_name])
     |> Repo.one()
   end
@@ -116,7 +126,7 @@ defmodule Teiserver.Communication.RoomLib do
   """
   @spec get_or_create_room(String.t()) :: Room.t()
   def get_or_create_room(room_name) do
-    case get_room_by_name(room_name) do
+    case get_room_by_name_or_id(room_name) do
       nil ->
         {:ok, room} = create_room(%{name: room_name})
         room

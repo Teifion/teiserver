@@ -133,4 +133,15 @@ defmodule Teiserver.Communication.RoomMessageLib do
   def change_room_message(%RoomMessage{} = room_message, attrs \\ %{}) do
     RoomMessage.changeset(room_message, attrs)
   end
+
+  @spec list_recent_room_messages(String.t() | Room.id(), non_neg_integer()) :: [RoomMessage.t()]
+  def list_recent_room_messages(room_name_or_id, limit \\ 50) do
+    room = Teiserver.Communication.get_room_by_name_or_id(room_name_or_id)
+    if room do
+      list_room_messages(where: [room_id: room.id], limit: limit)
+    else
+      []
+    end
+  end
+
 end
