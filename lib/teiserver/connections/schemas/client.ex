@@ -7,6 +7,7 @@ defmodule Teiserver.Connections.Client do
 
   * `:id` - The user_id of the User being represented
   * `:connected?` - When true, at least one connection for the client is still live, when false no connections for the client are live
+  * `:last_disconnected` - When disconnected, stores a DateTime of when the client was last connected
   * `:lobby_id` - nil or the id of the lobby current occupied by this client
   * `:in_game?` - True when the client is in-game
   * `:afk?` - True when the client has not sent an activity message for a while
@@ -23,6 +24,7 @@ defmodule Teiserver.Connections.Client do
   @type t :: %__MODULE__{
           id: Teiserver.user_id(),
           connected?: boolean,
+          last_disconnected: DateTime.t(),
 
           # Lobby status stuff
           lobby_id: Teiserver.lobby_id() | nil,
@@ -38,7 +40,7 @@ defmodule Teiserver.Connections.Client do
           party_id: Teiserver.party_id() | nil
         }
 
-  defstruct ~w(id connected? lobby_id in_game? afk? ready? player? player_number team_number team_colour sync lobby_host? party_id)a
+  defstruct ~w(id connected? last_disconnected lobby_id in_game? afk? ready? player? player_number team_number team_colour sync lobby_host? party_id)a
 
   @spec new(Teiserver.user_id()) :: __MODULE__.t()
   def new(user_id) do

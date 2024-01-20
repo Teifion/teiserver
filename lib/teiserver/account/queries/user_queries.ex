@@ -33,15 +33,15 @@ defmodule Teiserver.Account.UserQueries do
   def _where(query, _, nil), do: query
   def _where(query, _, "Any"), do: query
 
-  def _where(query, :id, id) do
+  def _where(query, :id, id_list) when is_list(id_list) do
     from(users in query,
-      where: users.id == ^id
+      where: users.id in ^id_list
     )
   end
 
-  def _where(query, :id_in, id_list) do
+  def _where(query, :id, id) do
     from(users in query,
-      where: users.id in ^id_list
+      where: users.id == ^id
     )
   end
 

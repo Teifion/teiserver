@@ -5,7 +5,12 @@ defmodule Teiserver.Connections.ClientServer do
   """
   use GenServer
   require Logger
-  alias Teiserver.Connections.Client
+  alias Teiserver.Connections.{Client, ClientLib}
+
+  @heartbeat_frequency_ms 5_000
+
+  # The amount of time after the last disconnect at which we will destroy the ClientServer process
+  @client_destroy_timeout_seconds Application.compile_env(:teiserver, :client_destroy_timeout_seconds, 300)
 
   defmodule State do
     @moduledoc false
@@ -37,25 +42,41 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   @impl true
-  def handle_info(:heartbeat, state) do
+  def handle_info(:heartbeat, %State{client: %{connected?: false}} = state) do
+    seconds_since_disconnect = Timex.diff(Timex.now(), state.client.last_disconnected, :second)
+
+    if seconds_since_disconnect > @client_destroy_timeout_seconds do
+      ClientLib.stop_client_server(state.user_id)
+      {:noreply, state}
+    else
+      {:noreply, state}
+    end
+  end
+
+  def handle_info(:heartbeat, %State{} = state) do
     {:noreply, state}
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _normal}, state) do
-    new_connections =
-      if Enum.member?(state.connections, pid) do
-        List.delete(state.connections, pid)
+    new_state = lose_connection(pid, state)
+    {:noreply, new_state}
+  end
+
+  @spec lose_connection(pid(), State.t()) :: State.t()
+  defp lose_connection(pid, state) do
+    if Enum.member?(state.connections, pid) do
+      new_connections = List.delete(state.connections, pid)
+
+      if Enum.empty?(new_connections) do
+        new_client = %{state.client | connected?: false, last_disconnected: Timex.now()}
+
+        %State{state | connections: new_connections, client: new_client}
       else
-        Logger.error("#{__MODULE__} got :DOWN message but did not have it as a connection")
-        state.connections
+        %State{state | connections: new_connections}
       end
-
-    if Enum.empty?(new_connections) do
-      new_client = %{state.client | connected?: false}
-
-      {:noreply, %State{state | connections: new_connections, client: new_client}}
     else
-      {:noreply, %State{state | connections: new_connections}}
+      Logger.error("#{__MODULE__} got :DOWN message but did not have it as a connection")
+      state
     end
   end
 
@@ -90,7 +111,7 @@ defmodule Teiserver.Connections.ClientServer do
   @spec init(map) :: {:ok, map}
   def init(%{client: %Client{id: id} = client}) do
     # Logger.metadata(request_id: "ClientServer##{id}")
-    :timer.send_interval(6_000, :heartbeat)
+    :timer.send_interval(@heartbeat_frequency_ms, :heartbeat)
 
     # Update the queue pids cache to point to this process
     Registry.register(

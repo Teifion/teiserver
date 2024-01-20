@@ -48,6 +48,77 @@ defmodule Teiserver.DirectMessageLibTest do
       assert DirectMessageLib.list_direct_messages([]) != []
     end
 
+    test "list_direct_messages_for_user/1" do
+      user1 = AccountFixtures.user_fixture()
+
+      # No direct_message yet
+      assert DirectMessageLib.list_direct_messages_for_user(user1.id) == []
+
+      # Add a direct_message
+      m1 = CommunicationFixtures.direct_message_fixture(to_id: user1.id)
+      m2 = CommunicationFixtures.direct_message_fixture(from_id: user1.id)
+      _m3 = CommunicationFixtures.direct_message_fixture()
+      assert DirectMessageLib.list_direct_messages_for_user(user1.id) == [m1, m2]
+    end
+
+    test "list_direct_messages_to_user/1" do
+      user1 = AccountFixtures.user_fixture()
+
+      # No direct_message yet
+      assert DirectMessageLib.list_direct_messages_to_user(user1.id) == []
+
+      # Add a direct_message
+      m1 = CommunicationFixtures.direct_message_fixture(to_id: user1.id)
+      _m2 = CommunicationFixtures.direct_message_fixture(from_id: user1.id)
+      _m3 = CommunicationFixtures.direct_message_fixture()
+      assert DirectMessageLib.list_direct_messages_to_user(user1.id) == [m1]
+    end
+
+    test "list_direct_messages_from_user/1" do
+      user1 = AccountFixtures.user_fixture()
+
+      # No direct_message yet
+      assert DirectMessageLib.list_direct_messages_from_user(user1.id) == []
+
+      # Add a direct_message
+      _m1 = CommunicationFixtures.direct_message_fixture(to_id: user1.id)
+      m2 = CommunicationFixtures.direct_message_fixture(from_id: user1.id)
+      _m3 = CommunicationFixtures.direct_message_fixture()
+      assert DirectMessageLib.list_direct_messages_from_user(user1.id) == [m2]
+    end
+
+    test "list_direct_messages_from_user_to_user/1" do
+      user1 = AccountFixtures.user_fixture()
+      user2 = AccountFixtures.user_fixture()
+
+      # No direct_message yet
+      assert DirectMessageLib.list_direct_messages_from_user_to_user(user1.id, user2.id) == []
+
+      # Add a direct_message
+      _m1 = CommunicationFixtures.direct_message_fixture(to_id: user1.id)
+      _m2 = CommunicationFixtures.direct_message_fixture(from_id: user1.id)
+      _m3 = CommunicationFixtures.direct_message_fixture()
+      m4 = CommunicationFixtures.direct_message_fixture(from_id: user1.id, to_id: user2.id)
+      _m5 = CommunicationFixtures.direct_message_fixture(from_id: user2.id, to_id: user1.id)
+      assert DirectMessageLib.list_direct_messages_from_user_to_user(user1.id, user2.id) == [m4]
+    end
+
+    test "list_direct_messages_between_users/1" do
+      user1 = AccountFixtures.user_fixture()
+      user2 = AccountFixtures.user_fixture()
+
+      # No direct_message yet
+      assert DirectMessageLib.list_direct_messages_between_users(user1.id, user2.id) == []
+
+      # Add a direct_message
+      _m1 = CommunicationFixtures.direct_message_fixture(to_id: user1.id)
+      _m2 = CommunicationFixtures.direct_message_fixture(from_id: user1.id)
+      _m3 = CommunicationFixtures.direct_message_fixture()
+      m4 = CommunicationFixtures.direct_message_fixture(from_id: user1.id, to_id: user2.id)
+      m5 = CommunicationFixtures.direct_message_fixture(from_id: user2.id, to_id: user1.id)
+      assert DirectMessageLib.list_direct_messages_between_users(user1.id, user2.id) == [m4, m5]
+    end
+
     test "get_direct_message!/1 and get_direct_message/1 returns the direct_message with given id" do
       direct_message = CommunicationFixtures.direct_message_fixture()
       assert DirectMessageLib.get_direct_message!(direct_message.id) == direct_message

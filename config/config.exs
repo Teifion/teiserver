@@ -16,6 +16,10 @@ config :teiserver, Teiserver.Test.Repo,
       "postgres://teiserver_test:123456789@localhost/teiserver_test"
 
 config :teiserver,
+  # Overridden by application
+  client_destroy_timeout_seconds: 300,
+
+  # Used for tests
   ecto_repos: [Teiserver.Test.Repo]
 
 # Import environment specific config

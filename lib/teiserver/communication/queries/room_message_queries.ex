@@ -33,21 +33,15 @@ defmodule Teiserver.Communication.RoomMessageQueries do
   def _where(query, _, nil), do: query
   def _where(query, _, "Any"), do: query
 
-  def _where(query, :id, id) do
-    from(room_messages in query,
-      where: room_messages.id == ^id
-    )
-  end
-
-  def _where(query, :id_in, id_list) do
+  def _where(query, :id, id_list) when is_list(id_list) do
     from(room_messages in query,
       where: room_messages.id in ^id_list
     )
   end
 
-  def _where(query, :name, name) do
+  def _where(query, :id, id) do
     from(room_messages in query,
-      where: room_messages.name == ^name
+      where: room_messages.id == ^id
     )
   end
 

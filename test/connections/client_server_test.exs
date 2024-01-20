@@ -28,6 +28,7 @@ defmodule Connections.ClientServerTest do
       assert client.__struct__ == Connections.Client
       assert client.id == user.id
       assert client.connected?
+      assert client.last_disconnected == nil
 
       # Okay, now lets ensure the server state is as we expect
       server_state = :sys.get_state(Connections.get_client_pid(user.id))
@@ -42,6 +43,7 @@ defmodule Connections.ClientServerTest do
       # New states
       client = Connections.get_client(user.id)
       refute client.connected?
+      assert client.last_disconnected != nil
 
       server_state = :sys.get_state(Connections.get_client_pid(user.id))
       assert server_state.client == client
@@ -181,6 +183,41 @@ defmodule Connections.ClientServerTest do
       # No messages either, client should be the same
       msgs = TestConn.get(conn)
       assert msgs == []
+    end
+
+    test "heartbeat destroy process" do
+      {conn, user} = ConnectionFixtures.client_fixture()
+
+      # Kill the connecting process
+      TestConn.stop(conn)
+
+      # Set the last_disconnected to something okay
+      disconnected_at = Timex.now |> Timex.shift(seconds: -100)
+      Connections.update_client(user.id, %{last_disconnected: disconnected_at})
+
+      client = Connections.get_client(user.id)
+      refute client.connected?
+      assert client.last_disconnected == disconnected_at
+
+      client_pid = Connections.get_client_pid(user.id)
+      send(client_pid, :heartbeat)
+      :timer.sleep(100)
+
+      assert Connections.client_exists?(user.id)
+
+      # Set the last_disconnected to something much larger, it should result in the client process being destroyed
+      disconnected_at = Timex.now |> Timex.shift(seconds: -1_000_000)
+      Connections.update_client(user.id, %{last_disconnected: disconnected_at})
+
+      client = Connections.get_client(user.id)
+      refute client.connected?
+      assert client.last_disconnected == disconnected_at
+
+      client_pid = Connections.get_client_pid(user.id)
+      send(client_pid, :heartbeat)
+      :timer.sleep(100)
+
+      refute Connections.client_exists?(user.id)
     end
   end
 end

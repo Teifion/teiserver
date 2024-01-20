@@ -2,7 +2,7 @@ defmodule Teiserver.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/Teifion/teiserver"
-  @version "0.0.2"
+  @version "0.0.3"
 
   def project do
     [
@@ -54,6 +54,7 @@ defmodule Teiserver.MixProject do
     [
       # Guides
       "documentation/guides/installation.md",
+      "documentation/guides/config.md",
       "documentation/guides/hello_world.md",
       "documentation/guides/program_structure.md",
       "documentation/guides/snippets.md",

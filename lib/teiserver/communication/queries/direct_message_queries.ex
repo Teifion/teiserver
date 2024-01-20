@@ -19,9 +19,9 @@ defmodule Teiserver.Communication.DirectMessageQueries do
   end
 
   @spec do_where(Ecto.Query.t(), list | map | nil) :: Ecto.Query.t()
-  defp do_where(query, nil), do: query
+  def do_where(query, nil), do: query
 
-  defp do_where(query, params) do
+  def do_where(query, params) do
     params
     |> Enum.reduce(query, fn {key, value}, query_acc ->
       _where(query_acc, key, value)
@@ -33,21 +33,51 @@ defmodule Teiserver.Communication.DirectMessageQueries do
   def _where(query, _, nil), do: query
   def _where(query, _, "Any"), do: query
 
+  def _where(query, :id_in, id_list) when is_list(id_list) do
+    from(direct_messages in query,
+      where: direct_messages.id in ^id_list
+    )
+  end
+
   def _where(query, :id, id) do
     from(direct_messages in query,
       where: direct_messages.id == ^id
     )
   end
 
-  def _where(query, :id_in, id_list) do
+  def _where(query, :to_id, to_id_list) when is_list(to_id_list) do
     from(direct_messages in query,
-      where: direct_messages.id in ^id_list
+      where: direct_messages.to_id in ^to_id_list
     )
   end
 
-  def _where(query, :name, name) do
+  def _where(query, :to_id, to_id) do
     from(direct_messages in query,
-      where: direct_messages.name == ^name
+      where: direct_messages.to_id == ^to_id
+    )
+  end
+
+  def _where(query, :from_id, from_id_list) when is_list(from_id_list) do
+    from(direct_messages in query,
+      where: direct_messages.from_id in ^from_id_list
+    )
+  end
+
+  def _where(query, :from_id, from_id) do
+    from(direct_messages in query,
+      where: direct_messages.from_id == ^from_id
+    )
+  end
+
+  def _where(query, :to_or_from_id, user_ids) when is_list(user_ids) do
+    from(direct_messages in query,
+      where: (direct_messages.from_id in ^user_ids or direct_messages.to_id in ^user_ids)
+    )
+  end
+
+  def _where(query, :to_or_from_id, user_id) do
+    from(direct_messages in query,
+      where: (direct_messages.from_id == ^user_id or direct_messages.to_id == ^user_id)
     )
   end
 

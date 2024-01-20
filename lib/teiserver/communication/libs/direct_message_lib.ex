@@ -60,10 +60,110 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages(list) :: list
+  @spec list_direct_messages(list) :: [%DirectMessage{}]
   def list_direct_messages(query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of direct_messages for a specific user (to and from).
+
+  ## Examples
+
+      iex> list_direct_messages_for_user(user_id)
+      [%DirectMessage{}, ...]
+
+  """
+  @spec list_direct_messages_for_user(Teiserver.user_id(), list) :: [%DirectMessage{}]
+  def list_direct_messages_for_user(user_id, query_args \\ []) do
+    query_args
+    |> DirectMessageQueries.direct_message_query()
+    |> DirectMessageQueries.do_where([
+      to_or_from_id: user_id
+    ])
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of direct_messages sent to a specific user.
+
+  ## Examples
+
+      iex> list_direct_messages_to_user(user_id)
+      [%DirectMessage{}, ...]
+
+  """
+  @spec list_direct_messages_to_user(Teiserver.user_id(), list) :: [%DirectMessage{}]
+  def list_direct_messages_to_user(user_id, query_args \\ []) do
+    query_args
+    |> DirectMessageQueries.direct_message_query()
+    |> DirectMessageQueries.do_where([
+      to_id: user_id
+    ])
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of direct_messages sent from a specific user.
+
+  ## Examples
+
+      iex> list_direct_messages_from_user(user_id)
+      [%DirectMessage{}, ...]
+
+  """
+  @spec list_direct_messages_from_user(Teiserver.user_id(), list) :: [%DirectMessage{}]
+  def list_direct_messages_from_user(user_id, query_args \\ []) do
+    query_args
+    |> DirectMessageQueries.direct_message_query()
+    |> DirectMessageQueries.do_where([
+      from_id: user_id
+    ])
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of direct_messages sent from a specific user to a specific user.
+
+  ## Examples
+
+      iex> list_direct_messages_from_user_to_user(from_id, to_id)
+      [%DirectMessage{}, ...]
+
+  """
+  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id(), list) :: [%DirectMessage{}]
+  def list_direct_messages_from_user_to_user(from_id, to_id, query_args \\ []) do
+    query_args
+    |> DirectMessageQueries.direct_message_query()
+    |> DirectMessageQueries.do_where([
+      from_id: from_id,
+      to_id: to_id
+    ])
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of direct_messages sent between specific users.
+
+  ## Examples
+
+      iex> list_direct_messages_between_users(user1_id, user2_id)
+      [%DirectMessage{}, ...]
+
+      iex> list_direct_messages_between_users(user1_id, user2_id, limit: 10, order_by: ["Newest first"])
+      [%DirectMessage{}, ...]
+
+  """
+  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id(), list) :: [%DirectMessage{}]
+  def list_direct_messages_between_users(user_id1, user_id2, query_args \\ []) do
+    query_args
+    |> DirectMessageQueries.direct_message_query()
+    |> DirectMessageQueries.do_where([
+      from_id: [user_id1, user_id2],
+      to_id: [user_id1, user_id2]
+    ])
     |> Repo.all()
   end
 
