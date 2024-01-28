@@ -147,7 +147,7 @@ defmodule Teiserver.MixProject do
       "Extra user data": &(&1[:section] == :extra_user_data),
 
       # Connections
-      "Clients": &(&1[:section] == :client),
+      Clients: &(&1[:section] == :client),
 
       # Communication
       "Room messages": &(&1[:section] == :room_message),
@@ -261,7 +261,7 @@ defmodule Teiserver.MixProject do
         "hex.publish --yes"
       ],
       "test.reset": ["ecto.drop --quiet", "test.setup"],
-      "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
+      "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"]
       # "test.ci": [
       #   "format --check-formatted",
       #   "deps.unlock --check-unused",

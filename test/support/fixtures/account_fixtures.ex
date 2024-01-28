@@ -1,6 +1,6 @@
 defmodule Teiserver.AccountFixtures do
   @moduledoc false
-  alias Teiserver.Account.User
+  alias Teiserver.Account.{User, ExtraUserData}
 
   @spec user_fixture(map) :: User.t()
   def user_fixture(data \\ %{}) do
@@ -17,6 +17,18 @@ defmodule Teiserver.AccountFixtures do
         restrictions: data["restrictions"] || []
       },
       :full
+    )
+    |> Teiserver.Repo.insert!()
+  end
+
+  @spec extra_user_data_fixture(map) :: ExtraUserData.t()
+  def extra_user_data_fixture(data \\ %{}) do
+    ExtraUserData.changeset(
+      %ExtraUserData{},
+      %{
+        user_id: data[:user_id] || user_fixture().id,
+        data: data[:data] || %{}
+      }
     )
     |> Teiserver.Repo.insert!()
   end

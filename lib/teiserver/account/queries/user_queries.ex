@@ -4,14 +4,13 @@ defmodule Teiserver.Account.UserQueries do
   alias Teiserver.Account.User
   require Logger
 
-  @spec user_query(list) :: Ecto.Query.t()
-  def user_query(args) do
+  @spec user_query(Teiserver.query_args()) :: Ecto.Query.t()
+  def user_query(args \\ []) do
     query = from(users in User)
 
     query
     |> do_where(id: args[:id])
     |> do_where(args[:where])
-    |> do_where(args[:search])
     |> do_preload(args[:preload])
     |> do_order_by(args[:order_by])
     |> QueryHelper.query_select(args[:select])
@@ -28,10 +27,9 @@ defmodule Teiserver.Account.UserQueries do
     end)
   end
 
-  @spec _where(Ecto.Query.t(), Atom.t(), any()) :: Ecto.Query.t()
+  @spec _where(Ecto.Query.t(), atom, any()) :: Ecto.Query.t()
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
-  def _where(query, _, "Any"), do: query
 
   def _where(query, :id, id_list) when is_list(id_list) do
     from(users in query,
@@ -174,25 +172,25 @@ defmodule Teiserver.Account.UserQueries do
 
   def _where(query, :last_played_after, timestamp) do
     from(users in query,
-      where: users.last_played >= ^timestamp
+      where: users.last_played_at >= ^timestamp
     )
   end
 
   def _where(query, :last_played_before, timestamp) do
     from(users in query,
-      where: users.last_played < ^timestamp
+      where: users.last_played_at < ^timestamp
     )
   end
 
   def _where(query, :last_login_after, timestamp) do
     from(users in query,
-      where: users.last_login >= ^timestamp
+      where: users.last_login_at >= ^timestamp
     )
   end
 
   def _where(query, :last_login_before, timestamp) do
     from(users in query,
-      where: users.last_login < ^timestamp
+      where: users.last_login_at < ^timestamp
     )
   end
 
@@ -234,23 +232,23 @@ defmodule Teiserver.Account.UserQueries do
 
   def _order_by(query, "Last logged in") do
     from(users in query,
-      order_by: [asc: users.last_logged_in]
+      order_by: [asc: users.last_login_at]
     )
   end
 
   def _order_by(query, "Last played") do
     from(users in query,
-      order_by: [desc: users.last_played]
+      order_by: [desc: users.last_played_at]
     )
   end
 
   def _order_by(query, "Last logged out") do
     from(users in query,
-      order_by: [desc: users.last_logout]
+      order_by: [desc: users.last_logout_at]
     )
   end
 
-  @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
+  @spec do_preload(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
   defp do_preload(query, preloads) do

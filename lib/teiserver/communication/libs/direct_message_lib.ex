@@ -5,7 +5,6 @@ defmodule Teiserver.Communication.DirectMessageLib do
   use TeiserverMacros, :library
   alias Teiserver.Communication.{DirectMessage, DirectMessageQueries}
 
-
   @doc """
   - Creates a direct message
   - If successful generate a pubsub message
@@ -18,14 +17,19 @@ defmodule Teiserver.Communication.DirectMessageLib do
       iex> send_direct_message(456, 457, "Message content")
       {:error, %Ecto.Changeset{}}
   """
-  @spec send_direct_message(Teiserver.user_id(), Room.id(), String.t(), map()) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset}
+  @spec send_direct_message(Teiserver.user_id(), Room.id(), String.t(), map()) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   def send_direct_message(from_id, to_id, content, attrs \\ %{}) do
-    attrs = Map.merge(%{
-      from_id: from_id,
-      to_id: to_id,
-      content: content,
-      inserted_at: Timex.now()
-    }, attrs)
+    attrs =
+      Map.merge(
+        %{
+          from_id: from_id,
+          to_id: to_id,
+          content: content,
+          inserted_at: Timex.now()
+        },
+        attrs
+      )
 
     case create_direct_message(attrs) do
       {:ok, direct_message} ->
@@ -46,6 +50,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
         )
 
         {:ok, direct_message}
+
       err ->
         err
     end
@@ -60,7 +65,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages(list) :: [%DirectMessage{}]
+  @spec list_direct_messages(Teiserver.query_args()) :: [DirectMessage.t()]
   def list_direct_messages(query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
@@ -76,13 +81,12 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_for_user(Teiserver.user_id(), list) :: [%DirectMessage{}]
+  @spec list_direct_messages_for_user(Teiserver.user_id()) :: [DirectMessage.t()]
+  @spec list_direct_messages_for_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
   def list_direct_messages_for_user(user_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
-    |> DirectMessageQueries.do_where([
-      to_or_from_id: user_id
-    ])
+    |> DirectMessageQueries.do_where(to_or_from_id: user_id)
     |> Repo.all()
   end
 
@@ -95,13 +99,12 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_to_user(Teiserver.user_id(), list) :: [%DirectMessage{}]
+  @spec list_direct_messages_to_user(Teiserver.user_id()) :: [DirectMessage.t()]
+  @spec list_direct_messages_to_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
   def list_direct_messages_to_user(user_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
-    |> DirectMessageQueries.do_where([
-      to_id: user_id
-    ])
+    |> DirectMessageQueries.do_where(to_id: user_id)
     |> Repo.all()
   end
 
@@ -114,13 +117,12 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_from_user(Teiserver.user_id(), list) :: [%DirectMessage{}]
+  @spec list_direct_messages_from_user(Teiserver.user_id()) :: [DirectMessage.t()]
+  @spec list_direct_messages_from_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
   def list_direct_messages_from_user(user_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
-    |> DirectMessageQueries.do_where([
-      from_id: user_id
-    ])
+    |> DirectMessageQueries.do_where(from_id: user_id)
     |> Repo.all()
   end
 
@@ -133,14 +135,15 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id(), list) :: [%DirectMessage{}]
+  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id(), Teiserver.query_args()) ::
+          [DirectMessage.t()]
   def list_direct_messages_from_user_to_user(from_id, to_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
-    |> DirectMessageQueries.do_where([
+    |> DirectMessageQueries.do_where(
       from_id: from_id,
       to_id: to_id
-    ])
+    )
     |> Repo.all()
   end
 
@@ -156,14 +159,15 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id(), list) :: [%DirectMessage{}]
+  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id()) :: [DirectMessage.t()]
+  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
   def list_direct_messages_between_users(user_id1, user_id2, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
-    |> DirectMessageQueries.do_where([
+    |> DirectMessageQueries.do_where(
       from_id: [user_id1, user_id2],
       to_id: [user_id1, user_id2]
-    ])
+    )
     |> Repo.all()
   end
 
@@ -182,6 +186,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
 
   """
   @spec get_direct_message!(non_neg_integer()) :: DirectMessage.t()
+  @spec get_direct_message!(non_neg_integer(), Teiserver.query_args()) :: DirectMessage.t()
   def get_direct_message!(direct_message_id, query_args \\ []) do
     (query_args ++ [id: direct_message_id])
     |> DirectMessageQueries.direct_message_query()
@@ -202,7 +207,8 @@ defmodule Teiserver.Communication.DirectMessageLib do
       nil
 
   """
-  @spec get_direct_message(non_neg_integer(), list) :: DirectMessage.t() | nil
+  @spec get_direct_message(non_neg_integer()) :: DirectMessage.t() | nil
+  @spec get_direct_message(non_neg_integer(), Teiserver.query_args()) :: DirectMessage.t() | nil
   def get_direct_message(direct_message_id, query_args \\ []) do
     (query_args ++ [id: direct_message_id])
     |> DirectMessageQueries.direct_message_query()

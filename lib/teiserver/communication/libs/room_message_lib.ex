@@ -5,7 +5,6 @@ defmodule Teiserver.Communication.RoomMessageLib do
   use TeiserverMacros, :library
   alias Teiserver.Communication.{Room, RoomMessage, RoomMessageQueries}
 
-
   @doc """
   Returns a list of messages from a room ordered as the most recent first.
 
@@ -36,14 +35,19 @@ defmodule Teiserver.Communication.RoomMessageLib do
         iex> send_room_message(456, 456, "Message content")
         {:error, %Ecto.Changeset{}}
   """
-  @spec send_room_message(Teiserver.user_id(), Room.id(), String.t(), map()) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset}
+  @spec send_room_message(Teiserver.user_id(), Room.id(), String.t(), map()) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   def send_room_message(sender_id, room_id, content, attrs \\ %{}) do
-    attrs = Map.merge(%{
-      sender_id: sender_id,
-      room_id: room_id,
-      content: content,
-      inserted_at: Timex.now()
-    }, attrs)
+    attrs =
+      Map.merge(
+        %{
+          sender_id: sender_id,
+          room_id: room_id,
+          content: content,
+          inserted_at: Timex.now()
+        },
+        attrs
+      )
 
     case create_room_message(attrs) do
       {:ok, room_message} ->
@@ -56,11 +60,11 @@ defmodule Teiserver.Communication.RoomMessageLib do
         )
 
         {:ok, room_message}
+
       err ->
         err
     end
   end
-
 
   @doc """
   Returns the list of room_messages.
@@ -190,5 +194,4 @@ defmodule Teiserver.Communication.RoomMessageLib do
   def change_room_message(%RoomMessage{} = room_message, attrs \\ %{}) do
     RoomMessage.changeset(room_message, attrs)
   end
-
 end

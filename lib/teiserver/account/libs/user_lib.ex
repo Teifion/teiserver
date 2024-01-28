@@ -14,7 +14,7 @@ defmodule Teiserver.Account.UserLib do
       [%User{}, ...]
 
   """
-  @spec list_users(list) :: list
+  @spec list_users(Teiserver.query_args()) :: [User.t()]
   def list_users(query_args \\ []) do
     UserQueries.user_query(query_args)
     |> Teiserver.Repo.all()
@@ -35,6 +35,7 @@ defmodule Teiserver.Account.UserLib do
 
   """
   @spec get_user!(Teiserver.user_id()) :: User.t()
+  @spec get_user!(Teiserver.user_id(), Teiserver.query_args()) :: User.t()
   def get_user!(user_id, query_args \\ []) do
     (query_args ++ [id: user_id])
     |> UserQueries.user_query()
@@ -58,7 +59,7 @@ defmodule Teiserver.Account.UserLib do
       %User{}
 
   """
-  @spec get_user(Teiserver.user_id(), list) :: User.t() | nil
+  @spec get_user(Teiserver.user_id(), Teiserver.query_args()) :: User.t() | nil
   def get_user(user_id, query_args \\ []) do
     UserQueries.user_query(query_args ++ [id: user_id])
     |> Teiserver.Repo.one()
@@ -69,11 +70,11 @@ defmodule Teiserver.Account.UserLib do
 
   ## Examples
 
-    iex> get_user(123)
-    %User{}
+      iex> get_user_by_id(123)
+      %User{}
 
-    iex> get_user(456)
-    nil
+      iex> get_user_by_id(456)
+      nil
   """
   @spec get_user_by_id(Teiserver.user_id()) :: User.t() | nil
   def get_user_by_id(user_id) do
@@ -86,11 +87,11 @@ defmodule Teiserver.Account.UserLib do
 
   ## Examples
 
-    iex> get_user("noodle")
-    %User{}
+      iex> get_user_by_name("noodle")
+      %User{}
 
-    iex> get_user("nobody")
-    nil
+      iex> get_user_by_name("nobody")
+      nil
   """
   @spec get_user_by_name(String.t()) :: User.t() | nil
   def get_user_by_name(name) do
@@ -103,11 +104,12 @@ defmodule Teiserver.Account.UserLib do
 
   ## Examples
 
-    iex> get_user("noodle@teiserver")
-    %User{}
+      iex> get_user_by_email("noodle@teiserver")
+      %User{}
 
-    iex> get_user("nobody@nowhere")
-    nil
+      iex> get_user_by_email("nobody@nowhere")
+      nil
+
   """
   @spec get_user_by_email(String.t()) :: User.t() | nil
   def get_user_by_email(email) do

@@ -14,7 +14,7 @@ defmodule Teiserver.Settings.UserSettingLib do
       [%UserSetting{}, ...]
 
   """
-  @spec list_user_settings(list) :: list
+  @spec list_user_settings(Teiserver.query_args()) :: list
   def list_user_settings(query_args \\ []) do
     query_args
     |> UserSettingQueries.user_setting_query()
@@ -129,7 +129,7 @@ defmodule Teiserver.Settings.UserSettingLib do
       %Ecto.Changeset{data: %UserSetting{}}
 
   """
-  @spec change_user_setting(UserSetting.t(), map) :: Ecto.Changeset
+  @spec change_user_setting(UserSetting.t(), map) :: Ecto.Changeset.t()
   def change_user_setting(%UserSetting{} = user_setting, attrs \\ %{}) do
     UserSetting.changeset(user_setting, attrs)
   end

@@ -13,8 +13,9 @@ defmodule Teiserver.Account do
   alias Teiserver.Account.{User, UserLib, UserQueries}
 
   @doc false
-  @spec user_query(list) :: Ecto.Query.t()
-  defdelegate user_query(args), to: UserQueries
+  @spec user_query() :: Ecto.Query.t()
+  @spec user_query(Teiserver.query_args()) :: Ecto.Query.t()
+  defdelegate user_query(args \\ []), to: UserQueries
 
   @doc section: :user
   @spec list_users() :: [User.t()]
@@ -45,15 +46,15 @@ defmodule Teiserver.Account do
   defdelegate get_user_by_email(email), to: UserLib
 
   @doc section: :user
-  @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset}
+  @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   defdelegate create_user(attrs \\ %{}), to: UserLib
 
   @doc section: :user
-  @spec update_user(User, map) :: {:ok, User.t()} | {:error, Ecto.Changeset}
+  @spec update_user(User, map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   defdelegate update_user(user, attrs), to: UserLib
 
   @doc section: :user
-  @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset}
+  @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   defdelegate delete_user(user), to: UserLib
 
   @doc section: :user

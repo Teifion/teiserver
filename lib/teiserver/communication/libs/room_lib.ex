@@ -14,7 +14,7 @@ defmodule Teiserver.Communication.RoomLib do
       [%Room{}, ...]
 
   """
-  @spec list_rooms(list) :: list
+  @spec list_rooms(Teiserver.query_args()) :: [Room.t()]
   def list_rooms(query_args \\ []) do
     query_args
     |> RoomQueries.room_query()
@@ -36,6 +36,7 @@ defmodule Teiserver.Communication.RoomLib do
 
   """
   @spec get_room!(non_neg_integer()) :: Room.t()
+  @spec get_room!(non_neg_integer(), Teiserver.query_args()) :: Room.t()
   def get_room!(room_id, query_args \\ []) do
     (query_args ++ [id: room_id])
     |> RoomQueries.room_query()
@@ -92,7 +93,6 @@ defmodule Teiserver.Communication.RoomLib do
     RoomQueries.room_query(where: [name: room_name])
     |> Repo.one()
   end
-
 
   @doc """
   Creates a room.

@@ -10,7 +10,11 @@ defmodule Teiserver.Connections.ClientServer do
   @heartbeat_frequency_ms 5_000
 
   # The amount of time after the last disconnect at which we will destroy the ClientServer process
-  @client_destroy_timeout_seconds Application.compile_env(:teiserver, :client_destroy_timeout_seconds, 300)
+  @client_destroy_timeout_seconds Application.compile_env(
+                                    :teiserver,
+                                    :client_destroy_timeout_seconds,
+                                    300
+                                  )
 
   defmodule State do
     @moduledoc false

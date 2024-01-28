@@ -129,7 +129,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
       %Ecto.Changeset{data: %ServerSetting{}}
 
   """
-  @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset
+  @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset.t()
   def change_server_setting(%ServerSetting{} = server_setting, attrs \\ %{}) do
     ServerSetting.changeset(server_setting, attrs)
   end

@@ -4,14 +4,14 @@ defmodule Teiserver.Settings.ServerSettingQueries do
   alias Teiserver.Settings.ServerSetting
   require Logger
 
-  @spec server_setting_query(list) :: Ecto.Query.t()
-  def server_setting_query(args) do
+  @spec server_setting_query() :: Ecto.Query.t()
+  @spec server_setting_query(Teiserver.query_args()) :: Ecto.Query.t()
+  def server_setting_query(args \\ []) do
     query = from(server_settings in ServerSetting)
 
     query
     |> do_where(id: args[:id])
     |> do_where(args[:where])
-    |> do_where(args[:search])
     |> do_preload(args[:preload])
     |> do_order_by(args[:order_by])
     |> QueryHelper.query_select(args[:select])
@@ -28,10 +28,9 @@ defmodule Teiserver.Settings.ServerSettingQueries do
     end)
   end
 
-  @spec _where(Ecto.Query.t(), Atom.t(), any()) :: Ecto.Query.t()
+  @spec _where(Ecto.Query.t(), atom, any()) :: Ecto.Query.t()
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
-  def _where(query, _, "Any"), do: query
 
   def _where(query, :id, id) do
     from(server_settings in query,
@@ -99,7 +98,7 @@ defmodule Teiserver.Settings.ServerSettingQueries do
     )
   end
 
-  @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
+  @spec do_preload(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
   defp do_preload(query, _), do: query

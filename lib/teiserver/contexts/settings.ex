@@ -29,21 +29,21 @@ defmodule Teiserver.Settings do
   defdelegate get_server_setting(server_setting_id, query_args \\ []), to: ServerSettingLib
 
   @doc section: :server_setting
-  @spec create_server_setting(map) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset}
+  @spec create_server_setting(map) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate create_server_setting(attrs \\ %{}), to: ServerSettingLib
 
   @doc section: :server_setting
   @spec update_server_setting(ServerSetting, map) ::
-          {:ok, ServerSetting.t()} | {:error, Ecto.Changeset}
+          {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate update_server_setting(server_setting, attrs), to: ServerSettingLib
 
   @doc section: :server_setting
   @spec delete_server_setting(ServerSetting.t()) ::
-          {:ok, ServerSetting.t()} | {:error, Ecto.Changeset}
+          {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate delete_server_setting(server_setting), to: ServerSettingLib
 
   @doc section: :server_setting
-  @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset
+  @spec change_server_setting(ServerSetting.t(), map) :: Ecto.Changeset.t()
   defdelegate change_server_setting(server_setting, attrs \\ %{}), to: ServerSettingLib
 
   # UserSettings
@@ -70,15 +70,15 @@ defmodule Teiserver.Settings do
   defdelegate get_user_setting(user_setting_id, query_args \\ []), to: UserSettingLib
 
   @doc section: :user_setting
-  @spec create_user_setting(map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset}
+  @spec create_user_setting(map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate create_user_setting(attrs \\ %{}), to: UserSettingLib
 
   @doc section: :user_setting
-  @spec update_user_setting(UserSetting, map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset}
+  @spec update_user_setting(UserSetting, map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate update_user_setting(user_setting, attrs), to: UserSettingLib
 
   @doc section: :user_setting
-  @spec delete_user_setting(UserSetting.t()) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset}
+  @spec delete_user_setting(UserSetting.t()) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate delete_user_setting(user_setting), to: UserSettingLib
 
   @doc section: :user_setting

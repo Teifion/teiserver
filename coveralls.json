@@ -1,6 +1,7 @@
 {
   "skip_files": [
-    "^test/.*"
+    "^test/.*",
+    "lib/teiserver/helpers/file_macros.ex"
   ],
   
   "terminal_options": {

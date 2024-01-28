@@ -4,14 +4,14 @@ defmodule Teiserver.Communication.RoomQueries do
   alias Teiserver.Communication.Room
   require Logger
 
-  @spec room_query(list) :: Ecto.Query.t()
-  def room_query(args) do
+  @spec room_query() :: Ecto.Query.t()
+  @spec room_query(Teiserver.query_args()) :: Ecto.Query.t()
+  def room_query(args \\ []) do
     query = from(rooms in Room)
 
     query
     |> do_where(id: args[:id])
     |> do_where(args[:where])
-    |> do_where(args[:search])
     |> do_preload(args[:preload])
     |> do_order_by(args[:order_by])
     |> QueryHelper.query_select(args[:select])
@@ -28,10 +28,9 @@ defmodule Teiserver.Communication.RoomQueries do
     end)
   end
 
-  @spec _where(Ecto.Query.t(), Atom.t(), any()) :: Ecto.Query.t()
+  @spec _where(Ecto.Query.t(), atom, any()) :: Ecto.Query.t()
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
-  def _where(query, _, "Any"), do: query
 
   def _where(query, :id, id_list) when is_list(id_list) do
     from(rooms in query,
@@ -99,7 +98,7 @@ defmodule Teiserver.Communication.RoomQueries do
     )
   end
 
-  @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
+  @spec do_preload(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
   defp do_preload(query, _), do: query

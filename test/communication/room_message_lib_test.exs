@@ -2,7 +2,7 @@ defmodule Teiserver.RoomMessageLibTest do
   @moduledoc false
   use Teiserver.Case, async: true
 
-  alias Teiserver.Communication.RoomMessageLib
+  alias Teiserver.Communication
   alias Teiserver.{CommunicationFixtures, AccountFixtures}
 
   defp valid_attrs() do
@@ -35,41 +35,41 @@ defmodule Teiserver.RoomMessageLibTest do
   describe "room_message" do
     alias Teiserver.Communication.RoomMessage
 
+    test "room_message_query/1 returns query" do
+      assert Communication.room_message_query([])
+    end
+
     test "list_room_message/0 returns room_message" do
       # No room_message yet
-      assert RoomMessageLib.list_room_messages() == []
-      assert RoomMessageLib.list_room_messages([]) == []
+      assert Communication.list_room_messages([]) == []
 
       # Add a room_message
       CommunicationFixtures.room_message_fixture()
-      assert RoomMessageLib.list_room_messages() != []
-
-      # Add a room_message
-      assert RoomMessageLib.list_room_messages([]) != []
+      assert Communication.list_room_messages([]) != []
     end
 
     test "get_room_message!/1 and get_room_message/1 returns the room_message with given id" do
       room_message = CommunicationFixtures.room_message_fixture()
-      assert RoomMessageLib.get_room_message!(room_message.id) == room_message
-      assert RoomMessageLib.get_room_message(room_message.id) == room_message
+      assert Communication.get_room_message!(room_message.id) == room_message
+      assert Communication.get_room_message(room_message.id) == room_message
     end
 
     test "create_room_message/1 with valid data creates a room_message" do
       assert {:ok, %RoomMessage{} = room_message} =
-               RoomMessageLib.create_room_message(valid_attrs())
+               Communication.create_room_message(valid_attrs())
 
       assert room_message.content == "some content"
     end
 
     test "create_room_message/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = RoomMessageLib.create_room_message(invalid_attrs())
+      assert {:error, %Ecto.Changeset{}} = Communication.create_room_message(invalid_attrs())
     end
 
     test "update_room_message/2 with valid data updates the room_message" do
       room_message = CommunicationFixtures.room_message_fixture()
 
       assert {:ok, %RoomMessage{} = room_message} =
-               RoomMessageLib.update_room_message(room_message, update_attrs())
+               Communication.update_room_message(room_message, update_attrs())
 
       assert room_message.content == "some updated content"
       assert room_message.content == "some updated content"
@@ -79,25 +79,25 @@ defmodule Teiserver.RoomMessageLibTest do
       room_message = CommunicationFixtures.room_message_fixture()
 
       assert {:error, %Ecto.Changeset{}} =
-               RoomMessageLib.update_room_message(room_message, invalid_attrs())
+               Communication.update_room_message(room_message, invalid_attrs())
 
-      assert room_message == RoomMessageLib.get_room_message!(room_message.id)
+      assert room_message == Communication.get_room_message!(room_message.id)
     end
 
     test "delete_room_message/1 deletes the room_message" do
       room_message = CommunicationFixtures.room_message_fixture()
-      assert {:ok, %RoomMessage{}} = RoomMessageLib.delete_room_message(room_message)
+      assert {:ok, %RoomMessage{}} = Communication.delete_room_message(room_message)
 
       assert_raise Ecto.NoResultsError, fn ->
-        RoomMessageLib.get_room_message!(room_message.id)
+        Communication.get_room_message!(room_message.id)
       end
 
-      assert RoomMessageLib.get_room_message(room_message.id) == nil
+      assert Communication.get_room_message(room_message.id) == nil
     end
 
     test "change_room_message/1 returns a room_message changeset" do
       room_message = CommunicationFixtures.room_message_fixture()
-      assert %Ecto.Changeset{} = RoomMessageLib.change_room_message(room_message)
+      assert %Ecto.Changeset{} = Communication.change_room_message(room_message)
     end
   end
 end

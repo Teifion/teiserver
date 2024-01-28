@@ -1,7 +1,8 @@
 ## v0.0.3 (in progress)
-- Added schemas for Rooms, RoomMessages and DirectMessages
+- Added `Room`, `RoomMessage` and `DirectMessage` along with their relevant lib functions
 - Added `UserLib.allow?/2` and `UserLib.restricted?/2`
 - Added `Teiserver.Communications` and relevant functions for Rooms, RoomMessages and DirectMessages
+- Added tests for query libraries, caught some bugs in the process
 
 ## v0.0.2
 - Client connectivity functionality

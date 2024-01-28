@@ -1,10 +1,6 @@
 defmodule Teiserver do
   alias Teiserver.Helpers.PubSubHelper
 
-  @type user_id :: Teiserver.Account.User.id()
-  @type lobby_id :: non_neg_integer()
-  @type party_id :: non_neg_integer()
-
   @moduledoc """
   Teiserver is a middleware server library; designed for usage with games. It handles game-agnostic issues (chat, searching for games, match history) and allows you to implement the game-specific items you care about.
 
@@ -48,6 +44,21 @@ defmodule Teiserver do
   - **Settings**: Key-Value pairs for users and the system
   - **Telemetry**: Moment to moment events
   """
+
+  # Types
+  @type user_id :: Teiserver.Account.User.id()
+  @type lobby_id :: non_neg_integer()
+  @type party_id :: non_neg_integer()
+
+  @type query_args ::
+          keyword(
+            id: non_neg_integer() | nil,
+            where: list(),
+            preload: list(),
+            order_by: list(),
+            offset: non_neg_integer() | nil,
+            limit: non_neg_integer() | nil
+          )
 
   # PubSub delegation
   @doc false
