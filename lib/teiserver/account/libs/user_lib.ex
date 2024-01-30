@@ -20,7 +20,7 @@ defmodule Teiserver.Account.UserLib do
 
   """
   @spec list_users(Teiserver.query_args()) :: [User.t()]
-  def list_users(query_args \\ []) do
+  def list_users(query_args) do
     UserQueries.user_query(query_args)
     |> Teiserver.Repo.all()
   end

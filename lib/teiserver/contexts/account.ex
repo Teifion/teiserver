@@ -21,10 +21,6 @@ defmodule Teiserver.Account do
   defdelegate user_query(args), to: UserQueries
 
   @doc section: :user
-  @spec list_users() :: [User.t()]
-  defdelegate list_users(), to: UserLib
-
-  @doc section: :user
   @spec list_users(list) :: [User.t()]
   defdelegate list_users(args), to: UserLib
 

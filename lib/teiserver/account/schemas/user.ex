@@ -95,7 +95,7 @@ defmodule Teiserver.Account.User do
         attrs,
         ~w(name email roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
-      |> validate_required(~w(name email permissions)a)
+      |> validate_required(~w(name email password permissions)a)
       |> unique_constraint(:email)
     else
       user
@@ -103,7 +103,7 @@ defmodule Teiserver.Account.User do
         attrs,
         ~w(name email password roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
-      |> validate_required(~w(name email permissions)a)
+      |> validate_required(~w(name email password permissions)a)
       |> unique_constraint(:email)
       |> put_password_hash()
     end
