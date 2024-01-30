@@ -197,32 +197,40 @@ defmodule Teiserver.DirectMessageLibTest do
 
       # Assert the message has arrived
       [message] = TestConn.get(conn1)
-      assert match?(%{
-        event: :message_sent,
-        topic: ^user1_topic,
-        direct_message: %DirectMessage{
-          id: _,
-          content: "First direct message",
-          inserted_at: _,
-          delivered?: false,
-          from_id: ^user1_id,
-          to_id: ^user2_id
-        }
-      }, message)
+
+      assert match?(
+               %{
+                 event: :message_sent,
+                 topic: ^user1_topic,
+                 direct_message: %DirectMessage{
+                   id: _,
+                   content: "First direct message",
+                   inserted_at: _,
+                   delivered?: false,
+                   from_id: ^user1_id,
+                   to_id: ^user2_id
+                 }
+               },
+               message
+             )
 
       [message] = TestConn.get(conn2)
-      assert match?(%{
-        event: :message_received,
-        topic: ^user2_topic,
-        direct_message: %DirectMessage{
-          id: _,
-          content: "First direct message",
-          inserted_at: _,
-          delivered?: false,
-          from_id: ^user1_id,
-          to_id: ^user2_id
-        }
-      }, message)
+
+      assert match?(
+               %{
+                 event: :message_received,
+                 topic: ^user2_topic,
+                 direct_message: %DirectMessage{
+                   id: _,
+                   content: "First direct message",
+                   inserted_at: _,
+                   delivered?: false,
+                   from_id: ^user1_id,
+                   to_id: ^user2_id
+                 }
+               },
+               message
+             )
 
       # Now both send a few more
       Communication.send_direct_message(user2.id, user1.id, "Second direct message")
@@ -230,57 +238,73 @@ defmodule Teiserver.DirectMessageLibTest do
 
       # Conn1
       [m1, m2] = TestConn.get(conn1)
-      assert match?(%{
-        event: :message_received,
-        topic: ^user1_topic,
-        direct_message: %DirectMessage{
-          id: _,
-          content: "Second direct message",
-          inserted_at: _,
-          delivered?: false,
-          from_id: ^user2_id,
-          to_id: ^user1_id
-        }
-      }, m1)
-      assert match?(%{
-        event: :message_sent,
-        topic: ^user1_topic,
-        direct_message: %DirectMessage{
-          id: _,
-          content: "Third direct message",
-          inserted_at: _,
-          delivered?: false,
-          from_id: ^user1_id,
-          to_id: ^user2_id
-        }
-      }, m2)
+
+      assert match?(
+               %{
+                 event: :message_received,
+                 topic: ^user1_topic,
+                 direct_message: %DirectMessage{
+                   id: _,
+                   content: "Second direct message",
+                   inserted_at: _,
+                   delivered?: false,
+                   from_id: ^user2_id,
+                   to_id: ^user1_id
+                 }
+               },
+               m1
+             )
+
+      assert match?(
+               %{
+                 event: :message_sent,
+                 topic: ^user1_topic,
+                 direct_message: %DirectMessage{
+                   id: _,
+                   content: "Third direct message",
+                   inserted_at: _,
+                   delivered?: false,
+                   from_id: ^user1_id,
+                   to_id: ^user2_id
+                 }
+               },
+               m2
+             )
 
       # Conn2
       [m1, m2] = TestConn.get(conn2)
-      assert match?(%{
-        event: :message_sent,
-        topic: ^user2_topic,
-        direct_message: %DirectMessage{
-          id: _,
-          content: "Second direct message",
-          inserted_at: _,
-          delivered?: false,
-          from_id: ^user2_id,
-          to_id: ^user1_id
-        }
-      }, m1)
-      assert match?(%{
-        event: :message_received,
-        topic: ^user2_topic,
-        direct_message: %DirectMessage{
-          id: _,
-          content: "Third direct message",
-          inserted_at: _,
-          delivered?: false,
-          from_id: ^user1_id,
-          to_id: ^user2_id
-        }
-      }, m2)
+
+      assert match?(
+               %{
+                 event: :message_sent,
+                 topic: ^user2_topic,
+                 direct_message: %DirectMessage{
+                   id: _,
+                   content: "Second direct message",
+                   inserted_at: _,
+                   delivered?: false,
+                   from_id: ^user2_id,
+                   to_id: ^user1_id
+                 }
+               },
+               m1
+             )
+
+      assert match?(
+               %{
+                 event: :message_received,
+                 topic: ^user2_topic,
+                 direct_message: %DirectMessage{
+                   id: _,
+                   content: "Third direct message",
+                   inserted_at: _,
+                   delivered?: false,
+                   from_id: ^user1_id,
+                   to_id: ^user2_id
+                 }
+               },
+               m2
+             )
     end
   end
 end

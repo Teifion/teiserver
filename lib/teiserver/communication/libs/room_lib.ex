@@ -19,6 +19,7 @@ defmodule Teiserver.Communication.RoomLib do
     |> room_topic()
     |> Teiserver.subscribe()
   end
+
   def subscribe_to_room(%Room{id: room_id}), do: subscribe_to_room(room_id)
   def subscribe_to_room(room_name), do: get_or_create_room(room_name).id
 

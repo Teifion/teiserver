@@ -7,7 +7,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
   alias Teiserver.Communication.{DirectMessage, DirectMessageQueries}
 
   @doc false
-  @spec user_messaging_topic(User.id() | User.t()) :: String.t()
+  @spec user_messaging_topic(Teiserver.user_id() | User.t()) :: String.t()
   def user_messaging_topic(%User{id: user_id}), do: "Teiserver.Communication.User:#{user_id}"
   def user_messaging_topic(user_id), do: "Teiserver.Communication.User:#{user_id}"
 
@@ -88,7 +88,9 @@ defmodule Teiserver.Communication.DirectMessageLib do
 
   """
   @spec list_direct_messages_for_user(Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_for_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_for_user(Teiserver.user_id(), Teiserver.query_args()) :: [
+          DirectMessage.t()
+        ]
   def list_direct_messages_for_user(user_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
@@ -106,7 +108,9 @@ defmodule Teiserver.Communication.DirectMessageLib do
 
   """
   @spec list_direct_messages_to_user(Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_to_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_to_user(Teiserver.user_id(), Teiserver.query_args()) :: [
+          DirectMessage.t()
+        ]
   def list_direct_messages_to_user(user_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
@@ -124,7 +128,9 @@ defmodule Teiserver.Communication.DirectMessageLib do
 
   """
   @spec list_direct_messages_from_user(Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_from_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_from_user(Teiserver.user_id(), Teiserver.query_args()) :: [
+          DirectMessage.t()
+        ]
   def list_direct_messages_from_user(user_id, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()
@@ -141,7 +147,11 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id(), Teiserver.query_args()) ::
+  @spec list_direct_messages_from_user_to_user(
+          Teiserver.user_id(),
+          Teiserver.user_id(),
+          Teiserver.query_args()
+        ) ::
           [DirectMessage.t()]
   def list_direct_messages_from_user_to_user(from_id, to_id, query_args \\ []) do
     query_args
@@ -165,8 +175,14 @@ defmodule Teiserver.Communication.DirectMessageLib do
       [%DirectMessage{}, ...]
 
   """
-  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id()) :: [
+          DirectMessage.t()
+        ]
+  @spec list_direct_messages_between_users(
+          Teiserver.user_id(),
+          Teiserver.user_id(),
+          Teiserver.query_args()
+        ) :: [DirectMessage.t()]
   def list_direct_messages_between_users(user_id1, user_id2, query_args \\ []) do
     query_args
     |> DirectMessageQueries.direct_message_query()

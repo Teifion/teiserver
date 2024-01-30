@@ -146,6 +146,11 @@ defmodule HelloWorldServer.TcpServer do
     send(self(), :terminate)
     {:noreply, state}
   end
+  
+  # Teiserver pubsub topics we'll be ignoring for now
+  def handle_info(%{topic: "Teiserver." <> _}, state) do
+    {:noreply, state}
+  end
 
   def handle_info({:tcp, _socket, data}, state) do
     data = data
@@ -163,37 +168,33 @@ end
 Place in `lib/hellow_world_server/tcp_in.ex`, this will handle all the commands coming in.
 ```elixir
 defmodule HelloWorldServer.TcpIn do
+  alias Teiserver.Api
+
   def data_in("ping" <> _data, state) do
     {state, "pong"}
   end
 
   def data_in("login " <> data, state) do
     [name, password] = String.split(data, " ")
-    case Teiserver.Account.get_user_by_name(name) do
-      nil ->
+    case Api.maybe_authenticate_user do
+      {:ok, user} ->
+        Api.connect_user(user)
+        {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
+      {:error, :no_user} ->
         {state, "Login failed (no user)"}
-      user ->
-        if Teiserver.Account.verify_user_password(user, password) do
-          Teiserver.Connections.connect_user(user.id)
-          {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
-        else
-          {state, "Login failed (bad password)"}
-        end
+      {:error, :bad_password} ->
+        {state, "Login failed (bad password)"}
     end
   end
 
   def data_in("register " <> data, state) do
     [name, password] = String.split(data, " ")
-    params = %{
-      "name" => name,
-      "password" => password,
-
-      # We're not using emails right now but Teiserver expects them to be unique
-      # this will do for the purposes of this example
-      "email" => to_string(:rand.uniform())
-    }
-
-    case Teiserver.Account.create_user(params) do
+    
+    # We're not using emails right now but Teiserver expects them to be unique
+    # this will do for the purposes of this example
+    email = to_string(:rand.uniform())
+    
+    case Api.register_user(name, email, password) do
       {:ok, _user} ->
         {state, "User created, you can now login with 'login name password'"}
       {:error, _} ->

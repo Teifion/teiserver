@@ -74,11 +74,13 @@ defmodule Teiserver.Settings do
   defdelegate create_user_setting(attrs \\ %{}), to: UserSettingLib
 
   @doc section: :user_setting
-  @spec update_user_setting(UserSetting, map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
+  @spec update_user_setting(UserSetting, map) ::
+          {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate update_user_setting(user_setting, attrs), to: UserSettingLib
 
   @doc section: :user_setting
-  @spec delete_user_setting(UserSetting.t()) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
+  @spec delete_user_setting(UserSetting.t()) ::
+          {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate delete_user_setting(user_setting), to: UserSettingLib
 
   @doc section: :user_setting

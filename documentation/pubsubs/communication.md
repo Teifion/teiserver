@@ -1,3 +1,6 @@
+# Communication messages
+Messages related to communication between players including RoomMessages, DirectMessages and LobbyMessages.
+
 ## `Teiserver.Communication.Room:{room_id}`
 Pubsub messages related to the Room.
 

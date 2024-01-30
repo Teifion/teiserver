@@ -92,11 +92,13 @@ defmodule Teiserver.Communication do
   defdelegate create_room_message(attrs \\ %{}), to: RoomMessageLib
 
   @doc section: :room_message
-  @spec update_room_message(RoomMessage, map) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
+  @spec update_room_message(RoomMessage, map) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   defdelegate update_room_message(room_message, attrs), to: RoomMessageLib
 
   @doc section: :room_message
-  @spec delete_room_message(RoomMessage.t()) :: {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
+  @spec delete_room_message(RoomMessage.t()) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   defdelegate delete_room_message(room_message), to: RoomMessageLib
 
   @doc section: :room_message
@@ -106,7 +108,7 @@ defmodule Teiserver.Communication do
   alias Teiserver.Communication.{DirectMessage, DirectMessageLib, DirectMessageQueries}
 
   @doc false
-  @spec user_messaging_topic(User.id() | User.t()) :: String.t()
+  @spec user_messaging_topic(Teiserver.user_id() | User.t()) :: String.t()
   defdelegate user_messaging_topic(room_or_room_id), to: DirectMessageLib
 
   @doc false
@@ -149,28 +151,48 @@ defmodule Teiserver.Communication do
   defdelegate send_direct_message(from_id, to_id, content, attrs \\ %{}), to: DirectMessageLib
 
   @doc section: :direct_message
-  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
-  defdelegate list_direct_messages_from_user_to_user(from_id, to_id, query_args \\ []), to: DirectMessageLib
+  @spec list_direct_messages_from_user_to_user(Teiserver.user_id(), Teiserver.user_id()) :: [
+          DirectMessage.t()
+        ]
+  @spec list_direct_messages_from_user_to_user(
+          Teiserver.user_id(),
+          Teiserver.user_id(),
+          Teiserver.query_args()
+        ) :: [DirectMessage.t()]
+  defdelegate list_direct_messages_from_user_to_user(from_id, to_id, query_args \\ []),
+    to: DirectMessageLib
 
   @doc section: :direct_message
   @spec list_direct_messages_for_user(Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_for_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_for_user(Teiserver.user_id(), Teiserver.query_args()) :: [
+          DirectMessage.t()
+        ]
   defdelegate list_direct_messages_for_user(user_id, query_args \\ []), to: DirectMessageLib
 
   @doc section: :direct_message
   @spec list_direct_messages_to_user(Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_to_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_to_user(Teiserver.user_id(), Teiserver.query_args()) :: [
+          DirectMessage.t()
+        ]
   defdelegate list_direct_messages_to_user(user_id, query_args \\ []), to: DirectMessageLib
 
   @doc section: :direct_message
   @spec list_direct_messages_from_user(Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_from_user(Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
+  @spec list_direct_messages_from_user(Teiserver.user_id(), Teiserver.query_args()) :: [
+          DirectMessage.t()
+        ]
   defdelegate list_direct_messages_from_user(user_id, query_args \\ []), to: DirectMessageLib
 
-  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id()) :: [DirectMessage.t()]
-  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id(), Teiserver.query_args()) :: [DirectMessage.t()]
-  defdelegate list_direct_messages_between_users(user_id1, user_id2, query_args \\ []), to: DirectMessageLib
+  @spec list_direct_messages_between_users(Teiserver.user_id(), Teiserver.user_id()) :: [
+          DirectMessage.t()
+        ]
+  @spec list_direct_messages_between_users(
+          Teiserver.user_id(),
+          Teiserver.user_id(),
+          Teiserver.query_args()
+        ) :: [DirectMessage.t()]
+  defdelegate list_direct_messages_between_users(user_id1, user_id2, query_args \\ []),
+    to: DirectMessageLib
 
   # Party chat
 end

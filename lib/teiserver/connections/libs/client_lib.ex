@@ -7,11 +7,10 @@ defmodule Teiserver.Connections.ClientLib do
   alias Teiserver.Account.User
 
   @doc false
-  @spec client_topic(User.id() | User.t() | Client.t()) :: String.t()
+  @spec client_topic(Teiserver.user_id() | User.t() | Client.t()) :: String.t()
   def client_topic(%User{id: user_id}), do: "Teiserver.Connections.Client:#{user_id}"
   def client_topic(%Client{id: user_id}), do: "Teiserver.Connections.Client:#{user_id}"
   def client_topic(user_id), do: "Teiserver.Connections.Client:#{user_id}"
-
 
   @doc """
   Returns the list of client ids.

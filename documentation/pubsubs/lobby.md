@@ -1,3 +1,6 @@
+# Lobby messages
+Messages relating to updates to the lobby in question.
+
 `Teiserver.LobbyServer:{lobby_id}`
 
 ### Global planned

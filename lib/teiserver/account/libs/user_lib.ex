@@ -6,7 +6,7 @@ defmodule Teiserver.Account.UserLib do
   alias Teiserver.Account.{User, UserQueries}
 
   @doc false
-  @spec user_topic(User.id() | User.t()) :: String.t()
+  @spec user_topic(Teiserver.user_id() | User.t()) :: String.t()
   def user_topic(%User{id: user_id}), do: "Teiserver.Account.User:#{user_id}"
   def user_topic(user_id), do: "Teiserver.Account.User:#{user_id}"
 

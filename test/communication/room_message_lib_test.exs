@@ -132,16 +132,20 @@ defmodule Teiserver.RoomMessageLibTest do
       [conn1, conn2, conn3]
       |> Enum.each(fn c ->
         [message] = TestConn.get(c)
-        assert match?(%{
-          event: :message_received,
-          topic: ^topic,
-          room_message: %RoomMessage{
-            id: _,
-            content: "Test first message",
-            sender_id: ^user1_id,
-            room_id: ^room_id
-          }
-        }, message)
+
+        assert match?(
+                 %{
+                   event: :message_received,
+                   topic: ^topic,
+                   room_message: %RoomMessage{
+                     id: _,
+                     content: "Test first message",
+                     sender_id: ^user1_id,
+                     room_id: ^room_id
+                   }
+                 },
+                 message
+               )
       end)
 
       # If we send three more, they should all appear but the first should now be removed
@@ -152,38 +156,48 @@ defmodule Teiserver.RoomMessageLibTest do
       [conn1, conn2, conn3]
       |> Enum.each(fn c ->
         [m1, m2, m3] = TestConn.get(c)
-        assert match?(%{
-          event: :message_received,
-          topic: ^topic,
-          room_message: %RoomMessage{
-            id: _,
-            content: "Test second message",
-            sender_id: ^user1_id,
-            room_id: ^room_id
-          }
-        }, m1)
 
-        assert match?(%{
-          event: :message_received,
-          topic: ^topic,
-          room_message: %RoomMessage{
-            id: _,
-            content: "Test third message",
-            sender_id: ^user2_id,
-            room_id: ^room_id
-          }
-        }, m2)
+        assert match?(
+                 %{
+                   event: :message_received,
+                   topic: ^topic,
+                   room_message: %RoomMessage{
+                     id: _,
+                     content: "Test second message",
+                     sender_id: ^user1_id,
+                     room_id: ^room_id
+                   }
+                 },
+                 m1
+               )
 
-        assert match?(%{
-          event: :message_received,
-          topic: ^topic,
-          room_message: %RoomMessage{
-            id: _,
-            content: "Test fourth message",
-            sender_id: ^user3_id,
-            room_id: ^room_id
-          }
-        }, m3)
+        assert match?(
+                 %{
+                   event: :message_received,
+                   topic: ^topic,
+                   room_message: %RoomMessage{
+                     id: _,
+                     content: "Test third message",
+                     sender_id: ^user2_id,
+                     room_id: ^room_id
+                   }
+                 },
+                 m2
+               )
+
+        assert match?(
+                 %{
+                   event: :message_received,
+                   topic: ^topic,
+                   room_message: %RoomMessage{
+                     id: _,
+                     content: "Test fourth message",
+                     sender_id: ^user3_id,
+                     room_id: ^room_id
+                   }
+                 },
+                 m3
+               )
       end)
     end
   end

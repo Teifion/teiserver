@@ -13,7 +13,7 @@ defmodule Teiserver.Account do
   alias Teiserver.Account.{User, UserLib, UserQueries}
 
   @doc false
-  @spec user_topic(User.id() | User.t()) :: String.t()
+  @spec user_topic(Teiserver.user_id() | User.t()) :: String.t()
   defdelegate user_topic(user_or_user_id), to: UserLib
 
   @doc false

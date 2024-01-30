@@ -1,4 +1,7 @@
-`Teiserver.Connections.Client:{user_id}`
+# Client messages
+PubSub messages sent out in relation to changes to the client in question.
+
+## `Teiserver.Connections.Client:{user_id}`
 The pubsub messages received by anybody watching this account. By default logging in will subscribe you to these messages.
 
 ### Updated client

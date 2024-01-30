@@ -24,10 +24,14 @@ defmodule Account.UserTest do
       bad_email = User.changeset(user, %{email: ""}, :full)
       refute bad_email.valid?
 
-      with_password = User.changeset(user, %{"email" => user.email <> "abc", "password" => "123"}, :full)
+      with_password =
+        User.changeset(user, %{"email" => user.email <> "abc", "password" => "123"}, :full)
+
       assert with_password.valid?
 
-      empty_password = User.changeset(user, %{"email" => user.email <> "abc", "password" => ""}, :full)
+      empty_password =
+        User.changeset(user, %{"email" => user.email <> "abc", "password" => ""}, :full)
+
       assert empty_password.valid?
 
       permissions = User.changeset(user, ~w(a b c), :permissions)
@@ -40,20 +44,40 @@ defmodule Account.UserTest do
       user_form_no_pass = User.changeset(user, %{"email" => user.email <> "abc"}, :user_form)
       refute user_form_no_pass.valid?
 
-      user_form_bad_pass = User.changeset(user, %{"email" => user.email <> "abc", "password" => "badpass"}, :user_form)
+      user_form_bad_pass =
+        User.changeset(
+          user,
+          %{"email" => user.email <> "abc", "password" => "badpass"},
+          :user_form
+        )
+
       refute user_form_bad_pass.valid?
 
-      user_form_pass = User.changeset(user, %{"email" => user.email <> "abc", "password" => "password"}, :user_form)
+      user_form_pass =
+        User.changeset(
+          user,
+          %{"email" => user.email <> "abc", "password" => "password"},
+          :user_form
+        )
+
       assert user_form_pass.valid?
 
       # Change password
       no_existing = User.changeset(user, %{"password" => "password1"}, :change_password)
       refute no_existing.valid?
 
-      bad_existing = User.changeset(user, %{"existing" => "bad", "password" => "password1"}, :change_password)
+      bad_existing =
+        User.changeset(user, %{"existing" => "bad", "password" => "password1"}, :change_password)
+
       refute bad_existing.valid?
 
-      good_existing = User.changeset(user, %{"existing" => "password", "password" => "password1"}, :change_password)
+      good_existing =
+        User.changeset(
+          user,
+          %{"existing" => "password", "password" => "password1"},
+          :change_password
+        )
+
       assert good_existing.valid?
 
       forgot_password = User.changeset(user, %{"password" => "password1"}, :forgot_password)

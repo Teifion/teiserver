@@ -16,7 +16,7 @@ defmodule Teiserver.Connections do
   alias Teiserver.Connections.{Client, ClientLib}
 
   @doc false
-  @spec client_topic(User.id() | User.t() | Client.t()) :: String.t()
+  @spec client_topic(Teiserver.user_id() | User.t() | Client.t()) :: String.t()
   defdelegate client_topic(client_or_user_or_user_id), to: ClientLib
 
   @doc section: :client
