@@ -77,7 +77,7 @@ defmodule Teiserver.TestSupport.TestConn do
   end
 
   def handle_info(item, state) do
-    {:noreply, [item | state]}
+    {:noreply, state ++ [item]}
   end
 
   def handle_call({:run, fun}, _from, state) do

@@ -101,7 +101,7 @@ defmodule Connections.ClientServerTest do
 
     test "update client" do
       {conn, user} = ConnectionFixtures.client_fixture()
-      TestConn.subscribe(conn, "Teiserver.ClientServer:#{user.id}")
+      TestConn.subscribe(conn, Connections.client_topic(user.id))
 
       msgs = TestConn.get(conn)
       assert msgs == []
@@ -122,7 +122,7 @@ defmodule Connections.ClientServerTest do
 
       assert msgs == [
                %{
-                 topic: "Teiserver.ClientServer:#{user.id}",
+                 topic: Connections.client_topic(user.id),
                  event: :client_updated,
                  client: %Teiserver.Connections.Client{
                    id: user.id,
@@ -168,7 +168,7 @@ defmodule Connections.ClientServerTest do
 
     test "updating with a bad key" do
       {conn, user} = ConnectionFixtures.client_fixture()
-      TestConn.subscribe(conn, "Teiserver.ClientServer:#{user.id}")
+      TestConn.subscribe(conn, Connections.client_topic(user.id))
 
       msgs = TestConn.get(conn)
       assert msgs == []

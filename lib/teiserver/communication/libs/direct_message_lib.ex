@@ -3,7 +3,13 @@ defmodule Teiserver.Communication.DirectMessageLib do
   Library of direct_message related functions.
   """
   use TeiserverMacros, :library
+  alias Teiserver.Account.User
   alias Teiserver.Communication.{DirectMessage, DirectMessageQueries}
+
+  @doc false
+  @spec user_messaging_topic(User.id() | User.t()) :: String.t()
+  def user_messaging_topic(%User{id: user_id}), do: "Teiserver.Communication.User:#{user_id}"
+  def user_messaging_topic(user_id), do: "Teiserver.Communication.User:#{user_id}"
 
   @doc """
   - Creates a direct message
@@ -34,7 +40,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
     case create_direct_message(attrs) do
       {:ok, direct_message} ->
         Teiserver.broadcast(
-          "Teiserver.Communication:User.#{direct_message.from_id}",
+          user_messaging_topic(direct_message.from_id),
           %{
             event: :message_sent,
             direct_message: direct_message
@@ -42,7 +48,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
         )
 
         Teiserver.broadcast(
-          "Teiserver.Communication:User.#{direct_message.to_id}",
+          user_messaging_topic(direct_message.to_id),
           %{
             event: :message_received,
             direct_message: direct_message

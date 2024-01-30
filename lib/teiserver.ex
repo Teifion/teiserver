@@ -63,5 +63,9 @@ defmodule Teiserver do
   # PubSub delegation
   @doc false
   @spec broadcast(String.t(), map()) :: :ok
-  defdelegate broadcast(channel, message), to: PubSubHelper
+  defdelegate broadcast(topic, message), to: PubSubHelper
+
+  @doc false
+  @spec subscribe(String.t()) :: :ok
+  defdelegate subscribe(topic), to: PubSubHelper
 end

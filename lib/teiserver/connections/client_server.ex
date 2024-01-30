@@ -18,7 +18,7 @@ defmodule Teiserver.Connections.ClientServer do
 
   defmodule State do
     @moduledoc false
-    defstruct [:client, :user_id, :connections, :update_id]
+    defstruct [:client, :user_id, :connections, :update_id, :topic]
   end
 
   @impl true
@@ -99,7 +99,7 @@ defmodule Teiserver.Connections.ClientServer do
       new_update_id = state.update_id + 1
 
       Teiserver.broadcast(
-        "Teiserver.ClientServer:#{state.user_id}",
+        state.topic,
         %{
           event: :client_updated,
           update_id: new_update_id,
@@ -129,6 +129,7 @@ defmodule Teiserver.Connections.ClientServer do
        client: client,
        connections: [],
        user_id: id,
+       topic: ClientLib.client_topic(id),
        update_id: 0
      }}
   end

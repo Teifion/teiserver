@@ -5,7 +5,7 @@ defmodule Teiserver.Account.UserQueries do
   require Logger
 
   @spec user_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def user_query(args \\ []) do
+  def user_query(args) do
     query = from(users in User)
 
     query

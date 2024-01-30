@@ -13,9 +13,12 @@ defmodule Teiserver.Account do
   alias Teiserver.Account.{User, UserLib, UserQueries}
 
   @doc false
-  @spec user_query() :: Ecto.Query.t()
+  @spec user_topic(User.id() | User.t()) :: String.t()
+  defdelegate user_topic(user_or_user_id), to: UserLib
+
+  @doc false
   @spec user_query(Teiserver.query_args()) :: Ecto.Query.t()
-  defdelegate user_query(args \\ []), to: UserQueries
+  defdelegate user_query(args), to: UserQueries
 
   @doc section: :user
   @spec list_users() :: [User.t()]

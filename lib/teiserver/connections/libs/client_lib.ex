@@ -4,6 +4,14 @@ defmodule Teiserver.Connections.ClientLib do
   """
   # use TeiserverMacros, :library
   alias Teiserver.Connections.Client
+  alias Teiserver.Account.User
+
+  @doc false
+  @spec client_topic(User.id() | User.t() | Client.t()) :: String.t()
+  def client_topic(%User{id: user_id}), do: "Teiserver.Connections.Client:#{user_id}"
+  def client_topic(%Client{id: user_id}), do: "Teiserver.Connections.Client:#{user_id}"
+  def client_topic(user_id), do: "Teiserver.Connections.Client:#{user_id}"
+
 
   @doc """
   Returns the list of client ids.
@@ -39,7 +47,7 @@ defmodule Teiserver.Connections.ClientLib do
   end
 
   @doc """
-  Updates a client with the new data. If changes are made then it will also generate a `Teiserver.ClientServer:{user_id}` pubsub message.
+  Updates a client with the new data. If changes are made then it will also generate a `Teiserver.Connections.Client:{user_id}` pubsub message.
 
   Returns nil if the Client does not exist, :ok if the client does.
 

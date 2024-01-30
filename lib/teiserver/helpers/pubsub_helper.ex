@@ -11,4 +11,12 @@ defmodule Teiserver.Helpers.PubSubHelper do
       Map.put(message, :topic, topic)
     )
   end
+
+  @spec subscribe(String.t()) :: :ok
+  def subscribe(topic) do
+    PubSub.subscribe(
+      Teiserver.PubSub,
+      topic
+    )
+  end
 end

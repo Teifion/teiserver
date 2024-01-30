@@ -1,10 +1,11 @@
 defmodule Teiserver.DirectMessageLibTest do
   @moduledoc false
+  alias Teiserver.Communication.DirectMessage
   alias Teiserver.Communication
   use Teiserver.Case, async: true
 
   alias Teiserver.Communication
-  alias Teiserver.{CommunicationFixtures, AccountFixtures}
+  alias Teiserver.{CommunicationFixtures, ConnectionFixtures, AccountFixtures}
 
   defp valid_attrs() do
     %{
@@ -171,6 +172,115 @@ defmodule Teiserver.DirectMessageLibTest do
     test "change_direct_message/1 returns a direct_message changeset" do
       direct_message = CommunicationFixtures.direct_message_fixture()
       assert %Ecto.Changeset{} = Communication.change_direct_message(direct_message)
+    end
+  end
+
+  describe "messaging" do
+    test "user to user" do
+      {conn1, user1} = ConnectionFixtures.client_fixture()
+      {conn2, user2} = ConnectionFixtures.client_fixture()
+
+      TestConn.subscribe(conn1, Communication.user_messaging_topic(user1.id))
+      TestConn.subscribe(conn2, Communication.user_messaging_topic(user2.id))
+
+      user1_id = user1.id
+      user2_id = user2.id
+
+      user1_topic = Communication.user_messaging_topic(user1_id)
+      user2_topic = Communication.user_messaging_topic(user2_id)
+
+      # Assert the queues are empty
+      assert TestConn.get(conn1) == []
+      assert TestConn.get(conn2) == []
+
+      Communication.send_direct_message(user1.id, user2.id, "First direct message")
+
+      # Assert the message has arrived
+      [message] = TestConn.get(conn1)
+      assert match?(%{
+        event: :message_sent,
+        topic: ^user1_topic,
+        direct_message: %DirectMessage{
+          id: _,
+          content: "First direct message",
+          inserted_at: _,
+          delivered?: false,
+          from_id: ^user1_id,
+          to_id: ^user2_id
+        }
+      }, message)
+
+      [message] = TestConn.get(conn2)
+      assert match?(%{
+        event: :message_received,
+        topic: ^user2_topic,
+        direct_message: %DirectMessage{
+          id: _,
+          content: "First direct message",
+          inserted_at: _,
+          delivered?: false,
+          from_id: ^user1_id,
+          to_id: ^user2_id
+        }
+      }, message)
+
+      # Now both send a few more
+      Communication.send_direct_message(user2.id, user1.id, "Second direct message")
+      Communication.send_direct_message(user1.id, user2.id, "Third direct message")
+
+      # Conn1
+      [m1, m2] = TestConn.get(conn1)
+      assert match?(%{
+        event: :message_received,
+        topic: ^user1_topic,
+        direct_message: %DirectMessage{
+          id: _,
+          content: "Second direct message",
+          inserted_at: _,
+          delivered?: false,
+          from_id: ^user2_id,
+          to_id: ^user1_id
+        }
+      }, m1)
+      assert match?(%{
+        event: :message_sent,
+        topic: ^user1_topic,
+        direct_message: %DirectMessage{
+          id: _,
+          content: "Third direct message",
+          inserted_at: _,
+          delivered?: false,
+          from_id: ^user1_id,
+          to_id: ^user2_id
+        }
+      }, m2)
+
+      # Conn2
+      [m1, m2] = TestConn.get(conn2)
+      assert match?(%{
+        event: :message_sent,
+        topic: ^user2_topic,
+        direct_message: %DirectMessage{
+          id: _,
+          content: "Second direct message",
+          inserted_at: _,
+          delivered?: false,
+          from_id: ^user2_id,
+          to_id: ^user1_id
+        }
+      }, m1)
+      assert match?(%{
+        event: :message_received,
+        topic: ^user2_topic,
+        direct_message: %DirectMessage{
+          id: _,
+          content: "Third direct message",
+          inserted_at: _,
+          delivered?: false,
+          from_id: ^user1_id,
+          to_id: ^user2_id
+        }
+      }, m2)
     end
   end
 end

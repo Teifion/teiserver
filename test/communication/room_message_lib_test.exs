@@ -1,9 +1,10 @@
 defmodule Teiserver.RoomMessageLibTest do
   @moduledoc false
+  alias Teiserver.Communication.RoomMessage
   use Teiserver.Case, async: true
 
   alias Teiserver.Communication
-  alias Teiserver.{CommunicationFixtures, AccountFixtures}
+  alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
 
   defp valid_attrs() do
     %{
@@ -98,6 +99,92 @@ defmodule Teiserver.RoomMessageLibTest do
     test "change_room_message/1 returns a room_message changeset" do
       room_message = CommunicationFixtures.room_message_fixture()
       assert %Ecto.Changeset{} = Communication.change_room_message(room_message)
+    end
+  end
+
+  describe "messaging" do
+    test "room" do
+      r = :rand.uniform(999_999_999)
+      {conn1, user1} = ConnectionFixtures.client_fixture()
+      {conn2, user2} = ConnectionFixtures.client_fixture()
+      {conn3, user3} = ConnectionFixtures.client_fixture()
+
+      room = Communication.get_or_create_room("#{r}_messaging_room")
+      topic = Communication.room_topic(room.id)
+
+      TestConn.run(conn1, fn -> Communication.subscribe_to_room(room.id) end)
+      TestConn.run(conn2, fn -> Communication.subscribe_to_room(room.id) end)
+      TestConn.run(conn3, fn -> Communication.subscribe_to_room(room.id) end)
+
+      assert TestConn.get(conn1) == []
+      assert TestConn.get(conn2) == []
+      assert TestConn.get(conn3) == []
+
+      # Now send messages
+      Communication.send_room_message(user1.id, room.id, "Test first message")
+
+      # Need to alias these here for the match
+      user1_id = user1.id
+      user2_id = user2.id
+      user3_id = user3.id
+      room_id = room.id
+
+      [conn1, conn2, conn3]
+      |> Enum.each(fn c ->
+        [message] = TestConn.get(c)
+        assert match?(%{
+          event: :message_received,
+          topic: ^topic,
+          room_message: %RoomMessage{
+            id: _,
+            content: "Test first message",
+            sender_id: ^user1_id,
+            room_id: ^room_id
+          }
+        }, message)
+      end)
+
+      # If we send three more, they should all appear but the first should now be removed
+      Communication.send_room_message(user1.id, room.id, "Test second message")
+      Communication.send_room_message(user2.id, room.id, "Test third message")
+      Communication.send_room_message(user3.id, room.id, "Test fourth message")
+
+      [conn1, conn2, conn3]
+      |> Enum.each(fn c ->
+        [m1, m2, m3] = TestConn.get(c)
+        assert match?(%{
+          event: :message_received,
+          topic: ^topic,
+          room_message: %RoomMessage{
+            id: _,
+            content: "Test second message",
+            sender_id: ^user1_id,
+            room_id: ^room_id
+          }
+        }, m1)
+
+        assert match?(%{
+          event: :message_received,
+          topic: ^topic,
+          room_message: %RoomMessage{
+            id: _,
+            content: "Test third message",
+            sender_id: ^user2_id,
+            room_id: ^room_id
+          }
+        }, m2)
+
+        assert match?(%{
+          event: :message_received,
+          topic: ^topic,
+          room_message: %RoomMessage{
+            id: _,
+            content: "Test fourth message",
+            sender_id: ^user3_id,
+            room_id: ^room_id
+          }
+        }, m3)
+      end)
     end
   end
 end

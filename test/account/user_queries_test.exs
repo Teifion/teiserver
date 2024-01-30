@@ -5,7 +5,7 @@ defmodule Teiserver.UserQueriesTest do
   alias Teiserver.Account.UserQueries
 
   describe "queries" do
-    @empty_query UserQueries.user_query()
+    @empty_query UserQueries.user_query([])
 
     test "clauses" do
       # Null values, shouldn't error but shouldn't generate a query

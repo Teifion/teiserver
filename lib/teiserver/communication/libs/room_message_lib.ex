@@ -3,7 +3,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
   Library of room_message related functions.
   """
   use TeiserverMacros, :library
-  alias Teiserver.Communication.{Room, RoomMessage, RoomMessageQueries}
+  alias Teiserver.Communication.{Room, RoomLib, RoomMessage, RoomMessageQueries}
 
   @doc """
   Returns a list of messages from a room ordered as the most recent first.
@@ -51,8 +51,10 @@ defmodule Teiserver.Communication.RoomMessageLib do
 
     case create_room_message(attrs) do
       {:ok, room_message} ->
+        topic = RoomLib.room_topic(room_message.room_id)
+
         Teiserver.broadcast(
-          "Teiserver.Communication:Room.#{room_message.room_id}",
+          topic,
           %{
             event: :message_received,
             room_message: room_message

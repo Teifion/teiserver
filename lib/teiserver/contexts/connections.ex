@@ -12,7 +12,12 @@ defmodule Teiserver.Connections do
   TODO: Implement and document
   """
 
+  alias Teiserver.Account.User
   alias Teiserver.Connections.{Client, ClientLib}
+
+  @doc false
+  @spec client_topic(User.id() | User.t() | Client.t()) :: String.t()
+  defdelegate client_topic(client_or_user_or_user_id), to: ClientLib
 
   @doc section: :client
   @spec list_client_ids() :: [Teiserver.user_id()]

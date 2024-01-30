@@ -7,12 +7,20 @@ defmodule Teiserver.Communication do
   - `Teiserver.Communication.LobbyMessage`
   - `Teiserver.Communication.PartyMessage`
   """
-
+  alias Teiserver.Account.User
   alias Teiserver.Communication.{Room, RoomLib, RoomQueries}
 
   @doc false
   @spec room_query(Teiserver.query_args()) :: Ecto.Query.t()
   defdelegate room_query(args \\ []), to: RoomQueries
+
+  @doc false
+  @spec room_topic(Room.id() | Room.t()) :: String.t()
+  defdelegate room_topic(room_or_room_id), to: RoomLib
+
+  @doc section: :room
+  @spec subscribe_to_room(Room.id() | Room.t() | String.t()) :: :ok
+  defdelegate subscribe_to_room(room_id_or_name), to: RoomLib
 
   @doc section: :room
   @spec list_rooms(Teiserver.query_args()) :: [Room.t()]
@@ -96,6 +104,10 @@ defmodule Teiserver.Communication do
   defdelegate change_room_message(room_message, attrs \\ %{}), to: RoomMessageLib
 
   alias Teiserver.Communication.{DirectMessage, DirectMessageLib, DirectMessageQueries}
+
+  @doc false
+  @spec user_messaging_topic(User.id() | User.t()) :: String.t()
+  defdelegate user_messaging_topic(room_or_room_id), to: DirectMessageLib
 
   @doc false
   @spec direct_message_query(Teiserver.query_args()) :: Ecto.Query.t()
