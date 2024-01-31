@@ -74,39 +74,4 @@ defmodule Teiserver.Helpers.SchemaHelper do
       end
     end)
   end
-
-  @doc """
-  Given a list of fields and a list of patterns, will apply Regex.replace for every
-  pattern to each field.
-  """
-  @spec remove_characters(map, list, list) :: map
-  def remove_characters(params, names, patterns) do
-    names = Enum.map(names, fn n -> Atom.to_string(n) end)
-
-    params
-    |> Map.new(fn {k, v} ->
-      case Enum.member?(names, k) do
-        true ->
-          case v do
-            nil ->
-              {k, nil}
-
-            _ ->
-              new_value =
-                patterns
-                |> Enum.reduce(v, fn pattern, acc ->
-                  Regex.replace(pattern, acc, "")
-                end)
-
-              {
-                k,
-                new_value
-              }
-          end
-
-        false ->
-          {k, v}
-      end
-    end)
-  end
 end

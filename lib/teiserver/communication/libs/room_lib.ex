@@ -24,6 +24,19 @@ defmodule Teiserver.Communication.RoomLib do
   def subscribe_to_room(room_name), do: get_or_create_room(room_name).id
 
   @doc """
+  Removes your process from a room's messages
+  """
+  @spec unsubscribe_from_room(Room.id() | Room.t() | String.t()) :: :ok
+  def unsubscribe_from_room(room_id) when is_integer(room_id) do
+    room_id
+    |> room_topic()
+    |> Teiserver.unsubscribe()
+  end
+
+  def unsubscribe_from_room(%Room{id: room_id}), do: unsubscribe_from_room(room_id)
+  def unsubscribe_from_room(room_name), do: get_or_create_room(room_name).id
+
+  @doc """
   Returns the list of rooms.
 
   ## Examples
@@ -53,8 +66,8 @@ defmodule Teiserver.Communication.RoomLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_room!(non_neg_integer()) :: Room.t()
-  @spec get_room!(non_neg_integer(), Teiserver.query_args()) :: Room.t()
+  @spec get_room!(Room.id()) :: Room.t()
+  @spec get_room!(Room.id(), Teiserver.query_args()) :: Room.t()
   def get_room!(room_id, query_args \\ []) do
     (query_args ++ [id: room_id])
     |> RoomQueries.room_query()
@@ -75,7 +88,8 @@ defmodule Teiserver.Communication.RoomLib do
       nil
 
   """
-  @spec get_room(non_neg_integer(), list) :: Room.t() | nil
+  @spec get_room(Room.id()) :: Room.t() | nil
+  @spec get_room(Room.id(), Teiserver.query_args()) :: Room.t() | nil
   def get_room(room_id, query_args \\ []) do
     (query_args ++ [id: room_id])
     |> RoomQueries.room_query()

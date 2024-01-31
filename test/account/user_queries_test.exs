@@ -20,7 +20,11 @@ defmodule Teiserver.UserQueriesTest do
       assert null_values == @empty_query
       Repo.all(null_values)
 
-      # # We expect all these to be present
+      # If a key is not present in the query library it should error
+      assert_raise(FunctionClauseError, fn ->
+        UserQueries.user_query(where: [not_a_key: 1])
+      end)
+
       # we expect the query to run though it won't produce meaningful results
       all_values =
         UserQueries.user_query(
@@ -63,7 +67,9 @@ defmodule Teiserver.UserQueriesTest do
           ],
           preload: [
             :extra_data
-          ]
+          ],
+          limit: nil,
+          select: [:id]
         )
 
       assert all_values != @empty_query

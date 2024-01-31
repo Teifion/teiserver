@@ -2,11 +2,12 @@ defmodule Teiserver.Communication.RoomMessageLib do
   @moduledoc """
   Library of room_message related functions.
   """
+  alias ElixirLS.LanguageServer.Protocol.TextEdit
   use TeiserverMacros, :library
   alias Teiserver.Communication.{Room, RoomLib, RoomMessage, RoomMessageQueries}
 
   @doc """
-  Returns a list of messages from a room ordered as the most recent first.
+  Returns a list of messages from a room ordered as the newest first.
 
   In the event of there being ne messages for a room of that ID the function will return an empty list.
 
@@ -20,7 +21,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
   """
   @spec list_recent_room_messages(Room.id(), non_neg_integer()) :: [RoomMessage.t()]
   def list_recent_room_messages(room_id, limit \\ 50) when is_integer(room_id) do
-    list_room_messages(where: [room_id: room_id], limit: limit, order_by: ["Most recent first"])
+    list_room_messages(where: [room_id: room_id], limit: limit, order_by: ["Newest first"])
   end
 
   @doc """
@@ -98,7 +99,8 @@ defmodule Teiserver.Communication.RoomMessageLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_room_message!(non_neg_integer()) :: RoomMessage.t()
+  @spec get_room_message!(RoomMessage.id()) :: RoomMessage.t()
+  @spec get_room_message!(RoomMessage.id(), Teiserver.query_args()) :: RoomMessage.t()
   def get_room_message!(room_message_id, query_args \\ []) do
     (query_args ++ [id: room_message_id])
     |> RoomMessageQueries.room_message_query()
@@ -119,7 +121,8 @@ defmodule Teiserver.Communication.RoomMessageLib do
       nil
 
   """
-  @spec get_room_message(non_neg_integer(), list) :: RoomMessage.t() | nil
+  @spec get_room_message(RoomMessage.id()) :: RoomMessage.t() | nil
+  @spec get_room_message(RoomMessage.id(), Teiserver.query_args()) :: RoomMessage.t() | nil
   def get_room_message(room_message_id, query_args \\ []) do
     (query_args ++ [id: room_message_id])
     |> RoomMessageQueries.room_message_query()

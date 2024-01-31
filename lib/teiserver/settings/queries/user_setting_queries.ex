@@ -4,9 +4,8 @@ defmodule Teiserver.Settings.UserSettingQueries do
   alias Teiserver.Settings.UserSetting
   require Logger
 
-  @spec user_setting_query() :: Ecto.Query.t()
   @spec user_setting_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def user_setting_query(args \\ []) do
+  def user_setting_query(args) do
     query = from(user_settings in UserSetting)
 
     query

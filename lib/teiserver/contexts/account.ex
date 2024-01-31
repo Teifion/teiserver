@@ -25,15 +25,17 @@ defmodule Teiserver.Account do
   defdelegate list_users(args), to: UserLib
 
   @doc section: :user
-  @spec get_user!(non_neg_integer(), list) :: User.t()
+  @spec get_user!(Teiserver.user_id()) :: User.t()
+  @spec get_user!(Teiserver.user_id(), Teiserver.query_args()) :: User.t()
   defdelegate get_user!(user_id, query_args \\ []), to: UserLib
 
   @doc section: :user
-  @spec get_user(non_neg_integer(), list) :: User.t() | nil
+  @spec get_user(Teiserver.user_id()) :: User.t() | nil
+  @spec get_user(Teiserver.user_id(), Teiserver.query_args()) :: User.t() | nil
   defdelegate get_user(user_id, query_args \\ []), to: UserLib
 
   @doc section: :user
-  @spec get_user_by_id(non_neg_integer()) :: User.t() | nil
+  @spec get_user_by_id(Teiserver.user_id()) :: User.t() | nil
   defdelegate get_user_by_id(user_id), to: UserLib
 
   @doc section: :user

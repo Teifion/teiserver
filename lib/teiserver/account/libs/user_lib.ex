@@ -208,7 +208,7 @@ defmodule Teiserver.Account.UserLib do
     "d52r8i5BhA6xBtmp7ElHI3Y/U/qztw2jUkgdeoZijWBEYzTf5DSBR5N87283WDiA"
   """
   @spec generate_password() :: String.t()
-  def generate_password() do
+  def generate_password do
     :crypto.strong_rand_bytes(64) |> Base.encode64(padding: false) |> binary_part(0, 64)
   end
 

@@ -262,14 +262,14 @@ defmodule Teiserver.MixProject do
         "hex.publish --yes"
       ],
       "test.reset": ["ecto.drop --quiet", "test.setup"],
-      "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"]
-      # "test.ci": [
-      #   "format --check-formatted",
-      #   "deps.unlock --check-unused",
-      #   "credo --strict",
-      #   "test --raise",
-      #   "dialyzer"
-      # ]
+      "test.setup": ["ecto.create --quiet", "ecto.migrate --quiet"],
+      "test.ci": [
+        "format --check-formatted",
+        "deps.unlock --check-unused",
+        "credo --strict",
+        "test --raise",
+        "dialyzer"
+      ]
     ]
   end
 end

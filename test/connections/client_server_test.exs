@@ -5,7 +5,7 @@ defmodule Connections.ClientServerTest do
   alias Teiserver.Connections
   alias Teiserver.{AccountFixtures, ConnectionFixtures}
 
-  describe "Clint server" do
+  describe "Client server" do
     test "server lifecycle" do
       user = AccountFixtures.user_fixture()
       conn = TestConn.new()

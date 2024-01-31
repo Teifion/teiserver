@@ -4,9 +4,8 @@ defmodule Teiserver.Communication.DirectMessageQueries do
   alias Teiserver.Communication.DirectMessage
   require Logger
 
-  @spec direct_message_query() :: Ecto.Query.t()
   @spec direct_message_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def direct_message_query(args \\ []) do
+  def direct_message_query(args) do
     query = from(direct_messages in DirectMessage)
 
     query
@@ -32,7 +31,7 @@ defmodule Teiserver.Communication.DirectMessageQueries do
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :id_in, id_list) when is_list(id_list) do
+  def _where(query, :id, id_list) when is_list(id_list) do
     from(direct_messages in query,
       where: direct_messages.id in ^id_list
     )
@@ -104,18 +103,6 @@ defmodule Teiserver.Communication.DirectMessageQueries do
   end
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
-  def _order_by(query, "Name (A-Z)") do
-    from(direct_messages in query,
-      order_by: [asc: direct_messages.name]
-    )
-  end
-
-  def _order_by(query, "Name (Z-A)") do
-    from(direct_messages in query,
-      order_by: [desc: direct_messages.name]
-    )
-  end
-
   def _order_by(query, "Newest first") do
     from(direct_messages in query,
       order_by: [desc: direct_messages.inserted_at]

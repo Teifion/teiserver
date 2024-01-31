@@ -22,7 +22,7 @@ defmodule Teiserver.Connections.ClientLib do
 
   """
   @spec list_client_ids() :: [Teiserver.user_id()]
-  def list_client_ids() do
+  def list_client_ids do
     Registry.select(Teiserver.ClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
 

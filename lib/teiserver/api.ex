@@ -6,6 +6,16 @@ defmodule Teiserver.Api do
   """
 
   alias Teiserver.{Account, Communication, Connections}
+  alias Account.UserLib
+
+  alias Communication.{
+    Room,
+    RoomLib,
+    RoomMessage,
+    RoomMessageLib,
+    DirectMessage,
+    DirectMessageLib
+  }
 
   @doc """
   Takes a name and password, tries to authenticate the user.
@@ -72,4 +82,30 @@ defmodule Teiserver.Api do
       "email" => email
     })
   end
+
+  @spec get_user_by_id(Teiserver.user_id()) :: User.t() | nil
+  defdelegate get_user_by_id(user_id), to: UserLib
+
+  @spec get_user_by_name(String.t()) :: User.t() | nil
+  defdelegate get_user_by_name(name), to: UserLib
+
+  @spec subscribe_to_room(Room.id() | Room.t() | String.t()) :: :ok
+  defdelegate subscribe_to_room(room_id_or_name), to: RoomLib
+
+  @spec unsubscribe_from_room(Room.id() | Room.t() | String.t()) :: :ok
+  defdelegate unsubscribe_from_room(room_id_or_name), to: RoomLib
+
+  @spec get_room_by_name_or_id(Room.name_or_id()) :: Room.t() | nil
+  defdelegate get_room_by_name_or_id(room_name_or_id), to: RoomLib
+
+  @spec list_recent_room_messages(Room.id()) :: [RoomMessage.t()]
+  defdelegate list_recent_room_messages(room_name_or_id), to: RoomMessageLib
+
+  @spec send_room_message(Teiserver.user_id(), Room.id(), String.t()) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate send_room_message(sender_id, room_id, content), to: RoomMessageLib
+
+  @spec send_direct_message(Teiserver.user_id(), Teiserver.user_id(), String.t()) ::
+          {:ok, DirectMessage.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate send_direct_message(from_id, to_id, content), to: DirectMessageLib
 end

@@ -3,7 +3,7 @@ defmodule Teiserver.Repo do
 
   @doc false
   @spec repo() :: Module
-  defp repo() do
+  defp repo do
     Application.get_env(:teiserver, :repo)
   end
 

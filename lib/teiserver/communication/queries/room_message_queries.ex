@@ -4,9 +4,8 @@ defmodule Teiserver.Communication.RoomMessageQueries do
   alias Teiserver.Communication.RoomMessage
   require Logger
 
-  @spec room_message_query() :: Ecto.Query.t()
   @spec room_message_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def room_message_query(args \\ []) do
+  def room_message_query(args) do
     query = from(room_messages in RoomMessage)
 
     query
@@ -44,6 +43,30 @@ defmodule Teiserver.Communication.RoomMessageQueries do
     )
   end
 
+  def _where(query, :room_id, room_ids) when is_list(room_ids) do
+    from(room_messages in query,
+      where: room_messages.room_id in ^room_ids
+    )
+  end
+
+  def _where(query, :room_id, room_id) do
+    from(room_messages in query,
+      where: room_messages.room_id == ^room_id
+    )
+  end
+
+  def _where(query, :sender_id, sender_ids) when is_list(sender_ids) do
+    from(room_messages in query,
+      where: room_messages.sender_id in ^sender_ids
+    )
+  end
+
+  def _where(query, :sender_id, sender_id) do
+    from(room_messages in query,
+      where: room_messages.sender_id == ^sender_id
+    )
+  end
+
   def _where(query, :inserted_after, timestamp) do
     from(room_messages in query,
       where: room_messages.inserted_at >= ^timestamp
@@ -68,18 +91,6 @@ defmodule Teiserver.Communication.RoomMessageQueries do
   end
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
-  def _order_by(query, "Name (A-Z)") do
-    from(room_messages in query,
-      order_by: [asc: room_messages.name]
-    )
-  end
-
-  def _order_by(query, "Name (Z-A)") do
-    from(room_messages in query,
-      order_by: [desc: room_messages.name]
-    )
-  end
-
   def _order_by(query, "Newest first") do
     from(room_messages in query,
       order_by: [desc: room_messages.inserted_at]
@@ -112,10 +123,10 @@ defmodule Teiserver.Communication.RoomMessageQueries do
   end
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
-  def _preload(query, :from) do
+  def _preload(query, :sender) do
     from(room_message in query,
-      left_join: froms in assoc(room_message, :from),
-      preload: [from: froms]
+      left_join: senders in assoc(room_message, :sender),
+      preload: [sender: senders]
     )
   end
 end

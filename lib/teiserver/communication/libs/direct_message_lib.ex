@@ -207,8 +207,8 @@ defmodule Teiserver.Communication.DirectMessageLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_direct_message!(non_neg_integer()) :: DirectMessage.t()
-  @spec get_direct_message!(non_neg_integer(), Teiserver.query_args()) :: DirectMessage.t()
+  @spec get_direct_message!(DirectMessage.id()) :: DirectMessage.t()
+  @spec get_direct_message!(DirectMessage.id(), Teiserver.query_args()) :: DirectMessage.t()
   def get_direct_message!(direct_message_id, query_args \\ []) do
     (query_args ++ [id: direct_message_id])
     |> DirectMessageQueries.direct_message_query()
@@ -229,8 +229,8 @@ defmodule Teiserver.Communication.DirectMessageLib do
       nil
 
   """
-  @spec get_direct_message(non_neg_integer()) :: DirectMessage.t() | nil
-  @spec get_direct_message(non_neg_integer(), Teiserver.query_args()) :: DirectMessage.t() | nil
+  @spec get_direct_message(DirectMessage.id()) :: DirectMessage.t() | nil
+  @spec get_direct_message(DirectMessage.id(), Teiserver.query_args()) :: DirectMessage.t() | nil
   def get_direct_message(direct_message_id, query_args \\ []) do
     (query_args ++ [id: direct_message_id])
     |> DirectMessageQueries.direct_message_query()

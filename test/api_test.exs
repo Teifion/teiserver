@@ -1,5 +1,6 @@
 defmodule ApiTest do
   @moduledoc false
+  alias Teiserver.CommunicationFixtures
   use Teiserver.Case, async: true
 
   alias Phoenix.PubSub
@@ -40,14 +41,42 @@ defmodule ApiTest do
       TestConn.run(conn, fn -> Api.connect_user(user.id) end)
 
       # Check we're subbed to the right stuff
-      PubSub.broadcast(Teiserver.PubSub, Teiserver.Connections.client_topic(user.id), "client_topic")
-      PubSub.broadcast(Teiserver.PubSub, Teiserver.Communication.user_messaging_topic(user.id), "user_messaging_topic")
+      PubSub.broadcast(
+        Teiserver.PubSub,
+        Teiserver.Connections.client_topic(user.id),
+        "client_topic"
+      )
+
+      PubSub.broadcast(
+        Teiserver.PubSub,
+        Teiserver.Communication.user_messaging_topic(user.id),
+        "user_messaging_topic"
+      )
 
       assert TestConn.get(conn) == ["client_topic", "user_messaging_topic"]
 
       # Check we're counted as logged in
       client_ids = Teiserver.Connections.list_client_ids()
       assert Enum.member?(client_ids, user.id)
+    end
+  end
+
+  # We just call these as they are for coverage purposes, they're delegated so tested fully elsewhere
+  describe "delegates" do
+    test "Communication" do
+      room = CommunicationFixtures.room_fixture()
+      user1 = AccountFixtures.user_fixture()
+      user2 = AccountFixtures.user_fixture()
+
+      assert room == Api.get_room_by_name_or_id(room.name)
+
+      Api.subscribe_to_room(room)
+      Api.unsubscribe_from_room(room)
+
+      assert Api.list_recent_room_messages(room.id) == []
+
+      {:ok, _} = Api.send_room_message(user1.id, room.id, "Content")
+      {:ok, _} = Api.send_direct_message(user1.id, user2.id, "Content")
     end
   end
 end

@@ -7,7 +7,7 @@ defmodule Teiserver.DirectMessageLibTest do
   alias Teiserver.Communication
   alias Teiserver.{CommunicationFixtures, ConnectionFixtures, AccountFixtures}
 
-  defp valid_attrs() do
+  defp valid_attrs do
     %{
       content: "some content",
       inserted_at: Timex.now(),
@@ -16,7 +16,7 @@ defmodule Teiserver.DirectMessageLibTest do
     }
   end
 
-  defp update_attrs() do
+  defp update_attrs do
     %{
       content: "some updated content",
       inserted_at: Timex.now(),
@@ -25,7 +25,7 @@ defmodule Teiserver.DirectMessageLibTest do
     }
   end
 
-  defp invalid_attrs() do
+  defp invalid_attrs do
     %{
       content: nil,
       inserted_at: nil,
@@ -175,6 +175,15 @@ defmodule Teiserver.DirectMessageLibTest do
     end
   end
 
+  describe "pure functions" do
+    test "topic" do
+      user = AccountFixtures.user_fixture()
+      expected = "Teiserver.Communication.User:#{user.id}"
+      assert Communication.user_messaging_topic(user) == expected
+      assert Communication.user_messaging_topic(user.id) == expected
+    end
+  end
+
   describe "messaging" do
     test "user to user" do
       {conn1, user1} = ConnectionFixtures.client_fixture()
@@ -305,6 +314,12 @@ defmodule Teiserver.DirectMessageLibTest do
                },
                m2
              )
+
+      # Now assert it errors the correct way
+      {:error, changeset} =
+        Communication.send_direct_message(nil, user2.id, "Test second message")
+
+      assert %Ecto.Changeset{valid?: false} = changeset
     end
   end
 end

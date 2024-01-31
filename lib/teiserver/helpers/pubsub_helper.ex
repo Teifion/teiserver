@@ -19,4 +19,12 @@ defmodule Teiserver.Helpers.PubSubHelper do
       topic
     )
   end
+
+  @spec unsubscribe(String.t()) :: :ok
+  def unsubscribe(topic) do
+    PubSub.unsubscribe(
+      Teiserver.PubSub,
+      topic
+    )
+  end
 end

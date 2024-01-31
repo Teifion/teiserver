@@ -187,7 +187,7 @@ defmodule Teiserver.Migration do
   end
 
   defp migrator do
-    case repo().__adapter__() do
+    case repo().__adapter__ do
       Ecto.Adapters.Postgres -> Teiserver.Migrations.Postgres
       Ecto.Adapters.SQLite3 -> Teiserver.Migrations.SQLite
       _ -> Keyword.fetch!(repo().config(), :migrator)

@@ -68,4 +68,8 @@ defmodule Teiserver do
   @doc false
   @spec subscribe(String.t()) :: :ok
   defdelegate subscribe(topic), to: PubSubHelper
+
+  @doc false
+  @spec unsubscribe(String.t()) :: :ok
+  defdelegate unsubscribe(topic), to: PubSubHelper
 end

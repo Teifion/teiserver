@@ -4,9 +4,8 @@ defmodule Teiserver.Settings.ServerSettingQueries do
   alias Teiserver.Settings.ServerSetting
   require Logger
 
-  @spec server_setting_query() :: Ecto.Query.t()
   @spec server_setting_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def server_setting_query(args \\ []) do
+  def server_setting_query(args) do
     query = from(server_settings in ServerSetting)
 
     query

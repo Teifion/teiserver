@@ -146,6 +146,15 @@ defmodule Teiserver.UserLibTest do
     end
   end
 
+  describe "pure functions" do
+    test "topic" do
+      user = AccountFixtures.user_fixture()
+      expected = "Teiserver.Account.User:#{user.id}"
+      assert Account.user_topic(user) == expected
+      assert Account.user_topic(user.id) == expected
+    end
+  end
+
   describe "user related functions" do
     test "generate password" do
       p = Account.generate_password()

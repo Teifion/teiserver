@@ -4,9 +4,8 @@ defmodule Teiserver.Communication.RoomQueries do
   alias Teiserver.Communication.Room
   require Logger
 
-  @spec room_query() :: Ecto.Query.t()
   @spec room_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def room_query(args \\ []) do
+  def room_query(args) do
     query = from(rooms in Room)
 
     query

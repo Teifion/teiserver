@@ -19,17 +19,6 @@ defmodule Teiserver.Helpers.QueryHelper do
     |> limit(^amount)
   end
 
-  @spec limit_query(Ecto.Query.t(), integer() | nil, integer() | nil) :: Ecto.Query.t()
-  def limit_query(query, nil, max_amount), do: limit_query(query, max_amount)
-
-  def limit_query(query, amount, max_amount) when is_integer(amount) do
-    limit_query(query, min(amount, max_amount))
-  end
-
-  def limit_query(query, amount, max_amount) do
-    limit_query(query, min(amount |> String.to_integer(), max_amount))
-  end
-
   @spec query_select(Ecto.Query.t(), String.t() | nil) :: Ecto.Query.t()
   def query_select(query, nil), do: query
 

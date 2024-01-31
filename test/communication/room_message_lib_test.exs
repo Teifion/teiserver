@@ -6,7 +6,7 @@ defmodule Teiserver.RoomMessageLibTest do
   alias Teiserver.Communication
   alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
 
-  defp valid_attrs() do
+  defp valid_attrs do
     %{
       content: "some content",
       inserted_at: Timex.now(),
@@ -15,7 +15,7 @@ defmodule Teiserver.RoomMessageLibTest do
     }
   end
 
-  defp update_attrs() do
+  defp update_attrs do
     %{
       content: "some updated content",
       inserted_at: Timex.now(),
@@ -24,7 +24,7 @@ defmodule Teiserver.RoomMessageLibTest do
     }
   end
 
-  defp invalid_attrs() do
+  defp invalid_attrs do
     %{
       content: nil,
       inserted_at: nil,
@@ -45,8 +45,12 @@ defmodule Teiserver.RoomMessageLibTest do
       assert Communication.list_room_messages([]) == []
 
       # Add a room_message
-      CommunicationFixtures.room_message_fixture()
+      m = CommunicationFixtures.room_message_fixture()
       assert Communication.list_room_messages([]) != []
+
+      # Assert recent lists those too
+      assert Communication.list_room_messages([]) ==
+               Communication.list_recent_room_messages(m.room_id)
     end
 
     test "get_room_message!/1 and get_room_message/1 returns the room_message with given id" do
@@ -199,6 +203,10 @@ defmodule Teiserver.RoomMessageLibTest do
                  m3
                )
       end)
+
+      # Now assert it errors the correct way
+      {:error, changeset} = Communication.send_room_message(nil, room.id, "Test second message")
+      assert %Ecto.Changeset{valid?: false} = changeset
     end
   end
 end

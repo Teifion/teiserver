@@ -23,17 +23,21 @@ defmodule Teiserver.Communication do
   defdelegate subscribe_to_room(room_id_or_name), to: RoomLib
 
   @doc section: :room
+  @spec unsubscribe_from_room(Room.id() | Room.t() | String.t()) :: :ok
+  defdelegate unsubscribe_from_room(room_id_or_name), to: RoomLib
+
+  @doc section: :room
   @spec list_rooms(Teiserver.query_args()) :: [Room.t()]
   defdelegate list_rooms(args), to: RoomLib
 
   @doc section: :room
-  @spec get_room!(non_neg_integer()) :: Room.t()
-  @spec get_room!(non_neg_integer(), Teiserver.query_args()) :: Room.t()
+  @spec get_room!(Room.id()) :: Room.t()
+  @spec get_room!(Room.id(), Teiserver.query_args()) :: Room.t()
   defdelegate get_room!(room_id, query_args \\ []), to: RoomLib
 
   @doc section: :room
-  @spec get_room(non_neg_integer()) :: Room.t() | nil
-  @spec get_room(non_neg_integer(), Teiserver.query_args()) :: Room.t() | nil
+  @spec get_room(Room.id()) :: Room.t() | nil
+  @spec get_room(Room.id(), Teiserver.query_args()) :: Room.t() | nil
   defdelegate get_room(room_id, query_args \\ []), to: RoomLib
 
   @doc section: :room
@@ -80,11 +84,13 @@ defmodule Teiserver.Communication do
   defdelegate list_room_messages(args), to: RoomMessageLib
 
   @doc section: :room_message
-  @spec get_room_message!(non_neg_integer(), list) :: RoomMessage.t()
+  @spec get_room_message!(RoomMessage.id()) :: RoomMessage.t()
+  @spec get_room_message!(RoomMessage.id(), Teiserver.query_args()) :: RoomMessage.t()
   defdelegate get_room_message!(room_message_id, query_args \\ []), to: RoomMessageLib
 
   @doc section: :room_message
-  @spec get_room_message(non_neg_integer(), list) :: RoomMessage.t() | nil
+  @spec get_room_message(RoomMessage.id()) :: RoomMessage.t() | nil
+  @spec get_room_message(RoomMessage.id(), Teiserver.query_args()) :: RoomMessage.t() | nil
   defdelegate get_room_message(room_message_id, query_args \\ []), to: RoomMessageLib
 
   @doc section: :room_message
@@ -120,11 +126,13 @@ defmodule Teiserver.Communication do
   defdelegate list_direct_messages(args), to: DirectMessageLib
 
   @doc section: :direct_message
-  @spec get_direct_message!(non_neg_integer(), list) :: DirectMessage.t()
+  @spec get_direct_message!(DirectMessage.id()) :: DirectMessage.t()
+  @spec get_direct_message!(DirectMessage.id(), Teiserver.query_args()) :: DirectMessage.t()
   defdelegate get_direct_message!(direct_message_id, query_args \\ []), to: DirectMessageLib
 
   @doc section: :direct_message
-  @spec get_direct_message(non_neg_integer(), list) :: DirectMessage.t() | nil
+  @spec get_direct_message(DirectMessage.id()) :: DirectMessage.t() | nil
+  @spec get_direct_message(DirectMessage.id(), Teiserver.query_args()) :: DirectMessage.t() | nil
   defdelegate get_direct_message(direct_message_id, query_args \\ []), to: DirectMessageLib
 
   @doc section: :direct_message
