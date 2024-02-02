@@ -2,7 +2,6 @@ defmodule Teiserver.Communication.RoomMessageLib do
   @moduledoc """
   Library of room_message related functions.
   """
-  alias ElixirLS.LanguageServer.Protocol.TextEdit
   use TeiserverMacros, :library
   alias Teiserver.Communication.{Room, RoomLib, RoomMessage, RoomMessageQueries}
 

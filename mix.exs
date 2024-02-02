@@ -2,7 +2,7 @@ defmodule Teiserver.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/Teifion/teiserver"
-  @version "0.0.3"
+  @version "0.0.4"
 
   def project do
     [
@@ -222,6 +222,7 @@ defmodule Teiserver.MixProject do
       {:jason, "~> 1.2"},
       {:argon2_elixir, "~> 3.0"},
       {:timex, "~> 3.7.5"},
+      {:typedstruct, "~> 0.5.2", runtime: false},
 
       # Libs I expect to use
       # {:parallel, "~> 0.0"},

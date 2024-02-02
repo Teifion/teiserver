@@ -8,7 +8,7 @@ defmodule Teiserver do
 
   ```mermaid
   graph TD;
-    srv{{Teiserver}};
+    srv{{Middleware Server}};
     srv <--> User1;
     srv <--> User2;
     srv <--> User3;
@@ -47,7 +47,7 @@ defmodule Teiserver do
 
   # Types
   @type user_id :: Teiserver.Account.User.id()
-  @type lobby_id :: non_neg_integer()
+  @type lobby_id :: Teiserver.Game.Lobby.id()
   @type party_id :: non_neg_integer()
 
   @type query_args ::

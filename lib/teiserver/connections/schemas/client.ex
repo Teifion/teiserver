@@ -21,45 +21,31 @@ defmodule Teiserver.Connections.Client do
   * `:party_id` - The ID of the party the client is part of or nil if not in a party
   """
 
-  @type t :: %__MODULE__{
-          id: Teiserver.user_id(),
-          connected?: boolean,
-          last_disconnected: DateTime.t(),
+  use TypedStruct
 
-          # Lobby status stuff
-          lobby_id: Teiserver.lobby_id() | nil,
-          in_game?: boolean,
-          afk?: boolean,
-          ready?: boolean,
-          player?: boolean,
-          player_number: non_neg_integer() | nil,
-          team_number: non_neg_integer() | nil,
-          team_colour: String.t() | nil,
-          sync: map | nil,
-          lobby_host?: boolean,
-          party_id: Teiserver.party_id() | nil
-        }
+  typedstruct do
+    field :id, Teiserver.user_id()
+    field :connected?, boolean, default: false
+    field :last_disconnected, DateTime.t()
 
-  defstruct ~w(id connected? last_disconnected lobby_id in_game? afk? ready? player? player_number team_number team_colour sync lobby_host? party_id)a
+    # Lobby status stuff
+    field :lobby_id, Teiserver.lobby_id()
+    field :in_game?, boolean, default: false
+    field :afk?, boolean, default: false
+    field :ready?, boolean, default: false
+    field :player?, boolean, default: false
+    field :player_number, non_neg_integer()
+    field :team_number, non_neg_integer()
+    field :team_colour, String.t()
+    field :sync, map | nil
+    field :lobby_host?, boolean, default: false
+    field :party_id, Teiserver.party_id()
+  end
 
   @spec new(Teiserver.user_id()) :: __MODULE__.t()
   def new(user_id) do
     %__MODULE__{
-      id: user_id,
-      connected?: false,
-
-      # Lobby status stuff
-      lobby_id: nil,
-      in_game?: false,
-      afk?: false,
-      ready?: false,
-      player?: false,
-      player_number: nil,
-      team_number: nil,
-      team_colour: nil,
-      sync: nil,
-      lobby_host?: false,
-      party_id: nil
+      id: user_id
     }
   end
 end

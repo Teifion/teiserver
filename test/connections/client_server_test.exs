@@ -126,6 +126,7 @@ defmodule Connections.ClientServerTest do
                  event: :client_updated,
                  client: %Teiserver.Connections.Client{
                    id: user.id,
+                   last_disconnected: nil,
                    connected?: true,
                    lobby_id: nil,
                    in_game?: false,

@@ -1,4 +1,7 @@
-## v0.0.3 (in progress)
+## v0.0.4
+- 
+
+## v0.0.3
 - Added `Teiserver.Api` to make getting writing a basic protocol handler easier
 - Added `Room`, `RoomMessage` and `DirectMessage` along with their relevant lib functions
 - Added `UserLib.allow?/2` and `UserLib.restricted?/2`

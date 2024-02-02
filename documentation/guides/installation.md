@@ -6,7 +6,7 @@ First add to your dependencies in `mix.exs`.
 ```elixir
 def deps do
   [
-    {:teiserver, "~> 0.0.3"}
+    {:teiserver, "~> 0.0.4"}
   ]
 end
 ```
