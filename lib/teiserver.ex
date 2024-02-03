@@ -37,18 +37,22 @@ defmodule Teiserver do
   - **Communication**: Chat
   - **Community**: Social interactions between players
   - **Connections**: User activity
-  - **Game**: Game functionality (e.g. matchmaking)
-  - **Lobby**: Game lobbies
+  - **Game**: Game/playing functionality
   - **Logging**: Logging of events and numbers
   - **Moderation**: Handling disruptive users
   - **Settings**: Key-Value pairs for users and the system
   - **Telemetry**: Moment to moment events
   """
 
-  # Types
+  # Aliased types
   @type user_id :: Teiserver.Account.User.id()
   @type lobby_id :: Teiserver.Game.Lobby.id()
-  @type party_id :: non_neg_integer()
+  @type match_id :: Teiserver.Game.Match.id()
+  @type party_id :: String.t()
+
+  # Teiserver types
+  @type team_number :: non_neg_integer()
+  @type seconds :: integer()
 
   @type query_args ::
           keyword(

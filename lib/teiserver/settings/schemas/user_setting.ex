@@ -11,7 +11,7 @@ defmodule Teiserver.Settings.UserSetting do
   """
   use TeiserverMacros, :schema
 
-  schema "settings_user" do
+  schema "settings_user_settings" do
     belongs_to(:user, Teiserver.Account.User)
     field(:key, :string)
     field(:value, :string)

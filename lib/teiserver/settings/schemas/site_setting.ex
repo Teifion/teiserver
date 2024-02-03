@@ -11,7 +11,7 @@ defmodule Teiserver.Settings.ServerSetting do
   use TeiserverMacros, :schema
 
   @primary_key false
-  schema "settings_server" do
+  schema "settings_server_settings" do
     field(:key, :string, primary_key: true)
     field(:value, :string)
 

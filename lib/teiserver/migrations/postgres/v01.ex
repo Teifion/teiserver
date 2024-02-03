@@ -46,6 +46,55 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:data, :jsonb)
     end
 
+    # Game
+    create table(:game_matches) do
+      add(:name, :string)
+      add(:tags, :jsonb)
+      add(:public?, :boolean)
+      add(:rated?, :boolean)
+
+      add(:game_name, :string)
+      add(:game_version, :string)
+      add(:map_name, :string)
+
+      add(:winning_team, :integer)
+      add(:team_count, :integer)
+      add(:team_size, :integer)
+      add(:processed?, :boolean, default: false)
+      add(:game_type, :string)
+
+      add(:lobby_opened_at, :utc_datetime)
+      add(:match_started_at, :utc_datetime)
+      add(:match_finished_at, :utc_datetime)
+
+      add(:match_duration_seconds, :integer)
+
+      add(:host_id, references(:account_users, on_delete: :nothing))
+
+      timestamps()
+    end
+
+    create table(:teiserver_battle_match_memberships, primary_key: false) do
+      add(:user_id, references(:account_users, on_delete: :nothing), primary_key: true)
+      add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
+      add(:team_number, :integer)
+
+      add(:win?, :boolean, default: nil, null: true)
+
+      add(:left_after_seconds, :integer)
+      add(:party_id, :string)
+    end
+
+    create table(:game_match_setting_types) do
+      add(:name, :string)
+    end
+
+    create table(:game_match_settings, primary_key: false) do
+      add(:type_id, references(:game_match_setting_types, on_delete: :nothing), primary_key: true)
+      add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
+      add(:value, :string)
+    end
+
     # Communications
     create_if_not_exists table(:communication_rooms, prefix: prefix) do
       add(:name, :string)
@@ -70,15 +119,23 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:to_id, references(:account_users, on_delete: :nothing))
     end
 
-    # Config
-    create_if_not_exists table(:settings_server, primary_key: false, prefix: prefix) do
+    create_if_not_exists table(:communication_match_messages, prefix: prefix) do
+      add(:content, :text)
+      add(:inserted_at, :utc_datetime)
+
+      add(:sender_id, references(:account_users, on_delete: :nothing))
+      add(:match_id, references(:game_matches, on_delete: :nothing))
+    end
+
+    # Settings
+    create_if_not_exists table(:settings_server_settings, primary_key: false, prefix: prefix) do
       add(:key, :string, primary_key: true)
       add(:value, :string)
 
       timestamps()
     end
 
-    create table(:settings_user, prefix: prefix) do
+    create table(:settings_user_setting_type, prefix: prefix) do
       add(:key, :string)
       add(:value, :string)
       add(:user_id, references(:account_users, on_delete: :nothing))
@@ -86,7 +143,15 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps()
     end
 
-    create(index(:settings_user, [:user_id], prefix: prefix))
+    create table(:settings_user_settings, prefix: prefix) do
+      add(:key, :string)
+      add(:value, :string)
+      add(:user_id, references(:account_users, on_delete: :nothing))
+
+      timestamps()
+    end
+
+    create(index(:settings_user_settings, [:user_id], prefix: prefix))
   end
 
   def down(%{prefix: prefix, quoted_prefix: _quoted}) do
@@ -97,7 +162,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     drop_if_exists(table(:account_extra_user_data, prefix: prefix))
 
     # Config
-    drop_if_exists(table(:settings_server, prefix: prefix))
-    drop_if_exists(table(:settings_user, prefix: prefix))
+    drop_if_exists(table(:settings_server_settings, prefix: prefix))
+    drop_if_exists(table(:settings_user_settings, prefix: prefix))
   end
 end

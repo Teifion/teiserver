@@ -7,9 +7,11 @@ defmodule Teiserver.Game.Lobby do
 
   * `:id` - The id of the lobby in question
   * `:match_id` - The id of the match for this lobby
+  * `:host_id` - The user_id of the creator of the lobby
   * `:match_ongoing` - True if the match is currently in progress
   * `:host_data` - A map of the data relevant to the host of the game
   * `:name` - The name of the lobby as displayed in lobby lists
+  * `:tags` - A list of strings representing tagged values
   * `:password` - The (plaintext) password for the lobby, nil if no password
   * `:locked` - Boolean of the room being locked to the general public at this stage
   * `:public` - Boolean of the room being public or not
@@ -33,42 +35,48 @@ defmodule Teiserver.Game.Lobby do
   typedstruct do
     @typedoc "A lobby"
 
-    field :id, id()
-    field :match_id, non_neg_integer()
-    field :match_ongoing, boolean(), default: false
+    field(:id, id())
+    field(:match_id, Teiserver.Game.Match.id())
+    field(:match_ongoing, boolean(), default: false)
 
-    # Host stuff
-    field :host_data, map(), default: %{}
-      # ip: String.t()
-      # port: non_neg_integer()
+    # Host stuff, not part of the match itself
+    field(:host_id, Teiserver.user_id())
+    field(:host_data, map(), default: %{})
+    # ip: String.t()
+    # port: non_neg_integer()
 
     # Discoverability
-    field :name, String.t()
-    field :password, String.t(), default: nil
-    field :locked, boolean(), default: false
+    field(:name, String.t())
+    field(:tags, [String.t()], default: [])
+    field(:password, String.t(), default: nil)
+    field(:locked, boolean(), default: false)
     # When set to false updates to this lobby won't appear in global_battle updates
-    field :public, boolean(), default: true
-    field :queue_id, non_neg_integer(), default: nil
+    field(:public, boolean(), default: true)
+
+    # When set to true it means the game will be rated (assuming all other requirements are met)
+    field(:rated, boolean(), default: true)
+    field(:queue_id, non_neg_integer(), default: nil)
 
     # Game version stuff
-    field :engine_name, String.t()
-    field :engine_version, String.t()
+    field(:engine_name, String.t())
+    field(:engine_version, String.t())
 
-    field :game_name, String.t()
-    field :game_version, String.t()
+    field(:game_name, String.t())
+    field(:game_version, String.t())
 
     # Game stuff
-    field :game_settings, map(), default: %{}
-    field :map_name, String.t()
+    field(:game_settings, map(), default: %{})
+    field(:map_name, String.t())
 
-    field :players, [Teiserver.user_id()], default: []
-    field :spectators, [Teiserver.user_id()], default: []
-    field :members, [Teiserver.user_id()], default: []
+    field(:players, [Teiserver.user_id()], default: [])
+    field(:spectators, [Teiserver.user_id()], default: [])
+    field(:members, [Teiserver.user_id()], default: [])
   end
 
   @spec new() :: __MODULE__.t()
   def new() do
     id = 123
+
     %__MODULE__{
       id: id,
       name: "Lobby #{id}"
