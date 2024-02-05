@@ -74,7 +74,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps()
     end
 
-    create table(:teiserver_battle_match_memberships, primary_key: false) do
+    create table(:game_match_memberships, primary_key: false) do
       add(:user_id, references(:account_users, on_delete: :nothing), primary_key: true)
       add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
       add(:team_number, :integer)

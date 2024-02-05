@@ -41,4 +41,9 @@ defmodule Teiserver.Repo do
   def delete(query, opts \\ []) do
     repo().delete(query, opts)
   end
+
+  @spec transaction(Ecto.Query.t(), list) :: any
+  def transaction(query, opts \\ []) do
+    repo().transaction(query, opts)
+  end
 end

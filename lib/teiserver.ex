@@ -48,6 +48,7 @@ defmodule Teiserver do
   @type user_id :: Teiserver.Account.User.id()
   @type lobby_id :: Teiserver.Game.Lobby.id()
   @type match_id :: Teiserver.Game.Match.id()
+  @type queue_id :: non_neg_integer()
   @type party_id :: String.t()
 
   # Teiserver types

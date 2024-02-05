@@ -9,7 +9,7 @@ defmodule Teiserver.Game.Match do
   * `:tags` - The lobby tags at the time of the match starting
   * `:public?` - The public flag at time of the match starting
   * `:rated?` - The rated flag at time of the match starting, updated to false if the match is later decided to be unrated
-  * `:game_name` - The game_name at time of the match starting
+  * `:game_name` - The game_name at time of the match starting, in most cases I expect game name to always be the same but this is in place to allow for multiple games to be run from a single server
   * `:game_version` - The game_version at time of the match starting
   * `:map_name` - The map_name at time of the match starting
   * `:winning_team` - The ID of the winning team, set to nil in a draw
@@ -97,13 +97,17 @@ defmodule Teiserver.Game.Match do
           members: list
         }
 
-  @doc false
+  @doc """
+  Builds a changeset based on the `struct` and `params`.
+  """
+  @spec changeset(map()) :: Ecto.Changeset.t()
+  @spec changeset(map(), map()) :: Ecto.Changeset.t()
   def changeset(struct, attrs \\ %{}) do
     struct
     |> cast(
       attrs,
-      ~w(name tags public? rated? game_name game_version map_name winning_team team_count team_size processed? game_type lobby_opened_at match_started_at match_finished_at match_duration_seconds)a
+      ~w(name tags public? rated? game_name game_version map_name winning_team team_count team_size processed? game_type lobby_opened_at match_started_at match_finished_at match_duration_seconds host_id)a
     )
-    |> validate_required(~w(name game_name game_version map_name lobby_opened_at)a)
+    |> validate_required(~w(public? rated? host_id)a)
   end
 end

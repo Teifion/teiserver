@@ -10,6 +10,9 @@ defmodule Teiserver.Application do
       # Teiserver.Registry,
       {Phoenix.PubSub, name: Teiserver.PubSub},
 
+      # Servers not part of the general slew of things
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.ServerRegistry]},
+
       # Clients and connections,
       {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.ClientSupervisor},
       {Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
@@ -22,6 +25,7 @@ defmodule Teiserver.Application do
       # Lobbies
       {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
       {Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
+      Teiserver.LobbyIdServer,
 
       # Matchmaking
       {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.MMSupervisor},

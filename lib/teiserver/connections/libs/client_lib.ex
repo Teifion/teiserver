@@ -101,9 +101,7 @@ defmodule Teiserver.Connections.ClientLib do
     server_pid
   end
 
-  @doc """
-  Tells us if the client exists right now or not.
-  """
+  @doc false
   @spec client_exists?(Teiserver.user_id()) :: pid() | boolean
   def client_exists?(user_id) do
     case Registry.lookup(Teiserver.ClientRegistry, user_id) do

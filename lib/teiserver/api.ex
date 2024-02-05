@@ -83,12 +83,17 @@ defmodule Teiserver.Api do
     })
   end
 
+  # Account
   @spec get_user_by_id(Teiserver.user_id()) :: User.t() | nil
   defdelegate get_user_by_id(user_id), to: UserLib
 
   @spec get_user_by_name(String.t()) :: User.t() | nil
   defdelegate get_user_by_name(name), to: UserLib
 
+  # Game
+
+
+  # Communication
   @spec subscribe_to_room(Room.id() | Room.t() | String.t()) :: :ok
   defdelegate subscribe_to_room(room_id_or_name), to: RoomLib
 

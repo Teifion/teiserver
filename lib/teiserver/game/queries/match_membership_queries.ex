@@ -9,7 +9,8 @@ defmodule Teiserver.Game.MatchMembershipQueries do
     query = from(match_memberships in MatchMembership)
 
     query
-    |> do_where(id: args[:id])
+    |> do_where(match_id: args[:match_id])
+    |> do_where(user_id: args[:user_id])
     |> do_where(args[:where])
     |> do_where(args[:search])
     |> do_preload(args[:preload])
@@ -32,35 +33,31 @@ defmodule Teiserver.Game.MatchMembershipQueries do
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :id, id_list) when is_list(id_list) do
+  def _where(query, :match_id, match_ids) when is_list(match_ids) do
     from(match_memberships in query,
-      where: match_memberships.id in ^id_list
+      where: match_memberships.match_id in ^match_ids
     )
   end
 
-  def _where(query, :id, id) do
+  def _where(query, :match_id, match_id) do
     from(match_memberships in query,
-      where: match_memberships.id == ^id
+      where: match_memberships.match_id == ^match_id
     )
   end
 
-  def _where(query, :name, name) do
+  def _where(query, :user_id, user_ids) when is_list(user_ids) do
     from(match_memberships in query,
-      where: match_memberships.name == ^name
+      where: match_memberships.user_id in ^user_ids
     )
   end
 
-  def _where(query, :inserted_after, timestamp) do
+  def _where(query, :user_id, user_id) do
     from(match_memberships in query,
-      where: match_memberships.inserted_at >= ^timestamp
+      where: match_memberships.user_id == ^user_id
     )
   end
 
-  def _where(query, :inserted_before, timestamp) do
-    from(match_memberships in query,
-      where: match_memberships.inserted_at < ^timestamp
-    )
-  end
+
 
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query

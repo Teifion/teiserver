@@ -35,10 +35,10 @@ defmodule Teiserver.Game.MatchMembershipLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_match_membership!(MatchMembership.id()) :: MatchMembership.t()
-  @spec get_match_membership!(MatchMembership.id(), Teiserver.query_args()) :: MatchMembership.t()
-  def get_match_membership!(match_membership_id, query_args \\ []) do
-    (query_args ++ [id: match_membership_id])
+  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t()
+  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) :: MatchMembership.t()
+  def get_match_membership!(match_id, user_id, query_args \\ []) do
+    (query_args ++ [match_id: match_id, user_id: user_id])
     |> MatchMembershipQueries.match_membership_query()
     |> Repo.one!()
   end
@@ -57,11 +57,11 @@ defmodule Teiserver.Game.MatchMembershipLib do
       nil
 
   """
-  @spec get_match_membership(MatchMembership.id()) :: MatchMembership.t() | nil
-  @spec get_match_membership(MatchMembership.id(), Teiserver.query_args()) ::
+  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t() | nil
+  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) ::
           MatchMembership.t() | nil
-  def get_match_membership(match_membership_id, query_args \\ []) do
-    (query_args ++ [id: match_membership_id])
+  def get_match_membership(match_id, user_id, query_args \\ []) do
+    (query_args ++ [match_id: match_id, user_id: user_id])
     |> MatchMembershipQueries.match_membership_query()
     |> Repo.one()
   end
@@ -83,6 +83,28 @@ defmodule Teiserver.Game.MatchMembershipLib do
     %MatchMembership{}
     |> MatchMembership.changeset(attrs)
     |> Repo.insert()
+  end
+
+
+  @doc """
+  Creates many match_memberships. Not unlike most other create functions this will raise an exception on failure and should not be caught using the normal case functions.
+
+  Expects a map of values which can be turned into valid match memberships.
+
+  ## Examples
+
+      iex> create_many_match_memberships([%{field: value}])
+      {:ok, %MatchMembership{}}
+
+      iex> create_many_match_memberships([%{field: bad_value}])
+      raise Postgrex.Error
+
+  """
+  @spec create_many_match_memberships([map]) :: {:ok, map}
+  def create_many_match_memberships(attr_list) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert_all(:insert_all, MatchMembership, attr_list)
+    |> Teiserver.Repo.transaction()
   end
 
   @doc """

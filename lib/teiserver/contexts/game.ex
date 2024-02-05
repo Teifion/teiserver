@@ -11,6 +11,46 @@ defmodule Teiserver.Game do
   """
 
   # Lobbies
+  alias Teiserver.Game.{Lobby, LobbyLib}
+
+  @spec lobby_topic(Lobby.id()) :: String.t()
+  defdelegate lobby_topic(lobby_id), to: LobbyLib
+
+  @spec get_lobby(Lobby.id()) :: Lobby.t() | nil
+  defdelegate get_lobby(lobby_id), to: LobbyLib
+
+  @spec get_lobby_summary(Lobby.id()) :: LobbySummary.t() | nil
+  defdelegate get_lobby_summary(lobby_id), to: LobbyLib
+
+  @spec get_lobby_attribute(Lobby.id(), atom()) :: any()
+  defdelegate get_lobby_attribute(lobby_id, key), to: LobbyLib
+
+  @spec update_lobby(Lobby.id(), map) :: :ok | nil
+  defdelegate update_lobby(lobby_id, value_map), to: LobbyLib
+
+  @spec list_lobby_ids() :: [Lobby.id()]
+  defdelegate list_lobby_ids, to: LobbyLib
+
+  @spec list_lobbies() :: [Lobby.t()]
+  defdelegate list_lobbies, to: LobbyLib
+
+  @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
+  defdelegate start_lobby_server(host_id, name), to: LobbyLib
+
+  @spec lobby_exists?(Lobby.id()) :: pid() | boolean
+  defdelegate lobby_exists?(lobby_id), to: LobbyLib
+
+  @spec get_lobby_pid(Lobby.id()) :: pid() | nil
+  defdelegate get_lobby_pid(lobby_id), to: LobbyLib
+
+  @spec cast_lobby(Lobby.id(), any) :: any | nil
+  defdelegate cast_lobby(lobby_id, message), to: LobbyLib
+
+  @spec call_lobby(Lobby.id(), any) :: any | nil
+  defdelegate call_lobby(lobby_id, message), to: LobbyLib
+
+  @spec stop_lobby_server(Lobby.id()) :: :ok | nil
+  defdelegate stop_lobby_server(lobby_id), to: LobbyLib
 
   # Matches
   alias Teiserver.Game.{Match, MatchLib, MatchQueries}
@@ -62,19 +102,23 @@ defmodule Teiserver.Game do
   defdelegate list_match_memberships(args), to: MatchMembershipLib
 
   @doc section: :match_membership
-  @spec get_match_membership!(MatchMembership.id()) :: MatchMembership.t()
-  @spec get_match_membership!(MatchMembership.id(), Teiserver.query_args()) :: MatchMembership.t()
-  defdelegate get_match_membership!(match_membership_id, query_args \\ []), to: MatchMembershipLib
+  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t()
+  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) :: MatchMembership.t()
+  defdelegate get_match_membership!(match_id, user_id, query_args \\ []), to: MatchMembershipLib
 
   @doc section: :match_membership
-  @spec get_match_membership(MatchMembership.id()) :: MatchMembership.t() | nil
-  @spec get_match_membership(MatchMembership.id(), Teiserver.query_args()) ::
+  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t() | nil
+  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) ::
           MatchMembership.t() | nil
-  defdelegate get_match_membership(match_membership_id, query_args \\ []), to: MatchMembershipLib
+  defdelegate get_match_membership(match_id, user_id, query_args \\ []), to: MatchMembershipLib
 
   @doc section: :match_membership
   @spec create_match_membership(map) :: {:ok, MatchMembership.t()} | {:error, Ecto.Changeset.t()}
   defdelegate create_match_membership(attrs), to: MatchMembershipLib
+
+  @doc section: :match_memberships
+  @spec create_many_match_memberships([map]) :: {:ok, MatchMembership.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate create_many_match_memberships(attr_list), to: MatchMembershipLib
 
   @doc section: :match_membership
   @spec update_match_membership(MatchMembership, map) ::
