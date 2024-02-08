@@ -51,7 +51,6 @@ defmodule Teiserver.MatchLibTest do
       assert Game.list_matches([]) != []
     end
 
-
     test "get_match!/1 and get_match/1 returns the match with given id" do
       match = GameFixtures.completed_match_fixture()
       assert Game.get_match!(match.id) == match

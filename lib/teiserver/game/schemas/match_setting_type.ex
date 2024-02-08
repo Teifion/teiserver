@@ -12,6 +12,13 @@ defmodule Teiserver.Game.MatchSettingType do
     field(:name, :string)
   end
 
+  @type id :: non_neg_integer()
+
+  @type t :: %__MODULE__{
+          id: id(),
+          name: String.t(),
+        }
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

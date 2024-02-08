@@ -69,7 +69,7 @@ defmodule Teiserver.Game.LobbySummary do
       game_version: lobby.game_version,
       map_name: lobby.map_name,
       player_count: Enum.count(lobby.players),
-      spectator_count: Enum.count(lobby.spectators),
+      spectator_count: Enum.count(lobby.spectators)
     }
   end
 end

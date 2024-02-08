@@ -8,6 +8,10 @@ defmodule Teiserver.Game.LobbyLib do
   @spec lobby_topic(Lobby.id()) :: String.t()
   def lobby_topic(lobby_id), do: "Teiserver.Game.Lobby:#{lobby_id}"
 
+  @doc false
+  @spec global_lobby_topic() :: String.t()
+  def global_lobby_topic(), do: "Teiserver.Game.GlobalLobby"
+
   @doc """
 
   """
@@ -32,8 +36,6 @@ defmodule Teiserver.Game.LobbyLib do
     call_lobby(lobby_id, {:get_attribute, key})
   end
 
-
-
   @doc """
 
   """
@@ -42,7 +44,6 @@ defmodule Teiserver.Game.LobbyLib do
     cast_lobby(lobby_id, {:update_lobby, data})
   end
 
-
   @doc """
 
   """
@@ -50,7 +51,6 @@ defmodule Teiserver.Game.LobbyLib do
   def list_lobby_ids() do
     Registry.select(Teiserver.LobbyRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
-
 
   @doc """
 
@@ -65,9 +65,11 @@ defmodule Teiserver.Game.LobbyLib do
   @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
   def start_lobby_server(host_id, name) do
     id = Teiserver.LobbyIdServer.get_next_lobby_id()
-    {:ok, _pid} = id
-    |> Lobby.new(host_id, name)
-    |> do_start_lobby_server()
+
+    {:ok, _pid} =
+      id
+      |> Lobby.new(host_id, name)
+      |> do_start_lobby_server()
 
     {:ok, id}
   end
@@ -146,6 +148,16 @@ defmodule Teiserver.Game.LobbyLib do
         nil
 
       p ->
+        Teiserver.broadcast(lobby_topic(lobby_id), %{
+          event: :lobby_closed,
+          lobby_id: lobby_id
+        })
+
+        Teiserver.broadcast(global_lobby_topic(), %{
+          event: :lobby_closed,
+          lobby_id: lobby_id
+        })
+
         DynamicSupervisor.terminate_child(Teiserver.LobbySupervisor, p)
         :ok
     end

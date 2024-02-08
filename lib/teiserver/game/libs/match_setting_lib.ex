@@ -3,7 +3,7 @@ defmodule Teiserver.Game.MatchSettingLib do
   TODO: Library of match_setting related functions.
   """
   use TeiserverMacros, :library
-  alias Teiserver.Game.{MatchSetting, MatchSettingQueries}
+  alias Teiserver.Game.{MatchSetting, MatchSettingQueries, MatchSettingType}
 
   @doc """
   Returns the list of match_settings.
@@ -35,10 +35,11 @@ defmodule Teiserver.Game.MatchSettingLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_match_setting!(MatchSetting.id()) :: MatchSetting.t()
-  @spec get_match_setting!(MatchSetting.id(), Teiserver.query_args()) :: MatchSetting.t()
-  def get_match_setting!(match_setting_id, query_args \\ []) do
-    (query_args ++ [id: match_setting_id])
+  @spec get_match_setting!(Teiserver.match_id(), MatchSettingType.id()) :: MatchSetting.t()
+  @spec get_match_setting!(Teiserver.match_id(), MatchSettingType.id(), Teiserver.query_args()) ::
+          MatchSetting.t()
+  def get_match_setting!(match_id, setting_type_id, query_args \\ []) do
+    (query_args ++ [match_id: match_id, setting_type_id: setting_type_id])
     |> MatchSettingQueries.match_setting_query()
     |> Repo.one!()
   end
@@ -57,10 +58,12 @@ defmodule Teiserver.Game.MatchSettingLib do
       nil
 
   """
-  @spec get_match_setting(MatchSetting.id()) :: MatchSetting.t() | nil
-  @spec get_match_setting(MatchSetting.id(), Teiserver.query_args()) :: MatchSetting.t() | nil
-  def get_match_setting(match_setting_id, query_args \\ []) do
-    (query_args ++ [id: match_setting_id])
+  @spec get_match_setting(Teiserver.match_id(), MatchSettingType.id()) ::
+          MatchSetting.t() | nil
+  @spec get_match_setting(Teiserver.match_id(), MatchSettingType.id(), Teiserver.query_args()) ::
+          MatchSetting.t() | nil
+  def get_match_setting(match_id, setting_type_id, query_args \\ []) do
+    (query_args ++ [match_id: match_id, setting_type_id: setting_type_id])
     |> MatchSettingQueries.match_setting_query()
     |> Repo.one()
   end
@@ -82,6 +85,27 @@ defmodule Teiserver.Game.MatchSettingLib do
     %MatchSetting{}
     |> MatchSetting.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Creates many match_settings. Not unlike most other create functions this will raise an exception on failure and should not be caught using the normal case functions.
+
+  Expects a map of values which can be turned into valid match settings.
+
+  ## Examples
+
+      iex> create_many_match_settings([%{field: value}])
+      {:ok, %MatchSetting{}}
+
+      iex> create_many_match_settings([%{field: bad_value}])
+      raise Postgrex.Error
+
+  """
+  @spec create_many_match_settings([map]) :: {:ok, map}
+  def create_many_match_settings(attr_list) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert_all(:insert_all, MatchSetting, attr_list)
+    |> Teiserver.Repo.transaction()
   end
 
   @doc """

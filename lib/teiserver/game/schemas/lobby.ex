@@ -9,7 +9,7 @@ defmodule Teiserver.Game.Lobby do
   * `:match_id` - The id of the match for this lobby
   * `:host_id` - The user_id of the creator of the lobby
   * `:match_ongoing?` - True if the match is currently in progress
-  * `:host_data` - A map of the data relevant to the host of the game
+  * `:host_data` - A map of the data relevant to the host of the game, if the data is set to nil it means the host is currently disconnected but the ClientServer process has yet to time out
   * `:name` - The name of the lobby as displayed in lobby lists
   * `:tags` - A list of strings representing tagged values
   * `:password` - The (plaintext) password for the lobby, nil if no password
@@ -41,7 +41,7 @@ defmodule Teiserver.Game.Lobby do
 
     # Host stuff, not part of the match itself
     field(:host_id, Teiserver.user_id())
-    field(:host_data, map(), default: %{})
+    field(:host_data, map() | nil, default: %{})
 
     # Discoverability
     field(:name, name())

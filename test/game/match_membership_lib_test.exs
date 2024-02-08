@@ -56,11 +56,14 @@ defmodule Teiserver.MatchMembershipLibTest do
       assert Game.list_match_memberships([]) != []
     end
 
-
     test "get_match_membership!/1 and get_match_membership/1 returns the match_membership with given id" do
       match_membership = GameFixtures.match_membership_fixture()
-      assert Game.get_match_membership!(match_membership.match_id, match_membership.user_id) == match_membership
-      assert Game.get_match_membership(match_membership.match_id, match_membership.user_id) == match_membership
+
+      assert Game.get_match_membership!(match_membership.match_id, match_membership.user_id) ==
+               match_membership
+
+      assert Game.get_match_membership(match_membership.match_id, match_membership.user_id) ==
+               match_membership
     end
 
     test "create_match_membership/1 with valid data creates a match_membership" do
@@ -120,7 +123,8 @@ defmodule Teiserver.MatchMembershipLibTest do
       assert {:error, %Ecto.Changeset{}} =
                Game.update_match_membership(match_membership, invalid_attrs())
 
-      assert match_membership == Game.get_match_membership!(match_membership.match_id, match_membership.user_id)
+      assert match_membership ==
+               Game.get_match_membership!(match_membership.match_id, match_membership.user_id)
     end
 
     test "delete_match_membership/1 deletes the match_membership" do

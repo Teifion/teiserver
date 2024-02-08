@@ -5,8 +5,8 @@ defmodule Teiserver.Game.LobbyServer do
   """
   use GenServer
   require Logger
-  alias Teiserver.Game.LobbySummary
-  alias Teiserver.Game.{Lobby, LobbyLib}
+  alias Teiserver.Connections
+  alias Teiserver.Game.{Lobby, LobbyLib, LobbySummary}
 
   @heartbeat_frequency_ms 5_000
 
@@ -37,6 +37,31 @@ defmodule Teiserver.Game.LobbyServer do
 
   @impl true
   def handle_info(:heartbeat, %State{} = state) do
+    {:noreply, state}
+  end
+
+  # Currently do nothing on return, we expect the client process to give us host_data
+  # which will then communicate via lobby_update that we're connected again
+  def handle_info(%{topic: "Teiserver.Connections.Client" <> _, event: :client_connected}, state) do
+    {:noreply, state}
+  end
+
+  # Set the host_data to nil
+  def handle_info(
+        %{topic: "Teiserver.Connections.Client" <> _, event: :client_disconnected},
+        state
+      ) do
+    new_lobby = struct(state.lobby, %{host_data: nil})
+    new_state = update_lobby(state, new_lobby)
+    {:noreply, new_state}
+  end
+
+  def handle_info(%{topic: "Teiserver.Connections.Client" <> _, event: :client_destroyed}, state) do
+    LobbyLib.stop_lobby_server(state.lobby_id)
+    {:noreply, state}
+  end
+
+  def handle_info(%{topic: "Teiserver." <> _}, state) do
     {:noreply, state}
   end
 
@@ -80,9 +105,12 @@ defmodule Teiserver.Game.LobbyServer do
       id
     )
 
+    topic = Connections.client_topic(lobby.host_id)
+    Teiserver.subscribe(topic)
+
     {:ok,
      %State{
-       lobby_id: lobby.id,
+       lobby_id: id,
        host_id: lobby.host_id,
        lobby: lobby,
        topic: LobbyLib.lobby_topic(id),

@@ -13,6 +13,8 @@ defmodule Teiserver.ConnectionFixtures do
       Connections.connect_user(user.id)
     end)
 
+    :timer.sleep(100)
+
     {conn, user}
   end
 end

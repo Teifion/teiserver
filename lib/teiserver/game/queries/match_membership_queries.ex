@@ -57,8 +57,6 @@ defmodule Teiserver.Game.MatchMembershipQueries do
     )
   end
 
-
-
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 

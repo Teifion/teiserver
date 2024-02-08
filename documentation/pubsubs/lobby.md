@@ -1,16 +1,56 @@
 # Lobby messages
+PubSub messages sent out in relation to changes to lobbies.
+
+## `Teiserver.Game.GlobalLobby`
+Messages for everybody for discoverability of lobbies.
+
+### Open - `:lobby_opened`
+
+### Closed - `:lobby_closed`
+- `:lobby_id` - The id of the lobby closed
+
+```elixir
+%{
+  event: :lobby_closed,
+  lobby_id: Lobby.id()
+}
+```
+
+## `Teiserver.Game.Lobby:{lobby_id}`
 Messages relating to updates to the lobby in question.
 
-`Teiserver.LobbyServer:{lobby_id}`
+### User joined - `:lobby_user_joined`
 
-### Global planned
-- Open/Close
-- Match ended
+### User left - `:lobby_user_left`
 
-### Local planned messages
-- Player join/leave
-- State change
-- Client updated status
+### Client state change - `:lobby_client_change`
+Note this will be sent in addition to normal client updated messages but by doing this we prevent people having to subscribe/unsubscribe from client update messages.
 
-### Lobby owner planned messages
-- User requests to join
+### State update - `:lobby_updated`
+
+- `:update_id` - An incremental number to allow for out of order messages
+- `:client` - A `Teiserver.Connections.Client` of the new client values
+
+```elixir
+%{
+  event: :lobby_updated,
+  update_id: integer(),
+  lobby: Lobby.t()
+}
+```
+
+### Closed - `:lobby_closed`
+- `:lobby_id` - The id of the lobby closed
+
+```elixir
+%{
+  event: :lobby_closed,
+  lobby_id: Lobby.id()
+}
+```
+
+## `Teiserver.Game.LobbyHost:{lobby_id}`
+Messages specifically for hosting of the lobby. Separate from client related ones to allow for observability and greater control for users of the library.
+
+### User requests to join - `:join_request`
+

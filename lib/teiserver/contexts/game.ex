@@ -13,6 +13,7 @@ defmodule Teiserver.Game do
   # Lobbies
   alias Teiserver.Game.{Lobby, LobbyLib}
 
+  @doc false
   @spec lobby_topic(Lobby.id()) :: String.t()
   defdelegate lobby_topic(lobby_id), to: LobbyLib
 
@@ -34,21 +35,27 @@ defmodule Teiserver.Game do
   @spec list_lobbies() :: [Lobby.t()]
   defdelegate list_lobbies, to: LobbyLib
 
+  @doc false
   @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
   defdelegate start_lobby_server(host_id, name), to: LobbyLib
 
+  @doc false
   @spec lobby_exists?(Lobby.id()) :: pid() | boolean
   defdelegate lobby_exists?(lobby_id), to: LobbyLib
 
+  @doc false
   @spec get_lobby_pid(Lobby.id()) :: pid() | nil
   defdelegate get_lobby_pid(lobby_id), to: LobbyLib
 
+  @doc false
   @spec cast_lobby(Lobby.id(), any) :: any | nil
   defdelegate cast_lobby(lobby_id, message), to: LobbyLib
 
+  @doc false
   @spec call_lobby(Lobby.id(), any) :: any | nil
   defdelegate call_lobby(lobby_id, message), to: LobbyLib
 
+  @doc false
   @spec stop_lobby_server(Lobby.id()) :: :ok | nil
   defdelegate stop_lobby_server(lobby_id), to: LobbyLib
 
@@ -103,11 +110,13 @@ defmodule Teiserver.Game do
 
   @doc section: :match_membership
   @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t()
-  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) :: MatchMembership.t()
+  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) ::
+          MatchMembership.t()
   defdelegate get_match_membership!(match_id, user_id, query_args \\ []), to: MatchMembershipLib
 
   @doc section: :match_membership
-  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t() | nil
+  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id()) ::
+          MatchMembership.t() | nil
   @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) ::
           MatchMembership.t() | nil
   defdelegate get_match_membership(match_id, user_id, query_args \\ []), to: MatchMembershipLib
@@ -117,7 +126,8 @@ defmodule Teiserver.Game do
   defdelegate create_match_membership(attrs), to: MatchMembershipLib
 
   @doc section: :match_memberships
-  @spec create_many_match_memberships([map]) :: {:ok, MatchMembership.t()} | {:error, Ecto.Changeset.t()}
+  @spec create_many_match_memberships([map]) ::
+          {:ok, MatchMembership.t()} | {:error, Ecto.Changeset.t()}
   defdelegate create_many_match_memberships(attr_list), to: MatchMembershipLib
 
   @doc section: :match_membership
@@ -192,18 +202,26 @@ defmodule Teiserver.Game do
   defdelegate list_match_settings(args), to: MatchSettingLib
 
   @doc section: :match_setting
-  @spec get_match_setting!(MatchSetting.id()) :: MatchSetting.t()
-  @spec get_match_setting!(MatchSetting.id(), Teiserver.query_args()) :: MatchSetting.t()
-  defdelegate get_match_setting!(match_setting_id, query_args \\ []), to: MatchSettingLib
+  @spec get_match_setting!(Teiserver.match_id(), MatchSettingType.id()) :: MatchSetting.t()
+  @spec get_match_setting!(Teiserver.match_id(), MatchSettingType.id(), Teiserver.query_args()) ::
+          MatchSetting.t()
+  defdelegate get_match_setting!(match_id, setting_type_id, query_args \\ []), to: MatchSettingLib
 
   @doc section: :match_setting
-  @spec get_match_setting(MatchSetting.id()) :: MatchSetting.t() | nil
-  @spec get_match_setting(MatchSetting.id(), Teiserver.query_args()) :: MatchSetting.t() | nil
-  defdelegate get_match_setting(match_setting_id, query_args \\ []), to: MatchSettingLib
+  @spec get_match_setting(Teiserver.match_id(), MatchSettingType.id()) ::
+          MatchSetting.t() | nil
+  @spec get_match_setting(Teiserver.match_id(), MatchSettingType.id(), Teiserver.query_args()) ::
+          MatchSetting.t() | nil
+  defdelegate get_match_setting(match_id, setting_type_id, query_args \\ []), to: MatchSettingLib
 
   @doc section: :match_setting
   @spec create_match_setting(map) :: {:ok, MatchSetting.t()} | {:error, Ecto.Changeset.t()}
   defdelegate create_match_setting(attrs), to: MatchSettingLib
+
+  @doc section: :match_settings
+  @spec create_many_match_settings([map]) ::
+          {:ok, MatchSetting.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate create_many_match_settings(attr_list), to: MatchSettingLib
 
   @doc section: :match_setting
   @spec update_match_setting(MatchSetting, map) ::
@@ -219,6 +237,7 @@ defmodule Teiserver.Game do
   @spec change_match_setting(MatchSetting.t()) :: Ecto.Changeset.t()
   @spec change_match_setting(MatchSetting.t(), map) :: Ecto.Changeset.t()
   defdelegate change_match_setting(match_setting, attrs \\ %{}), to: MatchSettingLib
+
 
   # Match results/stats/extra data
   # Game data file stuff (e.g. unit data if added by devs)

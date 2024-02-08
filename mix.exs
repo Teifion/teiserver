@@ -225,7 +225,6 @@ defmodule Teiserver.MixProject do
       {:typedstruct, "~> 0.5.2", runtime: false},
 
       # Libs I expect to use
-      # {:parallel, "~> 0.0"},
       # {:ex_ulid, "~> 0.1.0"},
       # {:csv, "~> 2.4"},
 

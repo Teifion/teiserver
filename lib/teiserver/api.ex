@@ -55,9 +55,11 @@ defmodule Teiserver.Api do
 
   Always returns `:ok`
   """
-  @spec connect_user(Teiserver.user_id()) :: :ok
+  @spec connect_user(Teiserver.user_id()) :: Connections.Client.t()
   def connect_user(user_id) when is_integer(user_id) do
     Connections.connect_user(user_id)
+    # Sleep to prevent this current process getting the messages related to the connection
+    :timer.sleep(100)
     Teiserver.subscribe(Connections.client_topic(user_id))
     Teiserver.subscribe(Communication.user_messaging_topic(user_id))
   end
@@ -91,7 +93,6 @@ defmodule Teiserver.Api do
   defdelegate get_user_by_name(name), to: UserLib
 
   # Game
-
 
   # Communication
   @spec subscribe_to_room(Room.id() | Room.t() | String.t()) :: :ok

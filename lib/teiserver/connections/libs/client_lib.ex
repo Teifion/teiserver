@@ -153,12 +153,17 @@ defmodule Teiserver.Connections.ClientLib do
 
   @doc false
   @spec stop_client_server(Teiserver.user_id()) :: :ok | nil
-  def stop_client_server(user_id) do
+  def stop_client_server(user_id) when is_integer(user_id) do
     case get_client_pid(user_id) do
       nil ->
         nil
 
       p ->
+        Teiserver.broadcast(client_topic(user_id), %{
+          event: :client_destroyed,
+          user_id: user_id
+        })
+
         DynamicSupervisor.terminate_child(Teiserver.ClientSupervisor, p)
         :ok
     end

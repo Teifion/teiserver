@@ -35,6 +35,12 @@ defmodule Teiserver.Connections.ClientServer do
       {:noreply, %State{state | connections: new_connections}}
     else
       new_client = %{state.client | connected?: true}
+
+      Teiserver.broadcast(state.topic, %{
+        event: :client_connected,
+        client: new_client
+      })
+
       {:noreply, %State{state | connections: new_connections, client: new_client}}
     end
   end
@@ -73,6 +79,11 @@ defmodule Teiserver.Connections.ClientServer do
 
       if Enum.empty?(new_connections) do
         new_client = %{state.client | connected?: false, last_disconnected: Timex.now()}
+
+        Teiserver.broadcast(state.topic, %{
+          event: :client_disconnected,
+          client: new_client
+        })
 
         %State{state | connections: new_connections, client: new_client}
       else

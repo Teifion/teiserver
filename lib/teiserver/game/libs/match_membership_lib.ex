@@ -36,7 +36,8 @@ defmodule Teiserver.Game.MatchMembershipLib do
 
   """
   @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t()
-  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) :: MatchMembership.t()
+  @spec get_match_membership!(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) ::
+          MatchMembership.t()
   def get_match_membership!(match_id, user_id, query_args \\ []) do
     (query_args ++ [match_id: match_id, user_id: user_id])
     |> MatchMembershipQueries.match_membership_query()
@@ -57,7 +58,8 @@ defmodule Teiserver.Game.MatchMembershipLib do
       nil
 
   """
-  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id()) :: MatchMembership.t() | nil
+  @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id()) ::
+          MatchMembership.t() | nil
   @spec get_match_membership(Teiserver.match_id(), Teiserver.user_id(), Teiserver.query_args()) ::
           MatchMembership.t() | nil
   def get_match_membership(match_id, user_id, query_args \\ []) do
@@ -84,7 +86,6 @@ defmodule Teiserver.Game.MatchMembershipLib do
     |> MatchMembership.changeset(attrs)
     |> Repo.insert()
   end
-
 
   @doc """
   Creates many match_memberships. Not unlike most other create functions this will raise an exception on failure and should not be caught using the normal case functions.
