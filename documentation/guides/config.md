@@ -26,6 +26,8 @@ Teiserver implements some defaults you may want to overwrite.
 ## `fn_calculate_match_type`
 Allows you to overwrite `Teiserver.Game.MatchTypeLib.default_calculate_match_type/1`. This is used to determine the type assigned to each match. By default a 2 player game is a `Duel` and anything else is a `Team` game.
 
+## `fn_calculate_user_permissions`
+Allows you to overwrite `Teiserver.Account.User.default_calculate_user_permissions/1`. This is used to generate the list of permissions held by a user. By default it mirrors their groups.
 
 
 # Complete example config
@@ -37,5 +39,6 @@ config :teiserver,
   lobby_join_method: :simple,
   
   # Overrides
-  fn_calculate_match_type: &HelloWorldServer.Game.calculate_match_type/1
+  fn_calculate_match_type: &HelloWorldServer.Game.calculate_match_type/1,
+  fn_calculate_user_permissions: &HelloWorldServer.Account.calculate_user_permissions/1,
 ```

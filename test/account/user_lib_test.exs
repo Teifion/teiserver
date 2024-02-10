@@ -108,7 +108,7 @@ defmodule Teiserver.UserLibTest do
 
     test "allow?/2" do
       # User must have all of the required permissions
-      user = AccountFixtures.user_fixture(%{"permissions" => ["perm1", "perm2"]})
+      user = AccountFixtures.user_fixture(%{"groups" => ["perm1", "perm2"]})
       assert Account.allow?(user, "perm1")
       assert Account.allow?(user.id, "perm1")
       assert Account.allow?(user.id, ["perm1"])

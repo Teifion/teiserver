@@ -86,23 +86,25 @@ defmodule Teiserver.Account.User do
     attrs =
       attrs
       |> SchemaHelper.trim_strings([:email])
-      |> SchemaHelper.uniq_lists(~w(permissions groups)a)
+      |> SchemaHelper.uniq_lists(~w(groups)a)
 
     # If password isn't included we won't be doing anything with it
     if attrs["password"] == "" do
       user
       |> cast(
         attrs,
-        ~w(name email groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
+        ~w(name email groups behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
+      |> calculate_user_permissions
       |> validate_required(~w(name email password permissions)a)
       |> unique_constraint(:email)
     else
       user
       |> cast(
         attrs,
-        ~w(name email password groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
+        ~w(name email password groups behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
+      |> calculate_user_permissions
       |> validate_required(~w(name email password permissions)a)
       |> unique_constraint(:email)
       |> put_password_hash()
@@ -213,5 +215,31 @@ defmodule Teiserver.Account.User do
   @spec verify_password(User.t(), String.t()) :: boolean
   def verify_password(plain_text_password, encrypted) do
     Argon2.verify_pass(plain_text_password, encrypted)
+  end
+
+  @doc """
+  Given a User changeset, calculate what the permissions should be and update the changeset
+  """
+  @spec calculate_user_permissions(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  def calculate_user_permissions(changeset) do
+    if Application.get_env(:teiserver, :fn_calculate_user_permissions) do
+      f = Application.get_env(:teiserver, :fn_calculate_user_permissions)
+      f.(changeset)
+    else
+      default_calculate_user_permissions(changeset)
+    end
+  end
+
+  @doc """
+  The default method used to define match types
+
+  Can be over-ridden using the config [fn_calculate_user_permissions](config.html#fn_calculate_user_permissions)
+  """
+  @spec default_calculate_user_permissions(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  def default_calculate_user_permissions(changeset) do
+    permissions = get_field(changeset, :groups, [])
+
+    changeset
+    |> put_change(:permissions, permissions)
   end
 end
