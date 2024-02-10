@@ -101,15 +101,15 @@ defmodule Teiserver.Account.UserQueries do
     )
   end
 
-  def _where(query, :has_role, role_name) do
+  def _where(query, :has_group, group_name) do
     from(users in query,
-      where: ^role_name in users.roles
+      where: ^group_name in users.groups
     )
   end
 
-  def _where(query, :not_has_role, role_name) do
+  def _where(query, :not_has_group, group_name) do
     from(users in query,
-      where: ^role_name not in users.roles
+      where: ^group_name not in users.groups
     )
   end
 

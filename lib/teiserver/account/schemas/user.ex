@@ -8,8 +8,8 @@ defmodule Teiserver.Account.User do
   * `:name` - The name of the user
   * `:email` - The email of the user
   * `:password` - The encrypted password of the user; if you ever want to compare the password please make user of `verify_password/2` (which can be called from `Teiserver.Account`).
-  * `:roles` - A list of the roles possessed by the user, these are used to inform permissions
-  * `:permissions` - A list of the things the user is allowed to do, typically derived from a combination of roles and restrictions
+  * `:groups` - A list of the groups possessed by the user, these are used to inform permissions
+  * `:permissions` - A list of the things the user is allowed to do, typically derived from a combination of groups and restrictions
   * `:behaviour_score` - Numerical score representing the behaviour of the user, a high score means they are better behaved
   * `:trust_score` - Numerical score representing the trustworthiness and accuracy of their reporting of other users
   * `:social_score` - Numerical score representing how much the user is liked or disliked by other players in general
@@ -30,7 +30,7 @@ defmodule Teiserver.Account.User do
     field(:email, :string)
     field(:password, :string)
 
-    field(:roles, {:array, :string}, default: [])
+    field(:groups, {:array, :string}, default: [])
     field(:permissions, {:array, :string}, default: [])
 
     field(:behaviour_score, :integer)
@@ -61,7 +61,7 @@ defmodule Teiserver.Account.User do
           name: String.t(),
           email: String.t(),
           password: String.t(),
-          roles: [String.t()],
+          groups: [String.t()],
           permissions: [String.t()],
           behaviour_score: integer() | nil,
           trust_score: integer() | nil,
@@ -86,14 +86,14 @@ defmodule Teiserver.Account.User do
     attrs =
       attrs
       |> SchemaHelper.trim_strings([:email])
-      |> SchemaHelper.uniq_lists(~w(permissions roles)a)
+      |> SchemaHelper.uniq_lists(~w(permissions groups)a)
 
     # If password isn't included we won't be doing anything with it
     if attrs["password"] == "" do
       user
       |> cast(
         attrs,
-        ~w(name email roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
+        ~w(name email groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
       |> validate_required(~w(name email password permissions)a)
       |> unique_constraint(:email)
@@ -101,7 +101,7 @@ defmodule Teiserver.Account.User do
       user
       |> cast(
         attrs,
-        ~w(name email password roles permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
+        ~w(name email password groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id)a
       )
       |> validate_required(~w(name email password permissions)a)
       |> unique_constraint(:email)

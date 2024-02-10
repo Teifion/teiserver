@@ -17,7 +17,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:email, :string)
       add(:password, :string)
 
-      add(:roles, {:array, :string})
+      add(:groups, {:array, :string})
       add(:permissions, {:array, :string})
 
       add(:trust_score, :integer)

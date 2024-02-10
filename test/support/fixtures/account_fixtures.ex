@@ -13,7 +13,7 @@ defmodule Teiserver.AccountFixtures do
         name: data["name"] || "user_name_#{r}",
         email: data["email"] || "user_email_#{r}",
         password: data["password"] || "password",
-        roles: data["roles"] || [],
+        groups: data["groups"] || [],
         permissions: data["permissions"] || [],
         restrictions: data["restrictions"] || []
       },
