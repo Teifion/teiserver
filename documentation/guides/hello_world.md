@@ -16,7 +16,7 @@ def deps do
     {:teiserver, path: "../teiserver"},
     {:ecto_sql, "~> 3.10"},
     {:postgrex, ">= 0.0.0"},
-    {:ranch, "~> 1.8"}
+    {:thousand_island, "~> 1.3"}
   ]
 end
 ```
@@ -81,11 +81,8 @@ Edit `application.ex` to start the various components on startup.
     {Ecto.Migrator,
         repos: Application.fetch_env!(:hello_world_server, :ecto_repos),
         skip: System.get_env("SKIP_MIGRATIONS") == "true"},
-    {Teiserver, Application.get_env(:hello_world_server, Teiserver)},
-    %{
-      id: HelloWorldServer.TcpServer,
-      start: {HelloWorldServer.TcpServer, :start_link, [[]]}
-    }
+
+    {ThousandIsland, port: 8200, handler_module: HelloWorldServer.TcpServer}
   ]
 ```
 
@@ -93,73 +90,27 @@ Edit `application.ex` to start the various components on startup.
 Place in `lib/hello_world_server/tcp_server.ex`
 ```elixir
 defmodule HelloWorldServer.TcpServer do
-  use GenServer
+  use ThousandIsland.Handler
   alias HelloWorldServer.{TcpIn, TcpOut}
-  @behaviour :ranch_protocol
 
-  def start_link(_opts) do
-    :ranch.start_listener(
-      make_ref(),
-      :ranch_tcp,
-      [port: 8200],
-      __MODULE__,
-      []
-    )
-  end
-
-  @impl true
-  def start_link(ref, socket, transport, _opts) do
-    pid = :proc_lib.spawn_link(__MODULE__, :init, [ref, socket, transport])
-    {:ok, pid}
-  end
-
-  def init(ref, socket, transport) do
-    :ranch.accept_ack(ref)
-    transport.setopts(socket, [{:active, true}])
-
-    state = %{
+  @impl ThousandIsland.Handler
+  def handle_connection(socket, _state) do
+    {:continue, %{
       user_id: nil,
-      socket: socket,
-      transport: transport,
-    }
-
-    :gen_server.enter_loop(__MODULE__, [], state)
+      socket: socket
+    }}
   end
 
-  @impl true
-  def init(init_arg) do
-    {:ok, init_arg}
-  end
-
-  @impl true
-  def handle_info(:init_timeout, %{userid: nil} = state) do
-    send(self(), :terminate)
-    {:noreply, state}
-  end
-
-  def handle_info(:init_timeout, state) do
-    {:noreply, state}
-  end
-
+  @impl ThousandIsland.Handler
   # If Ctrl + C is sent through it kills the connection, makes telnet debugging easier
-  def handle_info({_, _socket, <<255, 244, 255, 253, 6>>}, state) do
-    send(self(), :terminate)
-    {:noreply, state}
-  end
-  
-  # Teiserver pubsub topics we'll be ignoring for now
-  def handle_info(%{topic: "Teiserver." <> _}, state) do
-    {:noreply, state}
+  def handle_data(<<255, 244, 255, 253, 6>>, _socket, state) do
+    {:close, state}
   end
 
-  def handle_info({:tcp, _socket, data}, state) do
-    data = data
-    |> to_string
-    |> String.trim
-
-    {new_state, response} = TcpIn.data_in(data, state)
-    TcpOut.data_out(response, state)
-    {:noreply, new_state}
+  def handle_data(data, socket, state) do
+    {new_state, response} = TcpIn.data_in(String.trim(data), state)
+    TcpOut.data_out(response, new_state)
+    {:continue, new_state}
   end
 end
 ```
@@ -245,7 +196,7 @@ Place in `lib/hellow_world_server/tcp_out.ex`, this will handle sending data bac
 ```elixir
 defmodule HelloWorldServer.TcpOut do
   def data_out(msg, state) do
-    state.transport.send(state.socket, msg <> "\n")
+    ThousandIsland.Socket.send(state.socket, "#{msg}\n")
   end
 end
 ```
