@@ -3,13 +3,13 @@ defmodule Teiserver.Connections do
   The context for all things connection related, mostly `Teiserver.Connections.Client`
 
   # Clients
-  Clients are represented by a process holding their state, this process controls all updates to their state.
+  Clients are represented by a [`process`](Teiserver.Connections.ClientServer.html) holding their state, this process controls all updates to their state.
 
   ## Creating a client
   Clients are created using `connect_user/1`, this will create (if it doesn't already exist) a client process. Any process connecting a user will be subscribed to the `Teiserver.ClientUpdates:{user_id}` channel.
 
   ## Destroying clients
-  TODO: Implement and document
+  When a client loses all connections it will begin a countdown [(which can be configured)](config.html#client_destroy_timeout_seconds-default-300). If a connection is re-established in that time the countdown will be reset. If the countdown reaches zero then the client process will be stopped and the client will no longer show up on any lists.
   """
 
   alias Teiserver.Account.User

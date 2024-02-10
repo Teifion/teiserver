@@ -40,7 +40,7 @@ Typically a client will update via `Teiserver.Connections.update_client/2` but i
 The standard `update_client` only contacts the ClientServer to update values but with the `update_client_in_lobby` function the ClientServer will check with the LobbyServer before updating any details to ensure it is allowed to.
 
 ## Lobby configuration
-> #### Not fully implemented {: .error}
+> #### Not fully implemented {: .info}
 >
 > Options for configuration through votes will be added and will result in additional details in this section.
 
