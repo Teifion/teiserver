@@ -28,10 +28,12 @@ defmodule Teiserver.Connections.Client do
     field(:connected?, boolean, default: false)
     field(:last_disconnected, DateTime.t())
 
+    field(:afk?, boolean, default: false)
+    field(:party_id, Teiserver.party_id())
+    field(:in_game?, boolean, default: false)
+
     # Lobby status stuff
     field(:lobby_id, Teiserver.lobby_id())
-    field(:in_game?, boolean, default: false)
-    field(:afk?, boolean, default: false)
     field(:ready?, boolean, default: false)
     field(:player?, boolean, default: false)
     field(:player_number, non_neg_integer())
@@ -39,7 +41,6 @@ defmodule Teiserver.Connections.Client do
     field(:team_colour, String.t())
     field(:sync, map | nil)
     field(:lobby_host?, boolean, default: false)
-    field(:party_id, Teiserver.party_id())
   end
 
   @spec new(Teiserver.user_id()) :: __MODULE__.t()

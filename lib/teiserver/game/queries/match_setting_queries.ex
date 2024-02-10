@@ -32,33 +32,39 @@ defmodule Teiserver.Game.MatchSettingQueries do
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :id, id_list) when is_list(id_list) do
-    from(match_settings in query,
-      where: match_settings.id in ^id_list
+  def _where(query, :match_id, match_ids) when is_list(match_ids) do
+    from(match_settingss in query,
+      where: match_settingss.match_id in ^match_ids
     )
   end
 
-  def _where(query, :id, id) do
-    from(match_settings in query,
-      where: match_settings.id == ^id
+  def _where(query, :match_id, match_id) do
+    from(match_settingss in query,
+      where: match_settingss.match_id == ^match_id
     )
   end
 
-  def _where(query, :name, name) do
-    from(match_settings in query,
-      where: match_settings.name == ^name
+  def _where(query, :type_id, type_ids) when is_list(type_ids) do
+    from(match_settingss in query,
+      where: match_settingss.type_id in ^type_ids
     )
   end
 
-  def _where(query, :inserted_after, timestamp) do
-    from(match_settings in query,
-      where: match_settings.inserted_at >= ^timestamp
+  def _where(query, :type_id, type_id) do
+    from(match_settingss in query,
+      where: match_settingss.type_id == ^type_id
     )
   end
 
-  def _where(query, :inserted_before, timestamp) do
-    from(match_settings in query,
-      where: match_settings.inserted_at < ^timestamp
+  def _where(query, :value, values) when is_list(values) do
+    from(match_settingss in query,
+      where: match_settingss.value in ^values
+    )
+  end
+
+  def _where(query, :value, value) do
+    from(match_settingss in query,
+      where: match_settingss.value == ^value
     )
   end
 
@@ -74,53 +80,39 @@ defmodule Teiserver.Game.MatchSettingQueries do
   end
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
-  def _order_by(query, "Name (A-Z)") do
+  def _order_by(query, "Value (A-Z)") do
     from(match_settings in query,
-      order_by: [asc: match_settings.name]
+      order_by: [asc: match_settings.value]
     )
   end
 
-  def _order_by(query, "Name (Z-A)") do
+  def _order_by(query, "Value (Z-A)") do
     from(match_settings in query,
-      order_by: [desc: match_settings.name]
-    )
-  end
-
-  def _order_by(query, "Newest first") do
-    from(match_settings in query,
-      order_by: [desc: match_settings.inserted_at]
-    )
-  end
-
-  def _order_by(query, "Oldest first") do
-    from(match_settings in query,
-      order_by: [asc: match_settings.inserted_at]
+      order_by: [desc: match_settings.value]
     )
   end
 
   @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
-  defp do_preload(query, _), do: query
-  # defp do_preload(query, preloads) do
-  #   preloads
-  #   |> List.wrap
-  #   |> Enum.reduce(query, fn key, query_acc ->
-  #     _preload(query_acc, key)
-  #   end)
-  # end
+  defp do_preload(query, preloads) do
+    preloads
+    |> List.wrap
+    |> Enum.reduce(query, fn key, query_acc ->
+      _preload(query_acc, key)
+    end)
+  end
 
-  # @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
-  # def _preload(query, :relation) do
-  #   from match_setting in query,
-  #     left_join: relations in assoc(match_setting, :relation),
-  #     preload: [relation: relations]
-  # end
+  @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
+  def _preload(query, :type) do
+    from match_settings in query,
+      left_join: types in assoc(match_settings, :type),
+      preload: [type: types]
+  end
 
-  # def _preload(query, {:relation, join_query}) do
-  #   from match_setting in query,
-  #     left_join: relations in subquery(join_query),
-  #       on: relations.id == query.relation_id,
-  #     preload: [relation: relations]
-  # end
+  def _preload(query, :match) do
+    from match_settings in query,
+      left_join: matches in assoc(match_settings, :match),
+      preload: [match: matches]
+  end
 end

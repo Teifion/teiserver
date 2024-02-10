@@ -12,6 +12,26 @@ defmodule Teiserver.Communication.DirectMessageLib do
   def user_messaging_topic(user_id), do: "Teiserver.Communication.User:#{user_id}"
 
   @doc """
+  Joins your process to match messages
+  """
+  @spec subscribe_to_user_messaging(User.id() | User.t()) :: :ok
+  def subscribe_to_user_messaging(user_or_user_id) do
+    user_or_user_id
+    |> user_messaging_topic()
+    |> Teiserver.subscribe()
+  end
+
+  @doc """
+  Removes your process from a match's messages
+  """
+  @spec unsubscribe_from_user_messaging(User.id() | User.t()) :: :ok
+  def unsubscribe_from_user_messaging(user_or_user_id) do
+    user_or_user_id
+    |> user_messaging_topic()
+    |> Teiserver.unsubscribe()
+  end
+
+  @doc """
   - Creates a direct message
   - If successful generate a pubsub message
 

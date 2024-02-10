@@ -31,8 +31,10 @@ defmodule Teiserver.Communication.RoomMessage do
         }
 
   @doc false
-  def changeset(server_setting, attrs \\ %{}) do
-    server_setting
+  @spec changeset(map()) :: Ecto.Changeset.t()
+  @spec changeset(map(), map()) :: Ecto.Changeset.t()
+  def changeset(struct, attrs \\ %{}) do
+    struct
     |> cast(attrs, ~w(content inserted_at sender_id room_id)a)
     |> validate_required(~w(content inserted_at sender_id room_id)a)
   end

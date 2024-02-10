@@ -3,6 +3,8 @@ defmodule Teiserver.Game.Lobby do
   # Lobby
   A lobby is a place for users to gather and form a game instance. Once the lobby starts it becomes a match, once the match ends the users return to the lobby.
 
+  For a guide on the lifecycle of lobbies and matches please see the [`Match lifecycle guide`](match_lifecycle.html).
+
   ### Attributes
 
   * `:id` - The id of the lobby in question
@@ -15,6 +17,7 @@ defmodule Teiserver.Game.Lobby do
   * `:password` - The (plaintext) password for the lobby, nil if no password
   * `:locked?` - Boolean of the room being locked to the general public at this stage
   * `:public?` - Boolean of the room being public or not, when set to false updates to this lobby won't appear in global_battle updates
+  * `:match_type` - MatchType.id of the type of match this will be
   * `:rated?` - When set to true it means the game will be rated (assuming all other requirements are met)
   * `:queue_id` - The ID of the queue (matchmaking) this lobby belongs to
   * `:game_name` - String of the game name
@@ -49,6 +52,7 @@ defmodule Teiserver.Game.Lobby do
     field(:password, String.t(), default: nil)
     field(:locked?, boolean(), default: false)
     field(:public?, boolean(), default: true)
+    field(:match_type, Teiserver.Game.MatchType.id(), default: nil)
 
     field(:rated?, boolean(), default: true)
     field(:queue_id, Teiserver.queue_id(), default: nil)

@@ -17,7 +17,7 @@ defmodule Teiserver.Communication.MatchMessage do
     field(:inserted_at, :utc_datetime)
 
     belongs_to(:sender, Teiserver.Account.User)
-    belongs_to(:match_id, Teiserver.Game.Match)
+    belongs_to(:match, Teiserver.Game.Match)
   end
 
   @type id :: non_neg_integer()
@@ -31,8 +31,10 @@ defmodule Teiserver.Communication.MatchMessage do
         }
 
   @doc false
-  def changeset(server_setting, attrs \\ %{}) do
-    server_setting
+  @spec changeset(map()) :: Ecto.Changeset.t()
+  @spec changeset(map(), map()) :: Ecto.Changeset.t()
+  def changeset(struct, attrs \\ %{}) do
+    struct
     |> cast(attrs, ~w(content inserted_at sender_id match_id)a)
     |> validate_required(~w(content inserted_at sender_id match_id)a)
   end

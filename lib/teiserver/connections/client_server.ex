@@ -5,6 +5,7 @@ defmodule Teiserver.Connections.ClientServer do
   """
   use GenServer
   require Logger
+  alias Teiserver.Game.LobbyLib
   alias Teiserver.Connections.{Client, ClientLib}
 
   @heartbeat_frequency_ms 5_000
@@ -18,8 +19,11 @@ defmodule Teiserver.Connections.ClientServer do
 
   defmodule State do
     @moduledoc false
-    defstruct [:client, :user_id, :connections, :update_id, :topic]
+    defstruct [:client, :user_id, :connections, :update_id, :client_topic, :lobby_topic]
   end
+
+  @standard_data_keys ~w(connected? last_disconnected in_game? afk? party_id)a
+  @lobby_data_keys ~w(ready? player? player_number team_number team_colour sync lobby_host?)a
 
   @impl true
   def handle_call(:get_client_state, _from, state) do
@@ -36,7 +40,7 @@ defmodule Teiserver.Connections.ClientServer do
     else
       new_client = %{state.client | connected?: true}
 
-      Teiserver.broadcast(state.topic, %{
+      Teiserver.broadcast(state.client_topic, %{
         event: :client_connected,
         client: new_client
       })
@@ -46,6 +50,33 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   def handle_cast({:update_client, partial_client}, state) do
+    partial_client = Map.take(partial_client, @standard_data_keys)
+
+    if partial_client != %{} do
+      new_client = struct(state.client, partial_client)
+      new_state = update_client(state, new_client)
+      {:noreply, new_state}
+    else
+      {:noreply, state}
+    end
+  end
+
+  def handle_cast({:update_client_in_lobby, partial_client}, state) do
+    partial_client = partial_client
+      |> Map.take(@lobby_data_keys)
+      |> Map.put(:id, state.user_id)
+      |> LobbyLib.client_update_request(state.client.lobby_id)
+
+    if partial_client != %{} do
+      new_client = struct(state.client, partial_client)
+      new_state = update_client(state, new_client)
+      {:noreply, new_state}
+    else
+      {:noreply, state}
+    end
+  end
+
+  def handle_cast({:update_client_full, partial_client}, state) do
     new_client = struct(state.client, partial_client)
     new_state = update_client(state, new_client)
     {:noreply, new_state}
@@ -80,7 +111,7 @@ defmodule Teiserver.Connections.ClientServer do
       if Enum.empty?(new_connections) do
         new_client = %{state.client | connected?: false, last_disconnected: Timex.now()}
 
-        Teiserver.broadcast(state.topic, %{
+        Teiserver.broadcast(state.client_topic, %{
           event: :client_disconnected,
           client: new_client
         })
@@ -110,7 +141,7 @@ defmodule Teiserver.Connections.ClientServer do
       new_update_id = state.update_id + 1
 
       Teiserver.broadcast(
-        state.topic,
+        state.client_topic,
         %{
           event: :client_updated,
           update_id: new_update_id,
@@ -118,8 +149,42 @@ defmodule Teiserver.Connections.ClientServer do
         }
       )
 
+      if state.lobby_topic do
+        Teiserver.broadcast(
+          state.lobby_topic,
+          %{
+            event: :lobby_client_change,
+            update_id: new_update_id,
+            client: new_client
+          }
+        )
+      end
+
+      cond do
+        state.client.lobby_id == nil && new_client.lobby_id != nil ->
+          added_to_lobby(state)
+
+        state.client.lobby_id != nil && new_client.lobby_id == nil ->
+          removed_from_lobby(state)
+
+        true ->
+          :nop
+      end
+
       %{state | client: new_client, update_id: new_update_id}
     end
+  end
+
+  @spec added_to_lobby(Teiserver.lobby_id()) :: State.t()
+  defp added_to_lobby(_lobby_id) do
+    :nop
+    # LobbyLib.subscribe_to_lobby(lobby_id)
+  end
+
+  @spec removed_from_lobby(Teiserver.lobby_id()) :: State.t()
+  defp removed_from_lobby(_lobby_id) do
+    :nop
+    # LobbyLib.unsubscribe_from_lobby(lobby_id)
   end
 
   @impl true
@@ -140,7 +205,8 @@ defmodule Teiserver.Connections.ClientServer do
        client: client,
        connections: [],
        user_id: id,
-       topic: ClientLib.client_topic(id),
+       client_topic: ClientLib.client_topic(id),
+       lobby_topic: nil,
        update_id: 0
      }}
   end

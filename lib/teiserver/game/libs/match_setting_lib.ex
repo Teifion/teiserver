@@ -22,6 +22,26 @@ defmodule Teiserver.Game.MatchSettingLib do
   end
 
   @doc """
+  Returns a key => value map of match settings for a given match_id.
+
+  ## Examples
+
+      iex> get_match_settings_map(123)
+      %{"key1" => "value1", "key2" => "value2"}
+
+      iex> get_match_settings_map(456)
+      %{}
+
+  """
+  @spec get_match_settings_map(Teiserver.match_id()) :: %{String.t() => String.t()}
+  def get_match_settings_map(match_id) do
+    list_match_settings(where: [match_id: match_id], preload: [:type])
+    |> Map.new(fn ms ->
+      {ms.type.name, ms.value}
+    end)
+  end
+
+  @doc """
   Gets a single match_setting.
 
   Raises `Ecto.NoResultsError` if the MatchSetting does not exist.

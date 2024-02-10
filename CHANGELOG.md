@@ -1,7 +1,8 @@
 ## v0.0.4
-- Added `Lobby`, `LobbySummary`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` types/schemas
+- Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries
 - Added pubsub events for clients connecting, disconnecting and process destruction
 - Added lobby pubsub events
+- Split client updates into three types (out of lobby, in lobby and full)
 
 ## v0.0.3
 - Added `Teiserver.Api` to make getting writing a basic protocol handler easier

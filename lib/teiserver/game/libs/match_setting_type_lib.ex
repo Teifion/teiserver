@@ -88,6 +88,43 @@ defmodule Teiserver.Game.MatchSettingTypeLib do
   end
 
   @doc """
+  Gets the ID of a match_setting_type, if the type doesn't exist
+  it will create the match_setting_type and return the id of that type
+
+  ## Examples
+
+      iex> get_or_create_match_setting_type("existing")
+      123
+
+      iex> get_or_create_match_setting_type("non-existing")
+      1234
+
+  """
+  @spec get_or_create_match_setting_type(String.t()) :: MatchSettingType.id()
+  def get_or_create_match_setting_type(name) do
+    name = String.trim(name)
+
+    query = MatchSettingTypeQueries.match_setting_type_query(
+      where: [name: name],
+      select: [:id],
+      order_by: ["Name (A-Z)"]
+    )
+
+    case Repo.all(query) do
+      [] ->
+        {:ok, match_setting_type} =
+          %MatchSettingType{}
+          |> MatchSettingType.changeset(%{name: name})
+          |> Repo.insert()
+
+        match_setting_type.id
+
+      [%{id: id} | _] ->
+        id
+    end
+  end
+
+  @doc """
   Updates a match_setting_type.
 
   ## Examples

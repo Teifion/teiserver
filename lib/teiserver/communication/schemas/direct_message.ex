@@ -37,8 +37,10 @@ defmodule Teiserver.Communication.DirectMessage do
         }
 
   @doc false
-  def changeset(server_setting, attrs \\ %{}) do
-    server_setting
+  @spec changeset(map()) :: Ecto.Changeset.t()
+  @spec changeset(map(), map()) :: Ecto.Changeset.t()
+  def changeset(struct, attrs \\ %{}) do
+    struct
     |> cast(attrs, ~w(content inserted_at delivered? read? from_id to_id)a)
     |> validate_required(~w(content inserted_at delivered? read? from_id to_id)a)
   end

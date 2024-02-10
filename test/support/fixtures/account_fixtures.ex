@@ -2,6 +2,7 @@ defmodule Teiserver.AccountFixtures do
   @moduledoc false
   alias Teiserver.Account.{User, ExtraUserData}
 
+  @spec user_fixture() :: User.t()
   @spec user_fixture(map) :: User.t()
   def user_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)

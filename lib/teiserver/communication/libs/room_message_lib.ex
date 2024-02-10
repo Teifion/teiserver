@@ -3,7 +3,34 @@ defmodule Teiserver.Communication.RoomMessageLib do
   Library of room_message related functions.
   """
   use TeiserverMacros, :library
-  alias Teiserver.Communication.{Room, RoomLib, RoomMessage, RoomMessageQueries}
+  alias Teiserver.Communication.{Room, RoomMessage, RoomMessageQueries}
+
+
+
+  @doc false
+  @spec room_messaging_topic(Room.id() | Room.t()) :: String.t()
+  def room_messaging_topic(%Room{id: room_id}), do: "Teiserver.Communication.Room.#{room_id}"
+  def room_messaging_topic(room_id), do: "Teiserver.Communication.Room.#{room_id}"
+
+  @doc """
+  Joins your process to room messages
+  """
+  @spec subscribe_to_room_messages(Room.id() | Room.t()) :: :ok
+  def subscribe_to_room_messages(room_or_room_id) do
+    room_or_room_id
+    |> room_messaging_topic()
+    |> Teiserver.subscribe()
+  end
+
+  @doc """
+  Removes your process from a room's messages
+  """
+  @spec unsubscribe_from_room_messages(Room.id() | Room.t()) :: :ok
+  def unsubscribe_from_room_messages(room_or_room_id)  do
+    room_or_room_id
+    |> room_messaging_topic()
+    |> Teiserver.unsubscribe()
+  end
 
   @doc """
   Returns a list of messages from a room ordered as the newest first.
@@ -35,6 +62,8 @@ defmodule Teiserver.Communication.RoomMessageLib do
         iex> send_room_message(456, 456, "Message content")
         {:error, %Ecto.Changeset{}}
   """
+  @spec send_room_message(Teiserver.user_id(), Room.id(), String.t()) ::
+          {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   @spec send_room_message(Teiserver.user_id(), Room.id(), String.t(), map()) ::
           {:ok, RoomMessage.t()} | {:error, Ecto.Changeset.t()}
   def send_room_message(sender_id, room_id, content, attrs \\ %{}) do
@@ -51,7 +80,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
 
     case create_room_message(attrs) do
       {:ok, room_message} ->
-        topic = RoomLib.room_topic(room_message.room_id)
+        topic = room_messaging_topic(room_message.room_id)
 
         Teiserver.broadcast(
           topic,

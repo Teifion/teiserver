@@ -1,12 +1,34 @@
 defmodule Teiserver.Game.LobbyLib do
   @moduledoc """
-
+  TODO: Library of lobby related functions.
   """
   alias Teiserver.Game.{Lobby, LobbySummary}
+  alias Teiserver.Connections.ClientLib
+  alias Teiserver.Connections
 
   @doc false
   @spec lobby_topic(Lobby.id()) :: String.t()
   def lobby_topic(lobby_id), do: "Teiserver.Game.Lobby:#{lobby_id}"
+
+  @doc """
+  Subscribes the process to lobby updates for this user
+  """
+  @spec subscribe_to_lobby(User.id() | User.t() | Client.t()) :: :ok
+  def subscribe_to_lobby(lobby_or_lobby_id) do
+    lobby_or_lobby_id
+    |> lobby_topic()
+    |> Teiserver.subscribe()
+  end
+
+  @doc """
+  Unsubscribes the process to lobby updates for this user
+  """
+  @spec unsubscribe_from_lobby(User.id() | User.t() | Client.t()) :: :ok
+  def unsubscribe_from_lobby(lobby_or_lobby_id) do
+    lobby_or_lobby_id
+    |> lobby_topic()
+    |> Teiserver.unsubscribe()
+  end
 
   @doc false
   @spec global_lobby_topic() :: String.t()
@@ -33,7 +55,7 @@ defmodule Teiserver.Game.LobbyLib do
   """
   @spec get_lobby_attribute(Lobby.id(), atom()) :: any()
   def get_lobby_attribute(lobby_id, key) do
-    call_lobby(lobby_id, {:get_attribute, key})
+    call_lobby(lobby_id, {:get_lobby_attribute, key})
   end
 
   @doc """
@@ -55,13 +77,171 @@ defmodule Teiserver.Game.LobbyLib do
   @doc """
 
   """
-  @spec list_lobbies() :: [Lobby.t()]
-  def list_lobbies() do
+  @spec list_lobby_summaries() :: [LobbySummary.t()]
+  def list_lobby_summaries() do
     list_lobby_ids()
-    |> Enum.map(&get_lobby/1)
+    |> Enum.map(&get_lobby_summary/1)
     |> Enum.reject(&(&1 == nil))
   end
 
+  @spec list_lobby_summaries([Lobby.id()]) :: [LobbySummary.t()]
+  def list_lobby_summaries(lobby_ids) do
+    lobby_ids
+    |> Enum.map(&get_lobby_summary/1)
+    |> Enum.reject(&(&1 == nil))
+  end
+
+  @doc """
+  Given a user_id of the host and the initial lobby name, starts a process
+  for tracking the lobby.
+
+  It will then update the client of the host user and assign them to the lobby.
+
+  ## Examples
+
+      iex> open_lobby(123, "Name")
+      {:ok, 456}
+
+      iex> open_lobby(456, "Name")
+      {:error, "Client is not connected"}
+  """
+  @spec open_lobby(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, String.t()}
+  def open_lobby(host_id, name) when is_integer(host_id) do
+    client = Connections.get_client(host_id)
+
+    cond do
+      client == nil ->
+        {:error, "Client is not connected"}
+
+      client.connected? == false ->
+        {:error, "Client is disconnected"}
+
+      client.lobby_id != nil ->
+        {:error, "Already in a lobby"}
+
+      # All checks are good, lets try to create the lobby!
+      true ->
+        with {:ok, lobby_id} <- start_lobby_server(host_id, name),
+          :ok <- cycle_lobby(lobby_id),
+          _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby_id, lobby_host?: true})
+          do
+            {:ok, lobby_id}
+          else
+            :failure1 -> :fail_result1
+            :failure2 -> :fail_result2
+            :failure3 -> :fail_result3
+        end
+    end
+  end
+
+  @doc """
+  Used to cycle a lobby after a match has concluded.
+
+  ## Examples
+
+      iex> cycle_lobby(123)
+      :ok
+
+      iex> cycle_lobby(456)
+      nil
+  """
+  @spec cycle_lobby(Lobby.id()) :: :ok
+  def cycle_lobby(lobby_id) when is_integer(lobby_id) do
+    host_id = get_lobby_attribute(lobby_id, :host_id)
+
+    {:ok, match} = Teiserver.Game.create_match(%{
+      public?: true,
+      rated?: true,
+      host_id: host_id,
+      processed?: false,
+      lobby_opened_at: Timex.now()
+    })
+
+    cast_lobby(lobby_id, {:cycle_lobby, match.id})
+  end
+
+  @doc """
+  Used to tell a lobby process the current match has started
+
+  ## Examples
+
+      iex> lobby_start_match(123)
+      :ok
+
+      iex> lobby_start_match(456)
+      nil
+  """
+  @spec lobby_start_match(Lobby.id()) :: :ok
+  def lobby_start_match(lobby_id) when is_integer(lobby_id) do
+    cast_lobby(lobby_id, :lobby_start_match)
+  end
+
+  @doc """
+  Used to tell a lobby process the current match has started
+
+  ## Examples
+
+      iex> client_update_request(%{team_number: 1, id: 1}, 123)
+      %{}
+
+      iex> client_update_request(%{team_number: 1, id: 456}, 456)
+      nil
+  """
+  @spec client_update_request(map(), Lobby.id()) :: map()
+  def client_update_request(changes, lobby_id) when is_integer(lobby_id) do
+    call_lobby(lobby_id, {:client_update_request, changes})
+  end
+
+  @doc """
+  Given a lobby_id it will close the lobby. Every client in the lobby will be
+  removed from the lobby.
+
+  ## Examples
+
+    iex> close_lobby(123)
+    :ok
+  """
+  @spec close_lobby(Lobby.id()) :: :ok
+  def close_lobby(lobby_id) when is_integer(lobby_id) do
+    lobby = get_lobby(lobby_id)
+
+    if lobby do
+      lobby.members
+      |> Enum.each(fn user_id ->
+        ClientLib.update_client_full(user_id, %{lobby_id: nil, lobby_host?: false})
+      end)
+
+      ClientLib.update_client_full(lobby.host_id, %{lobby_id: nil, lobby_host?: false})
+    end
+
+    stop_lobby_server(lobby_id)
+  end
+
+  @doc """
+  Adds a client to the lobby
+  """
+  @spec can_add_client_to_lobby?(Teiserver.user_id(), Lobby.id()) :: boolean()
+  def can_add_client_to_lobby?(user_id, lobby_id) do
+    call_lobby(lobby_id, {:can_add_client?, user_id})
+  end
+
+  @doc """
+  Adds a client to the lobby
+  """
+  @spec add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: :ok | {:error, String.t()}
+  def add_client_to_lobby(user_id, lobby_id) do
+    call_lobby(lobby_id, {:add_client, user_id})
+  end
+
+  @doc """
+  Adds a client to the lobby
+  """
+  @spec remove_client_from_lobby(Teiserver.user_id(), Lobby.id()) :: :ok | nil
+  def remove_client_from_lobby(user_id, lobby_id) do
+    cast_lobby(lobby_id, {:remove_client, user_id})
+  end
+
+  @doc false
   @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
   def start_lobby_server(host_id, name) do
     id = Teiserver.LobbyIdServer.get_next_lobby_id()

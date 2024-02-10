@@ -1,14 +1,14 @@
-defmodule Teiserver.Game.MatchSettingType do
+defmodule Teiserver.Game.MatchType do
   @moduledoc """
-  # MatchSettingType
-  Type information regarding match setting values
+  # MatchType
+  Details for each type of match
 
   ### Attributes
-  * `:name` - The name of the setting
+  * `:name` - The name of the type
   """
   use TeiserverMacros, :schema
 
-  schema "game_match_setting_types" do
+  schema "game_match_types" do
     field(:name, :string)
   end
 

@@ -43,3 +43,17 @@ Sent whenever a new DirectMessage is sent by this user.
 }
 ```
 
+## `Teiserver.Communication.Match:{match_id}`
+Pubsub messages related to the Match.
+
+### Message received
+Sent whenever a new message is sent into a match
+
+- `:message` - A `Teiserver.Communication.MatchMessage` representing the message received
+
+```elixir
+%{
+  event: :message_received,
+  message: MatchMessage.t()
+}
+```

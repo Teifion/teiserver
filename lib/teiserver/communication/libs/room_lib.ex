@@ -5,37 +5,6 @@ defmodule Teiserver.Communication.RoomLib do
   use TeiserverMacros, :library
   alias Teiserver.Communication.{Room, RoomQueries}
 
-  @doc false
-  @spec room_topic(Room.id() | Room.t()) :: String.t()
-  def room_topic(%Room{id: room_id}), do: "Teiserver.Communication.Room.#{room_id}"
-  def room_topic(room_id), do: "Teiserver.Communication.Room.#{room_id}"
-
-  @doc """
-  Joins your process to room messages
-  """
-  @spec subscribe_to_room(Room.id() | Room.t() | String.t()) :: :ok
-  def subscribe_to_room(room_id) when is_integer(room_id) do
-    room_id
-    |> room_topic()
-    |> Teiserver.subscribe()
-  end
-
-  def subscribe_to_room(%Room{id: room_id}), do: subscribe_to_room(room_id)
-  def subscribe_to_room(room_name), do: get_or_create_room(room_name).id
-
-  @doc """
-  Removes your process from a room's messages
-  """
-  @spec unsubscribe_from_room(Room.id() | Room.t() | String.t()) :: :ok
-  def unsubscribe_from_room(room_id) when is_integer(room_id) do
-    room_id
-    |> room_topic()
-    |> Teiserver.unsubscribe()
-  end
-
-  def unsubscribe_from_room(%Room{id: room_id}), do: unsubscribe_from_room(room_id)
-  def unsubscribe_from_room(room_name), do: get_or_create_room(room_name).id
-
   @doc """
   Returns the list of rooms.
 

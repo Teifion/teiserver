@@ -57,6 +57,36 @@ defmodule Teiserver.Game.MatchMembershipQueries do
     )
   end
 
+  def _where(query, :win?, win?) do
+    from(match_memberships in query,
+      where: match_memberships.win? == ^win?
+    )
+  end
+
+  def _where(query, :party_id, party_ids) when is_list(party_ids) do
+    from(match_memberships in query,
+      where: match_memberships.party_id in ^party_ids
+    )
+  end
+
+  def _where(query, :party_id, party_id) do
+    from(match_memberships in query,
+      where: match_memberships.party_id == ^party_id
+    )
+  end
+
+  def _where(query, :team_number, team_numbers) when is_list(team_numbers) do
+    from(match_memberships in query,
+      where: match_memberships.team_number in ^team_numbers
+    )
+  end
+
+  def _where(query, :team_number, team_number) do
+    from(match_memberships in query,
+      where: match_memberships.team_number == ^team_number
+    )
+  end
+
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
@@ -69,53 +99,39 @@ defmodule Teiserver.Game.MatchMembershipQueries do
   end
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
-  def _order_by(query, "Name (A-Z)") do
+  def _order_by(query, "First to leave") do
     from(match_memberships in query,
-      order_by: [asc: match_memberships.name]
+      order_by: [asc: match_memberships.left_after_seconds]
     )
   end
 
-  def _order_by(query, "Name (Z-A)") do
+  def _order_by(query, "Last to leave") do
     from(match_memberships in query,
-      order_by: [desc: match_memberships.name]
-    )
-  end
-
-  def _order_by(query, "Newest first") do
-    from(match_memberships in query,
-      order_by: [desc: match_memberships.inserted_at]
-    )
-  end
-
-  def _order_by(query, "Oldest first") do
-    from(match_memberships in query,
-      order_by: [asc: match_memberships.inserted_at]
+      order_by: [desc: match_memberships.left_after_seconds]
     )
   end
 
   @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
-  defp do_preload(query, _), do: query
-  # defp do_preload(query, preloads) do
-  #   preloads
-  #   |> List.wrap
-  #   |> Enum.reduce(query, fn key, query_acc ->
-  #     _preload(query_acc, key)
-  #   end)
-  # end
+  defp do_preload(query, preloads) do
+    preloads
+    |> List.wrap
+    |> Enum.reduce(query, fn key, query_acc ->
+      _preload(query_acc, key)
+    end)
+  end
 
-  # @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
-  # def _preload(query, :relation) do
-  #   from match_membership in query,
-  #     left_join: relations in assoc(match_membership, :relation),
-  #     preload: [relation: relations]
-  # end
+  @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
+  def _preload(query, :user) do
+    from match_membership in query,
+      left_join: users in assoc(match_membership, :user),
+      preload: [user: users]
+  end
 
-  # def _preload(query, {:relation, join_query}) do
-  #   from match_membership in query,
-  #     left_join: relations in subquery(join_query),
-  #       on: relations.id == query.relation_id,
-  #     preload: [relation: relations]
-  # end
+  def _preload(query, :match) do
+    from match_membership in query,
+      left_join: matches in assoc(match_membership, :match),
+      preload: [match: matches]
+  end
 end

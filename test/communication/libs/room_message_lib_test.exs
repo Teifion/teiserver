@@ -4,6 +4,7 @@ defmodule Teiserver.RoomMessageLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Communication
+  alias Phoenix.PubSub
   alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
 
   defp valid_attrs do
@@ -107,6 +108,40 @@ defmodule Teiserver.RoomMessageLibTest do
   end
 
   describe "messaging" do
+    test "topic" do
+      r = :rand.uniform(999_999_999)
+      room = Communication.get_or_create_room("#{r}_messaging_room")
+      expected = "Teiserver.Communication.Room.#{room.id}"
+
+      assert expected == Communication.room_messaging_topic(room)
+      assert expected == Communication.room_messaging_topic(room.id)
+    end
+
+    test "subscribe_to_room_messages" do
+      room = CommunicationFixtures.room_fixture()
+      topic = Communication.room_messaging_topic(room)
+      conn = TestConn.new()
+
+      PubSub.broadcast(Teiserver.PubSub, topic, "message1")
+      assert TestConn.get(conn) == []
+
+      # Now subscribe via the Comms function each of the different ways
+      TestConn.run(conn, fn ->
+        Communication.subscribe_to_room_messages(room)
+      end)
+
+      PubSub.broadcast(Teiserver.PubSub, topic, "message2")
+      assert TestConn.get(conn) == ["message2"]
+
+      # Now un-sub
+      TestConn.run(conn, fn ->
+        Communication.unsubscribe_from_room_messages(room)
+      end)
+
+      PubSub.broadcast(Teiserver.PubSub, topic, "message3")
+      assert TestConn.get(conn) == []
+    end
+
     test "room" do
       r = :rand.uniform(999_999_999)
       {conn1, user1} = ConnectionFixtures.client_fixture()
@@ -114,11 +149,11 @@ defmodule Teiserver.RoomMessageLibTest do
       {conn3, user3} = ConnectionFixtures.client_fixture()
 
       room = Communication.get_or_create_room("#{r}_messaging_room")
-      topic = Communication.room_topic(room.id)
+      topic = Communication.room_messaging_topic(room.id)
 
-      TestConn.run(conn1, fn -> Communication.subscribe_to_room(room.id) end)
-      TestConn.run(conn2, fn -> Communication.subscribe_to_room(room.id) end)
-      TestConn.run(conn3, fn -> Communication.subscribe_to_room(room.id) end)
+      TestConn.run(conn1, fn -> Communication.subscribe_to_room_messages(room.id) end)
+      TestConn.run(conn2, fn -> Communication.subscribe_to_room_messages(room.id) end)
+      TestConn.run(conn3, fn -> Communication.subscribe_to_room_messages(room.id) end)
 
       assert TestConn.get(conn1) == []
       assert TestConn.get(conn2) == []

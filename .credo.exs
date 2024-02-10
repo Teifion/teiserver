@@ -9,7 +9,7 @@
           "lib/",
           "test/"
         ],
-        excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/"]
+        excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/", ~r"test/support/fixtures"]
       },
       #
       # Load and configure plugins here:

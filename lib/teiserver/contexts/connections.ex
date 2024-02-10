@@ -20,6 +20,14 @@ defmodule Teiserver.Connections do
   defdelegate client_topic(client_or_user_or_user_id), to: ClientLib
 
   @doc section: :client
+  @spec subscribe_to_client(User.id() | User.t() | Client.t()) :: :ok
+  defdelegate subscribe_to_client(client_or_client_id), to: ClientLib
+
+  @doc section: :client
+  @spec unsubscribe_from_client(User.id() | User.t() | Client.t()) :: :ok
+  defdelegate unsubscribe_from_client(client_or_client_id), to: ClientLib
+
+  @doc section: :client
   @spec list_client_ids() :: [Teiserver.user_id()]
   defdelegate list_client_ids(), to: ClientLib
 
@@ -28,8 +36,16 @@ defmodule Teiserver.Connections do
   defdelegate get_client(user_id), to: ClientLib
 
   @doc section: :client
+  @spec get_client_list([Teiserver.user_id()]) :: [Client.t() | nil]
+  defdelegate get_client_list(user_ids), to: ClientLib
+
+  @doc section: :client
   @spec update_client(Teiserver.user_id(), map) :: Client.t() | nil
   defdelegate update_client(user_id, updates), to: ClientLib
+
+  @doc section: :client
+  @spec update_client_in_lobby(Teiserver.user_id(), map) :: Client.t() | nil
+  defdelegate update_client_in_lobby(user_id, updates), to: ClientLib
 
   @doc section: :client
   @spec connect_user(Teiserver.user_id()) :: Client.t()

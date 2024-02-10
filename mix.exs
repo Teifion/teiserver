@@ -58,6 +58,7 @@ defmodule Teiserver.MixProject do
       "documentation/guides/hello_world.md",
       "documentation/guides/program_structure.md",
       "documentation/guides/snippets.md",
+      "documentation/guides/match_lifecycle.md",
 
       # Development
       "documentation/development/features.md",
@@ -65,7 +66,7 @@ defmodule Teiserver.MixProject do
 
       # PubSubs
       "documentation/pubsubs/client.md",
-      "documentation/pubsubs/lobby.md",
+      "documentation/pubsubs/match.md",
       "documentation/pubsubs/user.md",
       "documentation/pubsubs/communication.md",
       "CHANGELOG.md": [title: "Changelog"]
@@ -75,8 +76,8 @@ defmodule Teiserver.MixProject do
   defp groups_for_extras do
     [
       Guides: ~r{documentation/guides/[^\/]+\.md},
-      PubSubs: ~r{documentation/pubsubs/[^\/]+\.md},
-      Development: ~r{documentation/development/[^\/]+\.md}
+      Development: ~r{documentation/development/[^\/]+\.md},
+      PubSubs: ~r{documentation/pubsubs/[^\/]+\.md}
     ]
   end
 
@@ -153,8 +154,15 @@ defmodule Teiserver.MixProject do
       # Communication
       "Room messages": &(&1[:section] == :room_message),
       "Party messages": &(&1[:section] == :party_message),
-      "Lobby messages": &(&1[:section] == :lobby_message),
+      "Match messages": &(&1[:section] == :match_message),
       "Direct messages": &(&1[:section] == :direct_message),
+
+      # Game
+      "Lobby": &(&1[:section] == :lobby),
+      "Match": &(&1[:section] == :match),
+      "Match Type": &(&1[:section] == :match_type),
+      "Match Setting": &(&1[:section] == :match_setting),
+      "Match Setting Type": &(&1[:section] == :match_setting_type),
 
       # Settings
       "Site settings": &(&1[:section] == :server_setting),

@@ -47,6 +47,10 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     end
 
     # Game
+    create_if_not_exists table(:game_match_types, prefix: prefix) do
+      add(:name, :string)
+    end
+
     create table(:game_matches) do
       add(:name, :string)
       add(:tags, :jsonb)
@@ -61,15 +65,16 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:team_count, :integer)
       add(:team_size, :integer)
       add(:processed?, :boolean, default: false)
-      add(:game_type, :string)
+      add(:ended_normally?, :boolean)
 
       add(:lobby_opened_at, :utc_datetime)
       add(:match_started_at, :utc_datetime)
-      add(:match_finished_at, :utc_datetime)
+      add(:match_ended_at, :utc_datetime)
 
       add(:match_duration_seconds, :integer)
 
       add(:host_id, references(:account_users, on_delete: :nothing))
+      add(:type_id, references(:game_match_types, on_delete: :nothing))
 
       timestamps()
     end

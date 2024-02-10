@@ -1,7 +1,7 @@
 defmodule Teiserver.Game.Match do
   @moduledoc """
   # Match
-  The persisted storage of a game.
+  The persisted storage of a game, for a guide on the lifecycle of a match please see the [`Match lifecycle guide`](match_lifecycle.html).
 
   ### Attributes
 
@@ -19,7 +19,8 @@ defmodule Teiserver.Game.Match do
   * `:game_type` - A string indicating the type of game
   * `:lobby_opened_at` - The datetime the lobby was opened at or when the previous match completed
   * `:match_started_at` - The datetime the lobby swapped to being in progress, not the actual start time of the game itself
-  * `:match_finished_at` - The datetime the match ended and the players were returned to the lobby, not the actual end time of the game itself
+  * `:match_ended_at` - The datetime the match ended and the players were returned to the lobby, not the actual end time of the game itself
+  * `:ended_normally?` - True if the match was ended in a normal manner, false if ended in an abnormal manner (e.g. crashed)
   * `:match_duration_seconds` - The duration of the game in seconds as indicated by the game host
   * `:host` - The user account hosting the lobby
 
@@ -37,31 +38,32 @@ defmodule Teiserver.Game.Match do
 
     # Game stuff
     field(:map_name, :string)
-    field(:game_type, :string)
 
     # Outcome
     field(:winning_team, :integer)
     field(:team_count, :integer)
     field(:team_size, :integer)
     field(:processed?, :boolean, default: false)
+    field(:ended_normally?, :boolean)
 
     field(:lobby_opened_at, :utc_datetime)
     field(:match_started_at, :utc_datetime)
-    field(:match_finished_at, :utc_datetime)
+    field(:match_ended_at, :utc_datetime)
 
     # This will be something queried enough it's worth storing as it's own value
     field(:match_duration_seconds, :integer)
 
     # Memberships
     belongs_to(:host, Teiserver.Account.User)
+    belongs_to(:type, Teiserver.Game.MatchType)
     has_many(:members, Teiserver.Game.MatchMembership)
     has_many(:match_settings, Teiserver.Game.MatchSetting)
 
     # Relationships we expect to add
-    # belongs_to :founder, Teiserver.Game.MatchmakingQueue
-    # belongs_to :founder, Teiserver.Game.RatingType
-    # has_many :ratings, Teiserver.Game.RatingLog
-    # belongs_to :founder, Teiserver.Game.LobbyPolicy
+    # belongs_to :queue, Teiserver.Game.MatchmakingQueue
+    # belongs_to :rating_type, Teiserver.Game.RatingType
+    # has_many :rating_logs, Teiserver.Game.RatingLog
+    # belongs_to :lobby_policy, Teiserver.Game.LobbyPolicy
 
     timestamps()
   end
@@ -79,21 +81,23 @@ defmodule Teiserver.Game.Match do
 
           # Game stuff
           map_name: String.t(),
+          team_count: non_neg_integer(),
+          team_size: non_neg_integer(),
 
           # Outcome
           winning_team: non_neg_integer(),
-          team_count: non_neg_integer(),
-          team_size: non_neg_integer(),
           processed?: boolean(),
-          game_type: String.t(),
           lobby_opened_at: DateTime.t(),
           match_started_at: DateTime.t(),
-          match_finished_at: DateTime.t(),
+          match_ended_at: DateTime.t(),
+          ended_normally?: boolean(),
 
           # This will be something queried enough it's worth storing as it's own value
           match_duration_seconds: non_neg_integer(),
           host_id: Teiserver.user_id(),
           host: Teiserver.Account.User.t(),
+          type_id: Teiserver.Game.MatchType.id(),
+          type: Teiserver.Game.MatchType.t(),
           members: list
         }
 
@@ -106,7 +110,7 @@ defmodule Teiserver.Game.Match do
     struct
     |> cast(
       attrs,
-      ~w(name tags public? rated? game_name game_version map_name winning_team team_count team_size processed? game_type lobby_opened_at match_started_at match_finished_at match_duration_seconds host_id)a
+      ~w(name tags public? rated? game_name game_version map_name winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds host_id type_id)a
     )
     |> validate_required(~w(public? rated? host_id)a)
   end

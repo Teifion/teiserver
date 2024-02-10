@@ -1,7 +1,8 @@
 {
   "skip_files": [
     "^test/.*",
-    "lib/teiserver/helpers/file_macros.ex"
+    "lib/teiserver/helpers/file_macros.ex",
+    "lib/teiserver/game/servers/lobby_id_server.ex"
   ],
   
   "terminal_options": {

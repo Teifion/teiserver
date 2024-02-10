@@ -4,7 +4,7 @@ defmodule Teiserver.Communication do
   - `Teiserver.Communication.Room`
   - `Teiserver.Communication.RoomMessage`
   - `Teiserver.Communication.DirectMessage`
-  - `Teiserver.Communication.LobbyMessage`
+  - `Teiserver.Communication.MatchMessage`
   - `Teiserver.Communication.PartyMessage`
   """
   alias Teiserver.Account.User
@@ -13,18 +13,6 @@ defmodule Teiserver.Communication do
   @doc false
   @spec room_query(Teiserver.query_args()) :: Ecto.Query.t()
   defdelegate room_query(args \\ []), to: RoomQueries
-
-  @doc false
-  @spec room_topic(Room.id() | Room.t()) :: String.t()
-  defdelegate room_topic(room_or_room_id), to: RoomLib
-
-  @doc section: :room
-  @spec subscribe_to_room(Room.id() | Room.t() | String.t()) :: :ok
-  defdelegate subscribe_to_room(room_id_or_name), to: RoomLib
-
-  @doc section: :room
-  @spec unsubscribe_from_room(Room.id() | Room.t() | String.t()) :: :ok
-  defdelegate unsubscribe_from_room(room_id_or_name), to: RoomLib
 
   @doc section: :room
   @spec list_rooms(Teiserver.query_args()) :: [Room.t()]
@@ -76,6 +64,18 @@ defmodule Teiserver.Communication do
   defdelegate list_recent_room_messages(room_name_or_id, limit \\ 50), to: RoomMessageLib
 
   @doc false
+  @spec room_messaging_topic(Room.id() | Room.t()) :: String.t()
+  defdelegate room_messaging_topic(room_or_room_id), to: RoomMessageLib
+
+  @doc section: :room_message
+  @spec subscribe_to_room_messages(Room.id() | Room.t()) :: :ok
+  defdelegate subscribe_to_room_messages(room_or_room_id), to: RoomMessageLib
+
+  @doc section: :room_message
+  @spec unsubscribe_from_room_messages(Room.id() | Room.t()) :: :ok
+  defdelegate unsubscribe_from_room_messages(room_or_room_id), to: RoomMessageLib
+
+  @doc false
   @spec room_message_query(Teiserver.query_args()) :: Ecto.Query.t()
   defdelegate room_message_query(args), to: RoomMessageQueries
 
@@ -116,6 +116,14 @@ defmodule Teiserver.Communication do
   @doc false
   @spec user_messaging_topic(Teiserver.user_id() | User.t()) :: String.t()
   defdelegate user_messaging_topic(room_or_room_id), to: DirectMessageLib
+
+  @doc section: :direct_message
+  @spec subscribe_to_user_messaging(User.id() | User.t()) :: :ok
+  defdelegate subscribe_to_user_messaging(user_or_user_id), to: DirectMessageLib
+
+  @doc section: :direct_message
+  @spec unsubscribe_from_user_messaging(User.id() | User.t()) :: :ok
+  defdelegate unsubscribe_from_user_messaging(user_or_user_id), to: DirectMessageLib
 
   @doc false
   @spec direct_message_query(Teiserver.query_args()) :: Ecto.Query.t()
@@ -203,4 +211,65 @@ defmodule Teiserver.Communication do
     to: DirectMessageLib
 
   # Party chat
+
+  # Match chat
+  alias Teiserver.Communication.{MatchMessage, MatchMessageLib, MatchMessageQueries}
+  alias Teiserver.Game.Match
+
+  @doc false
+  @spec match_messaging_topic(Teiserver.match_id() | Match.t()) :: String.t()
+  defdelegate match_messaging_topic(match_or_match_id), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec subscribe_to_match_messages(Match.id() | Match.t()) :: :ok
+  defdelegate subscribe_to_match_messages(match_or_match_id), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec unsubscribe_from_match_messages(Match.id() | Match.t()) :: :ok
+  defdelegate unsubscribe_from_match_messages(match_or_match_id), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec send_match_message(Teiserver.user_id(), Match.id(), String.t(), map()) ::
+          {:ok, MatchMessage.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate send_match_message(sender_id, match_id, content, attrs \\ %{}), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec list_recent_match_messages(Match.id(), non_neg_integer()) :: [MatchMessage.t()]
+  defdelegate list_recent_match_messages(match_name_or_id, limit \\ 50), to: MatchMessageLib
+
+  @doc false
+  @spec match_message_query(Teiserver.query_args()) :: Ecto.Query.t()
+  defdelegate match_message_query(args), to: MatchMessageQueries
+
+  @doc section: :match_message
+  @spec list_match_messages(Teiserver.query_args()) :: [MatchMessage.t()]
+  defdelegate list_match_messages(args), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec get_match_message!(MatchMessage.id()) :: MatchMessage.t()
+  @spec get_match_message!(MatchMessage.id(), Teiserver.query_args()) :: MatchMessage.t()
+  defdelegate get_match_message!(match_message_id, query_args \\ []), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec get_match_message(MatchMessage.id()) :: MatchMessage.t() | nil
+  @spec get_match_message(MatchMessage.id(), Teiserver.query_args()) :: MatchMessage.t() | nil
+  defdelegate get_match_message(match_message_id, query_args \\ []), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec create_match_message(map) :: {:ok, MatchMessage.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate create_match_message(attrs \\ %{}), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec update_match_message(MatchMessage, map) ::
+          {:ok, MatchMessage.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate update_match_message(match_message, attrs), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec delete_match_message(MatchMessage.t()) ::
+          {:ok, MatchMessage.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate delete_match_message(match_message), to: MatchMessageLib
+
+  @doc section: :match_message
+  @spec change_match_message(MatchMessage.t(), map) :: Ecto.Changeset.t()
+  defdelegate change_match_message(match_message, attrs \\ %{}), to: MatchMessageLib
 end

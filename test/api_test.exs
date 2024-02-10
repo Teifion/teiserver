@@ -70,8 +70,8 @@ defmodule ApiTest do
 
       assert room == Api.get_room_by_name_or_id(room.name)
 
-      Api.subscribe_to_room(room)
-      Api.unsubscribe_from_room(room)
+      Api.subscribe_to_room_messages(room)
+      Api.unsubscribe_from_room_messages(room)
 
       assert Api.list_recent_room_messages(room.id) == []
 
