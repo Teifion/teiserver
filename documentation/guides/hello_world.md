@@ -127,7 +127,7 @@ defmodule HelloWorldServer.TcpIn do
 
   def data_in("login " <> data, state) do
     [name, password] = String.split(data, " ")
-    case Api.maybe_authenticate_user do
+    case Api.maybe_authenticate_user(name, password) do
       {:ok, user} ->
         Api.connect_user(user)
         {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
