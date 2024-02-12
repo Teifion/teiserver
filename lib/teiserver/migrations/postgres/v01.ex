@@ -51,7 +51,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:name, :string)
     end
 
-    create table(:game_matches) do
+    create_if_not_exists table(:game_matches) do
       add(:name, :string)
       add(:tags, :jsonb)
       add(:public?, :boolean)
@@ -79,7 +79,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps()
     end
 
-    create table(:game_match_memberships, primary_key: false) do
+    create_if_not_exists table(:game_match_memberships, primary_key: false) do
       add(:user_id, references(:account_users, on_delete: :nothing), primary_key: true)
       add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
       add(:team_number, :integer)
@@ -90,11 +90,11 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:party_id, :string)
     end
 
-    create table(:game_match_setting_types) do
+    create_if_not_exists table(:game_match_setting_types) do
       add(:name, :string)
     end
 
-    create table(:game_match_settings, primary_key: false) do
+    create_if_not_exists table(:game_match_settings, primary_key: false) do
       add(:type_id, references(:game_match_setting_types, on_delete: :nothing), primary_key: true)
       add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
       add(:value, :string)
@@ -140,7 +140,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps()
     end
 
-    create table(:settings_user_setting_type, prefix: prefix) do
+    create_if_not_exists table(:settings_user_setting_type, prefix: prefix) do
       add(:key, :string)
       add(:value, :string)
       add(:user_id, references(:account_users, on_delete: :nothing))
@@ -148,7 +148,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps()
     end
 
-    create table(:settings_user_settings, prefix: prefix) do
+    create_if_not_exists table(:settings_user_settings, prefix: prefix) do
       add(:key, :string)
       add(:value, :string)
       add(:user_id, references(:account_users, on_delete: :nothing))
@@ -160,14 +160,28 @@ defmodule Teiserver.Migrations.Postgres.V01 do
   end
 
   def down(%{prefix: prefix, quoted_prefix: _quoted}) do
-    execute("DROP EXTENSION IF EXISTS citext")
+    # Comms
+    drop_if_exists(table(:communication_room_messages, prefix: prefix))
+    drop_if_exists(table(:communication_rooms, prefix: prefix))
+    drop_if_exists(table(:communication_direct_messages, prefix: prefix))
+    drop_if_exists(table(:communication_match_messages, prefix: prefix))
 
-    # Accounts
-    drop_if_exists(table(:account_users, prefix: prefix))
-    drop_if_exists(table(:account_extra_user_data, prefix: prefix))
+    # Game
+    drop_if_exists(table(:game_match_memberships, prefix: prefix))
+    drop_if_exists(table(:game_match_settings, prefix: prefix))
+    drop_if_exists(table(:game_match_setting_types, prefix: prefix))
+    drop_if_exists(table(:game_matches, prefix: prefix))
+    drop_if_exists(table(:game_match_types, prefix: prefix))
 
     # Config
     drop_if_exists(table(:settings_server_settings, prefix: prefix))
+    drop_if_exists(table(:settings_user_setting_type, prefix: prefix))
     drop_if_exists(table(:settings_user_settings, prefix: prefix))
+
+    # Accounts
+    drop_if_exists(table(:account_extra_user_data, prefix: prefix))
+    drop_if_exists(table(:account_users, prefix: prefix))
+
+    execute("DROP EXTENSION IF EXISTS citext")
   end
 end
