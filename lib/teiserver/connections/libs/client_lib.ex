@@ -46,6 +46,11 @@ defmodule Teiserver.Connections.ClientLib do
     Registry.select(Teiserver.ClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
 
+  @spec horde_list_client_ids() :: [Teiserver.user_id()]
+  def horde_list_client_ids do
+    Horde.Registry.select(Teiserver.HordeClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
+  end
+
   @doc """
   Gets a single client from a user_id.
 

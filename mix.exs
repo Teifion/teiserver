@@ -241,7 +241,9 @@ defmodule Teiserver.MixProject do
       {:excoveralls, "~> 0.15.3", only: :test, runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:floki, ">= 0.34.0", only: :test},
-      {:dialyxir, "~> 1.1", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
+
+      {:horde, "~> 0.9"}
     ]
   end
 

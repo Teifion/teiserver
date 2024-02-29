@@ -9,6 +9,7 @@ defmodule Teiserver.Communication.Room do
   """
   use TeiserverMacros, :schema
 
+  @derive {Jason.Encoder, only: ~w(name inserted_at updated_at)a}
   schema "communication_rooms" do
     field(:name, :string)
 

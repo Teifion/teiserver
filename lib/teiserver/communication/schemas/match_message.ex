@@ -12,6 +12,7 @@ defmodule Teiserver.Communication.MatchMessage do
   """
   use TeiserverMacros, :schema
 
+  @derive {Jason.Encoder, only: ~w(content inserted_at sender_id match_id)a}
   schema "communication_match_messages" do
     field(:content, :string)
     field(:inserted_at, :utc_datetime)

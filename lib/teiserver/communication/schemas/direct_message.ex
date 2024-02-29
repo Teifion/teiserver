@@ -14,6 +14,7 @@ defmodule Teiserver.Communication.DirectMessage do
   """
   use TeiserverMacros, :schema
 
+  @derive {Jason.Encoder, only: ~w(content inserted_at delivered? read? from_id to_id)a}
   schema "communication_direct_messages" do
     field(:content, :string)
     field(:inserted_at, :utc_datetime)

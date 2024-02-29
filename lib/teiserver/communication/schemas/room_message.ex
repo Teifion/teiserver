@@ -12,6 +12,7 @@ defmodule Teiserver.Communication.RoomMessage do
   """
   use TeiserverMacros, :schema
 
+  @derive {Jason.Encoder, only: ~w(content inserted_at sender_id room_id)a}
   schema "communication_room_messages" do
     field(:content, :string)
     field(:inserted_at, :utc_datetime)

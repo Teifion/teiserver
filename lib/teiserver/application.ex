@@ -15,6 +15,7 @@ defmodule Teiserver.Application do
 
       # Clients and connections,
       {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.ClientSupervisor},
+      {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.HordeClientRegistry]},
       {Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
       # Teiserver.Connections.LoginThrottleServer,
 

@@ -200,6 +200,12 @@ defmodule Teiserver.Connections.ClientServer do
       id
     )
 
+    Horde.Registry.register(
+      Teiserver.HordeClientRegistry,
+      id,
+      id
+    )
+
     {:ok,
      %State{
        client: client,

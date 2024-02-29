@@ -25,6 +25,7 @@ defmodule Teiserver.Account.User do
   use TeiserverMacros, :schema
   alias Argon2
 
+  @derive {Jason.Encoder, only: ~w(name email groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id inserted_at updated_at)a}
   schema "account_users" do
     field(:name, :string)
     field(:email, :string)
