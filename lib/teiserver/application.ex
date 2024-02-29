@@ -6,32 +6,35 @@ defmodule Teiserver.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Teiserver.Repo,
-      # Teiserver.Registry,
       {Phoenix.PubSub, name: Teiserver.PubSub},
 
       # Servers not part of the general slew of things
       {Registry, [keys: :unique, members: :auto, name: Teiserver.ServerRegistry]},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalServerRegistry]},
 
-      # Clients and connections,
+      # Connections
       {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.ClientSupervisor},
-      {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.HordeClientRegistry]},
-      {Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
+      {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.ClientRegistry]},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalClientRegistry]},
       # Teiserver.Connections.LoginThrottleServer,
 
       # Parties
-      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.PartySupervisor},
-      {Registry, [keys: :unique, members: :auto, name: Teiserver.PartyRegistry]},
+      # {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.PartySupervisor},
+      # {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.PartyRegistry]},
+      # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalPartyRegistry]},
 
       # Lobbies
-      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
-      {Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
-      Teiserver.LobbyIdServer,
+      # {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
+      # {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
+      # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalLobbyRegistry]},
+      # Teiserver.LobbyIdServer,
 
       # Matchmaking
-      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.MMSupervisor},
-      {Registry, [keys: :unique, members: :auto, name: Teiserver.MMQueueRegistry]},
-      {Registry, [keys: :unique, members: :auto, name: Teiserver.MMMatchRegistry]}
+      # {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.MMSupervisor},
+      # {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.MMQueueRegistry]},
+      # {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.MMMatchRegistry]},
+      # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalMMQueueRegistry]},
+      # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalMMMatchRegistry]}
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]

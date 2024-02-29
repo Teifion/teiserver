@@ -32,8 +32,8 @@ defmodule Teiserver.Connections do
   defdelegate list_client_ids(), to: ClientLib
 
   @doc section: :client
-  @spec horde_list_client_ids() :: [Teiserver.user_id()]
-  defdelegate horde_list_client_ids(), to: ClientLib
+  @spec list_local_client_ids() :: [Teiserver.user_id()]
+  defdelegate list_local_client_ids(), to: ClientLib
 
   @doc section: :client
   @spec get_client(Teiserver.user_id()) :: Client.t() | nil

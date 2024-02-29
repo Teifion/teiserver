@@ -195,13 +195,13 @@ defmodule Teiserver.Connections.ClientServer do
 
     # Update the queue pids cache to point to this process
     Registry.register(
-      Teiserver.ClientRegistry,
+      Teiserver.LocalClientRegistry,
       id,
       id
     )
 
     Horde.Registry.register(
-      Teiserver.HordeClientRegistry,
+      Teiserver.ClientRegistry,
       id,
       id
     )

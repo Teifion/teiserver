@@ -43,12 +43,12 @@ defmodule Teiserver.Connections.ClientLib do
   """
   @spec list_client_ids() :: [Teiserver.user_id()]
   def list_client_ids do
-    Registry.select(Teiserver.ClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
+    Horde.Registry.select(Teiserver.ClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
 
-  @spec horde_list_client_ids() :: [Teiserver.user_id()]
-  def horde_list_client_ids do
-    Horde.Registry.select(Teiserver.HordeClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
+  @spec list_local_client_ids() :: [Teiserver.user_id()]
+  def list_local_client_ids do
+    Registry.select(Teiserver.LocalClientRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
 
   @doc """
