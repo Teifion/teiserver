@@ -31,10 +31,10 @@ defmodule Teiserver.MatchMessageQueriesTest do
           where: [
             id: [1, 2],
             id: 1,
-            sender_id: [1, 2],
-            sender_id: 1,
-            match_id: [1, 2],
-            match_id: 1,
+            sender_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
+            sender_id: Ecto.UUID.generate(),
+            match_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
+            match_id: Ecto.UUID.generate(),
             inserted_after: Timex.now(),
             inserted_before: Timex.now()
           ],

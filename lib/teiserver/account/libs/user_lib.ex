@@ -226,7 +226,7 @@ defmodule Teiserver.Account.UserLib do
     false
   """
   @spec allow?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
-  def allow?(user_or_user_id, permissions) when is_integer(user_or_user_id),
+  def allow?(user_or_user_id, permissions) when is_binary(user_or_user_id),
     do: allow?(get_user_by_id(user_or_user_id), permissions)
 
   def allow?(%User{} = user, permissions) do
@@ -254,7 +254,7 @@ defmodule Teiserver.Account.UserLib do
     false
   """
   @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
-  def restricted?(user_or_user_id, permissions) when is_integer(user_or_user_id),
+  def restricted?(user_or_user_id, permissions) when is_binary(user_or_user_id),
     do: restricted?(get_user_by_id(user_or_user_id), permissions)
 
   def restricted?(%User{} = user, permissions) do

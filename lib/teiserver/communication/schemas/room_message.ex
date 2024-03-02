@@ -17,7 +17,7 @@ defmodule Teiserver.Communication.RoomMessage do
     field(:content, :string)
     field(:inserted_at, :utc_datetime)
 
-    belongs_to(:sender, Teiserver.Account.User)
+    belongs_to(:sender, Teiserver.Account.User, type: Ecto.UUID)
     belongs_to(:room, Teiserver.Communication.Room)
   end
 

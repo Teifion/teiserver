@@ -45,7 +45,7 @@ defmodule Teiserver.Communication.MatchMessageLib do
       []
   """
   @spec list_recent_match_messages(Match.id(), non_neg_integer()) :: [MatchMessage.t()]
-  def list_recent_match_messages(match_id, limit \\ 50) when is_integer(match_id) do
+  def list_recent_match_messages(match_id, limit \\ 50) when is_binary(match_id) do
     list_match_messages(where: [match_id: match_id], limit: limit, order_by: ["Newest first"])
   end
 

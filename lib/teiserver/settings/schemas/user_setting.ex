@@ -12,7 +12,7 @@ defmodule Teiserver.Settings.UserSetting do
   use TeiserverMacros, :schema
 
   schema "settings_user_settings" do
-    belongs_to(:user, Teiserver.Account.User)
+    belongs_to(:user, Teiserver.Account.User, type: Ecto.UUID)
     field(:key, :string)
     field(:value, :string)
 

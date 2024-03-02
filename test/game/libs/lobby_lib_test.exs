@@ -11,15 +11,15 @@ defmodule Teiserver.Game.LobbyLibTest do
 
       # The fact it's not got a working userid isn't important, we don't check the DB
       # it just needs to not be nil
-      {:ok, lobby_id1} = Game.start_lobby_server(-1, nil)
-      assert is_integer(lobby_id1)
+      {:ok, lobby_id1} = Game.start_lobby_server(Ecto.UUID.generate(), nil)
+      assert is_binary(lobby_id1)
       assert lobby_id1 > 0
       assert Game.get_lobby(lobby_id1).name == "Lobby ##{lobby_id1}"
 
       {_conn, user} = ConnectionFixtures.client_fixture()
 
       {:ok, lobby_id2} = Game.start_lobby_server(user.id, "Lobby name")
-      assert is_integer(lobby_id2)
+      assert is_binary(lobby_id2)
       assert lobby_id2 > 0
       assert Game.get_lobby(lobby_id2).name == "Lobby name"
 

@@ -38,7 +38,7 @@ defmodule Teiserver.Game.LobbyLib do
 
   """
   @spec get_lobby(Lobby.id()) :: Lobby.t() | nil
-  def get_lobby(id) when is_integer(id) do
+  def get_lobby(id) when is_binary(id) do
     call_lobby(id, :get_lobby_state)
   end
 
@@ -46,7 +46,7 @@ defmodule Teiserver.Game.LobbyLib do
 
   """
   @spec get_lobby_summary(Lobby.id()) :: LobbySummary.t() | nil
-  def get_lobby_summary(id) when is_integer(id) do
+  def get_lobby_summary(id) when is_binary(id) do
     call_lobby(id, :get_lobby_summary)
   end
 
@@ -71,7 +71,15 @@ defmodule Teiserver.Game.LobbyLib do
   """
   @spec list_lobby_ids :: [Lobby.id()]
   def list_lobby_ids() do
-    Registry.select(Teiserver.LobbyRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
+    Horde.Registry.select(Teiserver.LobbyRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
+  end
+
+  @doc """
+
+  """
+  @spec list_local_lobby_ids :: [Lobby.id()]
+  def list_local_lobby_ids() do
+    Registry.select(Teiserver.LocalLobbyRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
   end
 
   @doc """
@@ -106,7 +114,7 @@ defmodule Teiserver.Game.LobbyLib do
       {:error, "Client is not connected"}
   """
   @spec open_lobby(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, String.t()}
-  def open_lobby(host_id, name) when is_integer(host_id) do
+  def open_lobby(host_id, name) when is_binary(host_id) do
     client = Connections.get_client(host_id)
 
     cond do
@@ -146,7 +154,7 @@ defmodule Teiserver.Game.LobbyLib do
       nil
   """
   @spec cycle_lobby(Lobby.id()) :: :ok
-  def cycle_lobby(lobby_id) when is_integer(lobby_id) do
+  def cycle_lobby(lobby_id) when is_binary(lobby_id) do
     host_id = get_lobby_attribute(lobby_id, :host_id)
 
     {:ok, match} = Teiserver.Game.create_match(%{
@@ -172,7 +180,7 @@ defmodule Teiserver.Game.LobbyLib do
       nil
   """
   @spec lobby_start_match(Lobby.id()) :: :ok
-  def lobby_start_match(lobby_id) when is_integer(lobby_id) do
+  def lobby_start_match(lobby_id) when is_binary(lobby_id) do
     cast_lobby(lobby_id, :lobby_start_match)
   end
 
@@ -188,7 +196,7 @@ defmodule Teiserver.Game.LobbyLib do
       nil
   """
   @spec client_update_request(map(), Lobby.id()) :: map()
-  def client_update_request(changes, lobby_id) when is_integer(lobby_id) do
+  def client_update_request(changes, lobby_id) when is_binary(lobby_id) do
     call_lobby(lobby_id, {:client_update_request, changes})
   end
 
@@ -202,7 +210,7 @@ defmodule Teiserver.Game.LobbyLib do
     :ok
   """
   @spec close_lobby(Lobby.id()) :: :ok
-  def close_lobby(lobby_id) when is_integer(lobby_id) do
+  def close_lobby(lobby_id) when is_binary(lobby_id) do
     lobby = get_lobby(lobby_id)
 
     if lobby do
@@ -244,18 +252,15 @@ defmodule Teiserver.Game.LobbyLib do
   @doc false
   @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
   def start_lobby_server(host_id, name) do
-    id = Teiserver.LobbyIdServer.get_next_lobby_id()
+    lobby_id = Ecto.UUID.generate()
 
     {:ok, _pid} =
-      id
+      lobby_id
       |> Lobby.new(host_id, name)
       |> do_start_lobby_server()
 
-    {:ok, id}
+    {:ok, lobby_id}
   end
-
-  @spec set_next_lobby_id(Lobby.id()) :: :ok | {:error, :no_pid}
-  defdelegate set_next_lobby_id(next_id), to: Teiserver.LobbyIdServer
 
   # Process stuff
   @doc false
@@ -273,7 +278,7 @@ defmodule Teiserver.Game.LobbyLib do
   @doc false
   @spec lobby_exists?(Lobby.id()) :: pid() | boolean
   def lobby_exists?(lobby_id) do
-    case Registry.lookup(Teiserver.LobbyRegistry, lobby_id) do
+    case Horde.Registry.lookup(Teiserver.LobbyRegistry, lobby_id) do
       [{_pid, _}] -> true
       _ -> false
     end
@@ -282,7 +287,7 @@ defmodule Teiserver.Game.LobbyLib do
   @doc false
   @spec get_lobby_pid(Lobby.id()) :: pid() | nil
   def get_lobby_pid(lobby_id) do
-    case Registry.lookup(Teiserver.LobbyRegistry, lobby_id) do
+    case Horde.Registry.lookup(Teiserver.LobbyRegistry, lobby_id) do
       [{pid, _}] -> pid
       _ -> nil
     end
@@ -303,7 +308,7 @@ defmodule Teiserver.Game.LobbyLib do
 
   @doc false
   @spec call_lobby(Lobby.id(), any) :: any | nil
-  def call_lobby(lobby_id, message) when is_integer(lobby_id) do
+  def call_lobby(lobby_id, message) when is_binary(lobby_id) do
     case get_lobby_pid(lobby_id) do
       nil ->
         nil

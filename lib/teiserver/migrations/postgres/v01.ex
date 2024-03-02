@@ -12,7 +12,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     execute("CREATE EXTENSION IF NOT EXISTS citext")
 
     # Accounts
-    create_if_not_exists table(:account_users, prefix: prefix) do
+    create_if_not_exists table(:account_users, primary_key: false, prefix: prefix) do
+      add(:id, :uuid, primary_key: true, null: false)
       add(:name, :string)
       add(:email, :string)
       add(:password, :string)
@@ -33,7 +34,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
       add(:shadow_banned?, :boolean, default: false)
 
-      add(:smurf_of_id, references(:account_users, on_delete: :nothing))
+      add(:smurf_of_id, references(:account_users, on_delete: :nothing, type: :uuid))
 
       timestamps()
     end
@@ -42,7 +43,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     create_if_not_exists(unique_index(:account_users, [:email], prefix: prefix))
 
     create_if_not_exists table(:account_extra_user_data, primary_key: false, prefix: prefix) do
-      add(:user_id, references(:account_users, on_delete: :nothing), primary_key: true)
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
       add(:data, :jsonb)
     end
 
@@ -51,7 +52,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:name, :string)
     end
 
-    create_if_not_exists table(:game_matches) do
+    create_if_not_exists table(:game_matches, primary_key: false) do
+      add(:id, :uuid, primary_key: true, null: false)
       add(:name, :string)
       add(:tags, :jsonb)
       add(:public?, :boolean)
@@ -73,15 +75,15 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
       add(:match_duration_seconds, :integer)
 
-      add(:host_id, references(:account_users, on_delete: :nothing))
+      add(:host_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:type_id, references(:game_match_types, on_delete: :nothing))
 
       timestamps()
     end
 
     create_if_not_exists table(:game_match_memberships, primary_key: false) do
-      add(:user_id, references(:account_users, on_delete: :nothing), primary_key: true)
-      add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
       add(:team_number, :integer)
 
       add(:win?, :boolean, default: nil, null: true)
@@ -96,7 +98,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     create_if_not_exists table(:game_match_settings, primary_key: false) do
       add(:type_id, references(:game_match_setting_types, on_delete: :nothing), primary_key: true)
-      add(:match_id, references(:game_matches, on_delete: :nothing), primary_key: true)
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
       add(:value, :string)
     end
 
@@ -110,7 +112,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:content, :text)
       add(:inserted_at, :utc_datetime)
 
-      add(:sender_id, references(:account_users, on_delete: :nothing))
+      add(:sender_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:room_id, references(:communication_rooms, on_delete: :nothing))
     end
 
@@ -120,16 +122,16 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:delivered?, :boolean)
       add(:read?, :boolean)
 
-      add(:from_id, references(:account_users, on_delete: :nothing))
-      add(:to_id, references(:account_users, on_delete: :nothing))
+      add(:from_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
+      add(:to_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
     end
 
     create_if_not_exists table(:communication_match_messages, prefix: prefix) do
       add(:content, :text)
       add(:inserted_at, :utc_datetime)
 
-      add(:sender_id, references(:account_users, on_delete: :nothing))
-      add(:match_id, references(:game_matches, on_delete: :nothing))
+      add(:sender_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), type: :uuid)
     end
 
     # Settings
@@ -143,7 +145,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     create_if_not_exists table(:settings_user_setting_type, prefix: prefix) do
       add(:key, :string)
       add(:value, :string)
-      add(:user_id, references(:account_users, on_delete: :nothing))
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
 
       timestamps()
     end
@@ -151,7 +153,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     create_if_not_exists table(:settings_user_settings, prefix: prefix) do
       add(:key, :string)
       add(:value, :string)
-      add(:user_id, references(:account_users, on_delete: :nothing))
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
 
       timestamps()
     end

@@ -94,7 +94,7 @@ defmodule Teiserver.Game.MatchLib do
 
   """
   @spec end_match(Match.id(), map()) :: Match.t()
-  def end_match(match_id, outcome) when is_integer(match_id) do
+  def end_match(match_id, outcome) when is_binary(match_id) do
     match = get_match!(match_id)
     now = Timex.now()
 

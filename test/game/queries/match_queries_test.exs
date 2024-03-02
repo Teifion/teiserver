@@ -29,8 +29,8 @@ defmodule Teiserver.MatchQueriesTest do
       all_values =
         MatchQueries.match_query(
           where: [
-            id: [1, 2],
-            id: 1,
+            id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
+            id: Ecto.UUID.generate(),
             name: "Some name",
             inserted_after: Timex.now(),
             inserted_before: Timex.now()

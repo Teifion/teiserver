@@ -24,10 +24,9 @@ defmodule Teiserver.Application do
       # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalPartyRegistry]},
 
       # Lobbies
-      # {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
-      # {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
-      # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalLobbyRegistry]},
-      # Teiserver.LobbyIdServer,
+      {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
+      {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalLobbyRegistry]},
 
       # Matchmaking
       # {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.MMSupervisor},

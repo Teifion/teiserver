@@ -190,7 +190,7 @@ defmodule Teiserver.Connections.ClientLib do
   @doc false
   @spec client_exists?(Teiserver.user_id()) :: pid() | boolean
   def client_exists?(user_id) do
-    case Registry.lookup(Teiserver.ClientRegistry, user_id) do
+    case Horde.Registry.lookup(Teiserver.ClientRegistry, user_id) do
       [{_pid, _}] -> true
       _ -> false
     end
@@ -199,7 +199,7 @@ defmodule Teiserver.Connections.ClientLib do
   @doc false
   @spec get_client_pid(Teiserver.user_id()) :: pid() | nil
   def get_client_pid(user_id) do
-    case Registry.lookup(Teiserver.ClientRegistry, user_id) do
+    case Horde.Registry.lookup(Teiserver.ClientRegistry, user_id) do
       [{pid, _}] -> pid
       _ -> nil
     end
@@ -220,7 +220,7 @@ defmodule Teiserver.Connections.ClientLib do
 
   @doc false
   @spec call_client(Teiserver.user_id(), any) :: any | nil
-  def call_client(user_id, message) when is_integer(user_id) do
+  def call_client(user_id, message) when is_binary(user_id) do
     case get_client_pid(user_id) do
       nil ->
         nil
@@ -239,7 +239,7 @@ defmodule Teiserver.Connections.ClientLib do
 
   @doc false
   @spec stop_client_server(Teiserver.user_id()) :: :ok | nil
-  def stop_client_server(user_id) when is_integer(user_id) do
+  def stop_client_server(user_id) when is_binary(user_id) do
     case get_client_pid(user_id) do
       nil ->
         nil

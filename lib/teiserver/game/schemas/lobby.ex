@@ -32,7 +32,7 @@ defmodule Teiserver.Game.Lobby do
 
   use TypedStruct
 
-  @type id :: non_neg_integer()
+  @type id :: Ecto.UUID.t()
   @type name :: String.t()
 
   typedstruct do
@@ -71,7 +71,7 @@ defmodule Teiserver.Game.Lobby do
   end
 
   @spec new(id(), Teiserver.user_id(), name()) :: __MODULE__.t()
-  def new(id, host_id, name) when is_integer(host_id) do
+  def new(id, host_id, name) when is_binary(host_id) do
     %__MODULE__{
       id: id,
       host_id: host_id,

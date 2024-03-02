@@ -16,8 +16,8 @@ defmodule Teiserver.Game.MatchMembership do
 
   @primary_key false
   schema "game_match_memberships" do
-    belongs_to(:user, Teiserver.Account.User, primary_key: true)
-    belongs_to(:match, Teiserver.Game.Match, primary_key: true)
+    belongs_to(:user, Teiserver.Account.User, primary_key: true, type: Ecto.UUID)
+    belongs_to(:match, Teiserver.Game.Match, primary_key: true, type: Ecto.UUID)
 
     field(:team_number, :integer, default: nil)
 

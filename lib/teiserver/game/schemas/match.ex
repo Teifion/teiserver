@@ -27,6 +27,7 @@ defmodule Teiserver.Game.Match do
   """
   use TeiserverMacros, :schema
 
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
   schema "game_matches" do
     field(:name, :string)
     field(:tags, {:array, :string}, default: [])
@@ -54,7 +55,7 @@ defmodule Teiserver.Game.Match do
     field(:match_duration_seconds, :integer)
 
     # Memberships
-    belongs_to(:host, Teiserver.Account.User)
+    belongs_to(:host, Teiserver.Account.User, type: Ecto.UUID)
     belongs_to(:type, Teiserver.Game.MatchType)
     has_many(:members, Teiserver.Game.MatchMembership)
     has_many(:match_settings, Teiserver.Game.MatchSetting)
@@ -68,7 +69,7 @@ defmodule Teiserver.Game.Match do
     timestamps()
   end
 
-  @type id :: non_neg_integer()
+  @type id :: Ecto.UUID.t()
 
   @type t :: %__MODULE__{
           id: id(),

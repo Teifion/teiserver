@@ -21,8 +21,8 @@ defmodule Teiserver.Communication.DirectMessage do
     field(:delivered?, :boolean, default: false)
     field(:read?, :boolean, default: false)
 
-    belongs_to(:from, Teiserver.Account.User)
-    belongs_to(:to, Teiserver.Account.User)
+    belongs_to(:from, Teiserver.Account.User, type: Ecto.UUID)
+    belongs_to(:to, Teiserver.Account.User, type: Ecto.UUID)
   end
 
   @type id :: non_neg_integer()

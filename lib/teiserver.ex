@@ -49,7 +49,7 @@ defmodule Teiserver do
   @type lobby_id :: Teiserver.Game.Lobby.id()
   @type match_id :: Teiserver.Game.Match.id()
   @type queue_id :: non_neg_integer()
-  @type party_id :: String.t()
+  @type party_id :: Ecto.UUID.t()
 
   # Teiserver types
   @type team_number :: non_neg_integer()

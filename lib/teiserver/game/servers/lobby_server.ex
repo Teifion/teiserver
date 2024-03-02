@@ -272,8 +272,14 @@ defmodule Teiserver.Game.LobbyServer do
     :timer.send_interval(@heartbeat_frequency_ms, :heartbeat)
 
     # Update the queue pids cache to point to this process
-    Registry.register(
+    Horde.Registry.register(
       Teiserver.LobbyRegistry,
+      id,
+      id
+    )
+
+    Registry.register(
+      Teiserver.LocalLobbyRegistry,
       id,
       id
     )

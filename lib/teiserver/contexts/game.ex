@@ -46,6 +46,10 @@ defmodule Teiserver.Game do
   defdelegate list_lobby_ids, to: LobbyLib
 
   @doc section: :lobby
+  @spec list_local_lobby_ids() :: [Lobby.id()]
+  defdelegate list_local_lobby_ids, to: LobbyLib
+
+  @doc section: :lobby
   @spec list_lobby_summaries() :: [LobbySummary.t()]
   defdelegate list_lobby_summaries(), to: LobbyLib
 

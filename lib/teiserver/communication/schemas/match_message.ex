@@ -17,8 +17,8 @@ defmodule Teiserver.Communication.MatchMessage do
     field(:content, :string)
     field(:inserted_at, :utc_datetime)
 
-    belongs_to(:sender, Teiserver.Account.User)
-    belongs_to(:match, Teiserver.Game.Match)
+    belongs_to(:sender, Teiserver.Account.User, type: Ecto.UUID)
+    belongs_to(:match, Teiserver.Game.Match, type: Ecto.UUID)
   end
 
   @type id :: non_neg_integer()

@@ -137,14 +137,13 @@ defmodule Teiserver.Account.UserQueries do
     )
   end
 
-  def _where(query, :smurf_of, userid) when is_integer(userid) do
+  def _where(query, :smurf_of, "Smurf"), do: _where(query, :smurf_of, true)
+  def _where(query, :smurf_of, "Non-smurf"), do: _where(query, :smurf_of, false)
+  def _where(query, :smurf_of, userid) when is_binary(userid) do
     from(users in query,
       where: users.smurf_of_id == ^userid
     )
   end
-
-  def _where(query, :smurf_of, "Smurf"), do: _where(query, :smurf_of, true)
-  def _where(query, :smurf_of, "Non-smurf"), do: _where(query, :smurf_of, false)
 
   def _where(query, :smurf_of, true) do
     from(users in query,

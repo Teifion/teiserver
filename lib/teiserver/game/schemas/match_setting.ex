@@ -14,7 +14,7 @@ defmodule Teiserver.Game.MatchSetting do
   @primary_key false
   schema "game_match_settings" do
     belongs_to(:type, Teiserver.Game.MatchSettingType, primary_key: true)
-    belongs_to(:match, Teiserver.Game.Match, primary_key: true)
+    belongs_to(:match, Teiserver.Game.Match, primary_key: true, type: Ecto.UUID)
 
     field(:value, :string)
   end
