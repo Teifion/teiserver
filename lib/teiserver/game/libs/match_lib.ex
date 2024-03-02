@@ -19,47 +19,53 @@ defmodule Teiserver.Game.MatchLib do
 
     clients = Connections.get_client_list(lobby.members)
 
-    teams = clients
+    teams =
+      clients
       |> Enum.group_by(fn c -> c.team_number end)
 
-    team_count = teams
-      |> Map.keys
-      |> Enum.count
+    team_count =
+      teams
+      |> Map.keys()
+      |> Enum.count()
 
-    team_size = teams
+    team_size =
+      teams
       |> Enum.map(fn {_, team_members} -> Enum.count(team_members) end)
-      |> Enum.max
+      |> Enum.max()
 
-    {:ok, match} = match_id
-    |> get_match!()
-    |> update_match(%{
-      name: lobby.name,
-      tags: lobby.tags,
-      public?: lobby.public?,
-      rated?: lobby.rated?,
-      game_name: lobby.game_name,
-      game_version: lobby.game_version,
-      team_count: team_count,
-      team_size: team_size,
-      map_name: lobby.map_name,
-      match_started_at: Timex.now(),
-      type_id: type_id
-    })
+    {:ok, match} =
+      match_id
+      |> get_match!()
+      |> update_match(%{
+        name: lobby.name,
+        tags: lobby.tags,
+        public?: lobby.public?,
+        rated?: lobby.rated?,
+        game_name: lobby.game_name,
+        game_version: lobby.game_version,
+        team_count: team_count,
+        team_size: team_size,
+        map_name: lobby.map_name,
+        match_started_at: Timex.now(),
+        type_id: type_id
+      })
 
     # Do members
-    {:ok, _memberships} = clients
-    |> Enum.map(fn client ->
-      %{
-        user_id: client.id,
-        match_id: match.id,
-        team_number: client.team_number,
-        party_id: client.party_id
-      }
-    end)
-    |> Game.create_many_match_memberships()
+    {:ok, _memberships} =
+      clients
+      |> Enum.map(fn client ->
+        %{
+          user_id: client.id,
+          match_id: match.id,
+          team_number: client.team_number,
+          party_id: client.party_id
+        }
+      end)
+      |> Game.create_many_match_memberships()
 
     # Do settings
-    {:ok, _settings} = lobby.game_settings
+    {:ok, _settings} =
+      lobby.game_settings
       |> Enum.map(fn {key, value} ->
         type_id = Game.get_or_create_match_setting_type(key)
         %{type_id: type_id, match_id: match.id, value: value}
@@ -100,31 +106,31 @@ defmodule Teiserver.Game.MatchLib do
 
     duration_seconds = Timex.diff(match.match_started_at, now, :second)
 
-    {:ok, updated_match} = update_match(match, %{
-      winning_team: outcome.winning_team,
-      ended_normally?: outcome.ended_normally?,
-      match_ended_at: now,
-      match_duration_seconds: duration_seconds,
-    })
+    {:ok, updated_match} =
+      update_match(match, %{
+        winning_team: outcome.winning_team,
+        ended_normally?: outcome.ended_normally?,
+        match_ended_at: now,
+        match_duration_seconds: duration_seconds
+      })
 
     Game.list_match_memberships(where: [match_id: match.id])
-      |> Enum.each(fn mm ->
-        player_outcome = outcome.players[mm.user_id]
+    |> Enum.each(fn mm ->
+      player_outcome = outcome.players[mm.user_id]
 
-        win? = mm.team_number == outcome.winning_team
+      win? = mm.team_number == outcome.winning_team
 
-        attrs = %{
-          win?: win?,
-          left_after_seconds: Map.get(player_outcome, :left_after_seconds)
-        }
+      attrs = %{
+        win?: win?,
+        left_after_seconds: Map.get(player_outcome, :left_after_seconds)
+      }
 
-        Game.update_match_membership(mm, attrs)
-      end)
+      Game.update_match_membership(mm, attrs)
+    end)
 
     # Finally return the updated match
     updated_match
   end
-
 
   @doc """
   Returns the list of matches.

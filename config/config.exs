@@ -18,6 +18,9 @@ config :teiserver, Teiserver.Test.Repo,
 config :teiserver,
   # Overridden by application
   client_destroy_timeout_seconds: 300,
+  lobby_join_method: :simple,
+  teiserver_clustering: true,
+  teiserver_clustering_post_join_functions: [],
 
   # Used for tests
   ecto_repos: [Teiserver.Test.Repo]

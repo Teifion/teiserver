@@ -20,6 +20,12 @@ The process for which players are able to join lobbies, can be set to `:simple` 
 
 `:host_approval` means all requests to join lobbies are first approved by Teiserver but then approved by the host client. This means you will need to implement the relevant messaging and handling for clients hosting lobbies to be able to approve join requests.
 
+## `teiserver_clustering` - Default: true
+When enabled Teiserver will attempt to handle the clustering of nodes using a database table. Turning it off will mean this behaves like any other application and you can either not cluster it or use things like `libcluster` as you desire. See `Teiserver.System.ClusterManager` for more details.
+
+## `teiserver_clustering_post_join_functions` - Default: []
+When teiserver_clustering is enabled, this will be a list of functions called by the genserver handling the join once it has joined the cluster. See `Teiserver.System.ClusterManager` for more details.
+
 # Overrides
 Teiserver implements some defaults you may want to overwrite.
 
@@ -35,8 +41,8 @@ Allows you to overwrite `Teiserver.Account.User.default_calculate_user_permissio
 config :teiserver,
   repo: HelloWorldServer.Repo,
   client_destroy_timeout_seconds: 300,
-  
   lobby_join_method: :simple,
+  teiserver_clustering: true,
   
   # Overrides
   fn_calculate_match_type: &HelloWorldServer.Game.calculate_match_type/1,

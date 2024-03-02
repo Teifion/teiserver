@@ -97,7 +97,7 @@ defmodule Teiserver.Game.MatchSettingQueries do
 
   defp do_preload(query, preloads) do
     preloads
-    |> List.wrap
+    |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
       _preload(query_acc, key)
     end)
@@ -105,14 +105,16 @@ defmodule Teiserver.Game.MatchSettingQueries do
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
   def _preload(query, :type) do
-    from match_settings in query,
+    from(match_settings in query,
       left_join: types in assoc(match_settings, :type),
       preload: [type: types]
+    )
   end
 
   def _preload(query, :match) do
-    from match_settings in query,
+    from(match_settings in query,
       left_join: matches in assoc(match_settings, :match),
       preload: [match: matches]
+    )
   end
 end

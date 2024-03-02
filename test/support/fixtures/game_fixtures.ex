@@ -14,30 +14,25 @@ defmodule Teiserver.GameFixtures do
       id: data["id"] || r,
       match_id: data["match_id"] || unstarted_match_fixture().id,
       match_ongoing?: data["match_ongoing?"] || false,
-
       host_id: data["host_id"] || user_fixture().id,
       host_data: data["host_data"] || %{},
-
       name: data["name"] || "lobby_#{r}",
       tags: data["tags"] || ["tag1", "tag2"],
       password: data["password"] || nil,
       locked?: data["locked?"] || false,
       public?: data["public?"] || true,
       match_type: data["match_type"] || match_type_fixture().id,
-
       rated?: data["rated"] || true,
       queue_id: data["queue_id"] || nil,
-
       game_name: data["game_name"] || "game_name_#{r}",
       game_version: data["game_version"] || "game_version_#{r}",
 
       # Game stuff
       game_settings: data["game_settings"] || %{},
       map_name: data["map_name"] || "map_name_#{r}",
-
       players: data["players"] || [],
       spectators: data["spectators"] || [],
-      members: data["members"] || ((data["players"] || []) ++ (data["spectators"] || []))
+      members: data["members"] || (data["players"] || []) ++ (data["spectators"] || [])
     }
   end
 

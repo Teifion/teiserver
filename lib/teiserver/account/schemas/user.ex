@@ -27,7 +27,9 @@ defmodule Teiserver.Account.User do
 
   @foreign_key_type Ecto.UUID
 
-  @derive {Jason.Encoder, only: ~w(name email groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id inserted_at updated_at)a}
+  @derive {Jason.Encoder,
+           only:
+             ~w(name email groups permissions behaviour_score trust_score social_score last_login_at last_played_at last_logout_at restrictions restricted_until shadow_banned? smurf_of_id inserted_at updated_at)a}
   @primary_key {:id, Ecto.UUID, autogenerate: true}
   schema "account_users" do
     field(:name, :string)

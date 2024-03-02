@@ -130,14 +130,13 @@ defmodule Teiserver.Game.LobbyLib do
       # All checks are good, lets try to create the lobby!
       true ->
         with {:ok, lobby_id} <- start_lobby_server(host_id, name),
-          :ok <- cycle_lobby(lobby_id),
-          _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby_id, lobby_host?: true})
-          do
-            {:ok, lobby_id}
-          else
-            :failure1 -> :fail_result1
-            :failure2 -> :fail_result2
-            :failure3 -> :fail_result3
+             :ok <- cycle_lobby(lobby_id),
+             _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby_id, lobby_host?: true}) do
+          {:ok, lobby_id}
+        else
+          :failure1 -> :fail_result1
+          :failure2 -> :fail_result2
+          :failure3 -> :fail_result3
         end
     end
   end
@@ -157,13 +156,14 @@ defmodule Teiserver.Game.LobbyLib do
   def cycle_lobby(lobby_id) when is_binary(lobby_id) do
     host_id = get_lobby_attribute(lobby_id, :host_id)
 
-    {:ok, match} = Teiserver.Game.create_match(%{
-      public?: true,
-      rated?: true,
-      host_id: host_id,
-      processed?: false,
-      lobby_opened_at: Timex.now()
-    })
+    {:ok, match} =
+      Teiserver.Game.create_match(%{
+        public?: true,
+        rated?: true,
+        host_id: host_id,
+        processed?: false,
+        lobby_opened_at: Timex.now()
+      })
 
     cast_lobby(lobby_id, {:cycle_lobby, match.id})
   end

@@ -162,7 +162,12 @@ defmodule Teiserver.Communication do
   defdelegate change_direct_message(direct_message, attrs \\ %{}), to: DirectMessageLib
 
   @doc section: :direct_message
-  @spec send_direct_message(from_id :: Teiserver.user_id(), to_id :: Teiserver.user_id(), content :: String.t(), attrs :: map()) ::
+  @spec send_direct_message(
+          from_id :: Teiserver.user_id(),
+          to_id :: Teiserver.user_id(),
+          content :: String.t(),
+          attrs :: map()
+        ) ::
           {:ok, DirectMessage.t()} | {:error, Ecto.Changeset.t()}
   defdelegate send_direct_message(from_id, to_id, content, attrs \\ %{}), to: DirectMessageLib
 

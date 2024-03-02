@@ -158,8 +158,8 @@ defmodule Teiserver.MixProject do
       "Direct messages": &(&1[:section] == :direct_message),
 
       # Game
-      "Lobby": &(&1[:section] == :lobby),
-      "Match": &(&1[:section] == :match),
+      Lobby: &(&1[:section] == :lobby),
+      Match: &(&1[:section] == :match),
       "Match Type": &(&1[:section] == :match_type),
       "Match Setting": &(&1[:section] == :match_setting),
       "Match Setting Type": &(&1[:section] == :match_setting_type),
@@ -242,7 +242,6 @@ defmodule Teiserver.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:floki, ">= 0.34.0", only: :test},
       {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
-
       {:horde, "~> 0.9"}
     ]
   end

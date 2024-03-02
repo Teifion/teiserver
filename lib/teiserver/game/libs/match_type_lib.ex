@@ -10,12 +10,13 @@ defmodule Teiserver.Game.MatchTypeLib do
   """
   @spec calculate_match_type(Lobby.t()) :: MatchType.id()
   def calculate_match_type(%Lobby{} = lobby) do
-    name = if Application.get_env(:teiserver, :fn_calculate_match_type) do
-      f = Application.get_env(:teiserver, :fn_calculate_match_type)
-      f.(lobby)
-    else
-      default_calculate_match_type(lobby)
-    end
+    name =
+      if Application.get_env(:teiserver, :fn_calculate_match_type) do
+        f = Application.get_env(:teiserver, :fn_calculate_match_type)
+        f.(lobby)
+      else
+        default_calculate_match_type(lobby)
+      end
 
     get_or_create_match_type(name)
   end
@@ -179,7 +180,8 @@ defmodule Teiserver.Game.MatchTypeLib do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_match_type(MatchType.t(), map) :: {:ok, MatchType.t()} | {:error, Ecto.Changeset.t()}
+  @spec update_match_type(MatchType.t(), map) ::
+          {:ok, MatchType.t()} | {:error, Ecto.Changeset.t()}
   def update_match_type(%MatchType{} = match_type, attrs) do
     match_type
     |> MatchType.changeset(attrs)

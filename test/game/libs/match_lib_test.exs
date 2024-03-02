@@ -137,8 +137,11 @@ defmodule Teiserver.MatchLibAsyncTest do
 
       # Update the clients by making them players and putting them on teams
       Connections.update_client_in_lobby(u1.id, %{player_number: 1, team_number: 1, player?: true})
+
       Connections.update_client_in_lobby(u2.id, %{player_number: 2, team_number: 1, player?: true})
+
       Connections.update_client_in_lobby(u3.id, %{player_number: 3, team_number: 2, player?: true})
+
       Connections.update_client_in_lobby(u4.id, %{player_number: 4, team_number: 2, player?: true})
 
       # Give the lobby time to read and update
@@ -189,7 +192,7 @@ defmodule Teiserver.MatchLibAsyncTest do
           u1.id => %{},
           u2.id => %{},
           u3.id => %{left_after_seconds: 1},
-          u4.id => %{},
+          u4.id => %{}
         }
       }
 
@@ -199,8 +202,13 @@ defmodule Teiserver.MatchLibAsyncTest do
       # Now check memberships
       memberships = Game.list_match_memberships(where: [match_id: match.id])
 
-      assert Enum.all?(memberships, fn mm -> mm.win? == (if mm.team_number == 1, do: true, else: false) end)
-      assert Enum.all?(memberships, fn mm -> mm.left_after_seconds == (if mm.user_id == u3.id, do: 1, else: nil) end)
+      assert Enum.all?(memberships, fn mm ->
+               mm.win? == if mm.team_number == 1, do: true, else: false
+             end)
+
+      assert Enum.all?(memberships, fn mm ->
+               mm.left_after_seconds == if mm.user_id == u3.id, do: 1, else: nil
+             end)
 
       membership_ids = memberships |> Enum.map(fn mm -> mm.user_id end)
       assert Enum.sort(membership_ids) == Enum.sort([u1.id, u2.id, u3.id, u4.id])

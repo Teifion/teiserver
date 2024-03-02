@@ -207,7 +207,6 @@ defmodule Teiserver.MatchMessageLibTest do
       {:error, changeset} = Communication.send_match_message(nil, match.id, "Test second message")
       assert %Ecto.Changeset{valid?: false} = changeset
 
-
       # Unsub
       TestConn.run(conn1, fn -> Communication.unsubscribe_from_match_messages(match.id) end)
       TestConn.run(conn2, fn -> Communication.unsubscribe_from_match_messages(match.id) end)

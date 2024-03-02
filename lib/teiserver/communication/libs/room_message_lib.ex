@@ -5,8 +5,6 @@ defmodule Teiserver.Communication.RoomMessageLib do
   use TeiserverMacros, :library
   alias Teiserver.Communication.{Room, RoomMessage, RoomMessageQueries}
 
-
-
   @doc false
   @spec room_messaging_topic(Room.id() | Room.t()) :: String.t()
   def room_messaging_topic(%Room{id: room_id}), do: "Teiserver.Communication.Room.#{room_id}"
@@ -26,7 +24,7 @@ defmodule Teiserver.Communication.RoomMessageLib do
   Removes your process from a room's messages
   """
   @spec unsubscribe_from_room_messages(Room.id() | Room.t()) :: :ok
-  def unsubscribe_from_room_messages(room_or_room_id)  do
+  def unsubscribe_from_room_messages(room_or_room_id) do
     room_or_room_id
     |> room_messaging_topic()
     |> Teiserver.unsubscribe()

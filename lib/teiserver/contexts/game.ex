@@ -93,17 +93,17 @@ defmodule Teiserver.Game do
   @spec lobby_exists?(Lobby.id()) :: pid() | boolean
   defdelegate lobby_exists?(lobby_id), to: LobbyLib
 
-#   @doc false
-#   @spec get_lobby_pid(Lobby.id()) :: pid() | nil
-#   defdelegate get_lobby_pid(lobby_id), to: LobbyLib
+  #   @doc false
+  #   @spec get_lobby_pid(Lobby.id()) :: pid() | nil
+  #   defdelegate get_lobby_pid(lobby_id), to: LobbyLib
 
-#   @doc false
-#   @spec cast_lobby(Lobby.id(), any) :: any | nil
-#   defdelegate cast_lobby(lobby_id, message), to: LobbyLib
+  #   @doc false
+  #   @spec cast_lobby(Lobby.id(), any) :: any | nil
+  #   defdelegate cast_lobby(lobby_id, message), to: LobbyLib
 
-#   @doc false
-#   @spec call_lobby(Lobby.id(), any) :: any | nil
-#   defdelegate call_lobby(lobby_id, message), to: LobbyLib
+  #   @doc false
+  #   @spec call_lobby(Lobby.id(), any) :: any | nil
+  #   defdelegate call_lobby(lobby_id, message), to: LobbyLib
 
   @doc false
   @spec stop_lobby_server(Lobby.id()) :: :ok | nil
@@ -352,7 +352,6 @@ defmodule Teiserver.Game do
   @spec change_match_setting(MatchSetting.t()) :: Ecto.Changeset.t()
   @spec change_match_setting(MatchSetting.t(), map) :: Ecto.Changeset.t()
   defdelegate change_match_setting(match_setting, attrs \\ %{}), to: MatchSettingLib
-
 
   # Match results/stats/extra data
   # Game data file stuff (e.g. unit data if added by devs)

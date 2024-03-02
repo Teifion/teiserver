@@ -93,6 +93,5 @@ defmodule Teiserver.RoomLibTest do
 
       assert Communication.get_or_create_room("MyMadeUpRoomName") == new_room
     end
-
   end
 end

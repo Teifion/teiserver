@@ -40,7 +40,6 @@ defmodule Teiserver.Game.LobbyLibTest do
     end
 
     test "open_lobby" do
-
     end
 
     test "list_lobby_summaries" do

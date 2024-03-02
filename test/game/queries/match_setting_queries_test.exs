@@ -38,7 +38,7 @@ defmodule Teiserver.MatchSettingQueriesTest do
           ],
           order_by: [
             "Value (A-Z)",
-            "Value (Z-A)",
+            "Value (Z-A)"
           ],
           preload: [
             :match,

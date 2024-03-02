@@ -50,7 +50,7 @@ defmodule Teiserver.Game.LobbyServer do
   end
 
   def handle_call(msg, _from, state) do
-    raise "err: #{inspect msg}"
+    raise "err: #{inspect(msg)}"
     {:reply, nil, state}
   end
 
@@ -73,19 +73,21 @@ defmodule Teiserver.Game.LobbyServer do
     match_topic = nil
     # match_topic = Game.match_topic(match.id)
 
-    new_state = update_lobby(state, %{
-      match_id: match_id,
-      match_ongoing?: false,
-      match_type: nil
-    })
+    new_state =
+      update_lobby(state, %{
+        match_id: match_id,
+        match_ongoing?: false,
+        match_type: nil
+      })
 
     {:noreply, %{new_state | match_id: match_id, match_topic: match_topic}}
   end
 
   def handle_cast(:lobby_start_match, state) do
-    new_state = update_lobby(state, %{
-      match_ongoing?: true
-    })
+    new_state =
+      update_lobby(state, %{
+        match_ongoing?: true
+      })
 
     {:noreply, new_state}
   end
@@ -115,26 +117,32 @@ defmodule Teiserver.Game.LobbyServer do
     {:noreply, state}
   end
 
-  def handle_info(%{topic: "Teiserver.Connections.Client" <> _, event: :client_updated} = msg, state) do
+  def handle_info(
+        %{topic: "Teiserver.Connections.Client" <> _, event: :client_updated} = msg,
+        state
+      ) do
     client = msg.client
     user_id = client.id
     lobby = state.lobby
 
     # Are they now a player?
-    changes = cond do
-      client.player? && Enum.member?(lobby.spectators, user_id) ->
-        %{
-          spectators: List.delete(lobby.spectators, user_id),
-          players: [user_id | lobby.players]
-        }
-      not client.player? && Enum.member?(lobby.players, user_id) ->
-        %{
-          players: List.delete(lobby.players, user_id),
-          spectators: [user_id | lobby.players]
-        }
-      true ->
-        %{}
-    end
+    changes =
+      cond do
+        client.player? && Enum.member?(lobby.spectators, user_id) ->
+          %{
+            spectators: List.delete(lobby.spectators, user_id),
+            players: [user_id | lobby.players]
+          }
+
+        not client.player? && Enum.member?(lobby.players, user_id) ->
+          %{
+            players: List.delete(lobby.players, user_id),
+            spectators: [user_id | lobby.players]
+          }
+
+        true ->
+          %{}
+      end
 
     if changes == %{} do
       {:noreply, state}
@@ -221,6 +229,7 @@ defmodule Teiserver.Game.LobbyServer do
     })
 
     client = ClientLib.get_client(user_id)
+
     Teiserver.broadcast(
       state.lobby_topic,
       %{
@@ -230,6 +239,7 @@ defmodule Teiserver.Game.LobbyServer do
     )
 
     Connections.subscribe_to_client(user_id)
+
     update_lobby(state, %{
       members: [user_id | state.lobby.members],
       spectators: [user_id | state.lobby.spectators]
@@ -239,6 +249,7 @@ defmodule Teiserver.Game.LobbyServer do
   @spec do_remove_client(Teiserver.user_id(), State.t()) :: State.t()
   defp do_remove_client(user_id, state) do
     Connections.unsubscribe_from_client(user_id)
+
     ClientLib.update_client_full(user_id, %{
       lobby_id: nil,
       ready?: false,

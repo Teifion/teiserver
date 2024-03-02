@@ -104,11 +104,12 @@ defmodule Teiserver.Game.MatchSettingTypeLib do
   def get_or_create_match_setting_type(name) do
     name = String.trim(name)
 
-    query = MatchSettingTypeQueries.match_setting_type_query(
-      where: [name: name],
-      select: [:id],
-      order_by: ["Name (A-Z)"]
-    )
+    query =
+      MatchSettingTypeQueries.match_setting_type_query(
+        where: [name: name],
+        select: [:id],
+        order_by: ["Name (A-Z)"]
+      )
 
     case Repo.all(query) do
       [] ->

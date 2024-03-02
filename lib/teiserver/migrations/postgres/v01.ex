@@ -4,12 +4,21 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
   use Ecto.Migration
 
+  @spec up(map) :: any
   def up(%{create_schema: create?, prefix: prefix} = opts) do
     %{escaped_prefix: _escaped, quoted_prefix: quoted} = opts
 
     if create?, do: execute("CREATE SCHEMA IF NOT EXISTS #{quoted};")
 
     execute("CREATE EXTENSION IF NOT EXISTS citext")
+
+    # Clustering
+    create table(:teiserver_cluster_members, primary_key: false, prefix: prefix) do
+      add(:id, :uuid, primary_key: true, null: false)
+      add(:host, :string, null: false)
+
+      timestamps()
+    end
 
     # Accounts
     create_if_not_exists table(:account_users, primary_key: false, prefix: prefix) do
@@ -43,7 +52,11 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     create_if_not_exists(unique_index(:account_users, [:email], prefix: prefix))
 
     create_if_not_exists table(:account_extra_user_data, primary_key: false, prefix: prefix) do
-      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
       add(:data, :jsonb)
     end
 
@@ -82,8 +95,16 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     end
 
     create_if_not_exists table(:game_match_memberships, primary_key: false) do
-      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
-      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
       add(:team_number, :integer)
 
       add(:win?, :boolean, default: nil, null: true)
@@ -98,7 +119,12 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     create_if_not_exists table(:game_match_settings, primary_key: false) do
       add(:type_id, references(:game_match_setting_types, on_delete: :nothing), primary_key: true)
-      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), primary_key: true, type: :uuid)
+
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
       add(:value, :string)
     end
 
@@ -183,6 +209,9 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     # Accounts
     drop_if_exists(table(:account_extra_user_data, prefix: prefix))
     drop_if_exists(table(:account_users, prefix: prefix))
+
+    # System
+    drop_if_exists(table(:teiserver_cluster_members, prefix: prefix))
 
     execute("DROP EXTENSION IF EXISTS citext")
   end

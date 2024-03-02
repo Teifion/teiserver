@@ -116,7 +116,7 @@ defmodule Teiserver.Game.MatchMembershipQueries do
 
   defp do_preload(query, preloads) do
     preloads
-    |> List.wrap
+    |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
       _preload(query_acc, key)
     end)
@@ -124,14 +124,16 @@ defmodule Teiserver.Game.MatchMembershipQueries do
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
   def _preload(query, :user) do
-    from match_membership in query,
+    from(match_membership in query,
       left_join: users in assoc(match_membership, :user),
       preload: [user: users]
+    )
   end
 
   def _preload(query, :match) do
-    from match_membership in query,
+    from(match_membership in query,
       left_join: matches in assoc(match_membership, :match),
       preload: [match: matches]
+    )
   end
 end

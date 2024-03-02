@@ -35,7 +35,7 @@ defmodule Teiserver.DirectMessageQueriesTest do
             from_id: Ecto.UUID.generate(),
             to_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
             to_id: Ecto.UUID.generate(),
-            to_or_from_id: [Ecto.UUID.generate(),Ecto.UUID.generate()],
+            to_or_from_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
             to_or_from_id: Ecto.UUID.generate(),
             inserted_after: Timex.now(),
             inserted_before: Timex.now()

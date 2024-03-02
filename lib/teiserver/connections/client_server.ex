@@ -62,7 +62,8 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   def handle_cast({:update_client_in_lobby, partial_client}, state) do
-    partial_client = partial_client
+    partial_client =
+      partial_client
       |> Map.take(@lobby_data_keys)
       |> Map.put(:id, state.user_id)
       |> LobbyLib.client_update_request(state.client.lobby_id)
