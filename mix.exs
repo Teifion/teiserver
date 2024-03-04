@@ -231,18 +231,14 @@ defmodule Teiserver.MixProject do
       {:argon2_elixir, "~> 3.0"},
       {:timex, "~> 3.7.5"},
       {:typedstruct, "~> 0.5.2", runtime: false},
-
-      # Libs I expect to use
-      # {:ex_ulid, "~> 0.1.0"},
-      # {:csv, "~> 2.4"},
+      {:horde, "~> 0.9"},
 
       # Dev and Test stuff
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:excoveralls, "~> 0.15.3", only: :test, runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:floki, ">= 0.34.0", only: :test},
-      {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
-      {:horde, "~> 0.9"}
+      {:dialyxir, "~> 1.1", only: [:dev], runtime: false}
     ]
   end
 
