@@ -123,7 +123,7 @@ defmodule Teiserver.Account.UserLib do
   end
 
   @doc """
-  Creates a user.
+  Creates a user with no checks, use this for system users or automated processes; for user registration make use of `register_user/1`.
 
   ## Examples
 
@@ -137,6 +137,24 @@ defmodule Teiserver.Account.UserLib do
   @spec create_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def create_user(attrs \\ %{}) do
     User.changeset(%User{}, attrs, :full)
+    |> Teiserver.Repo.insert()
+  end
+
+  @doc """
+  Creates a user specifically via the registration changeset, you should use this for user-registration and `create_user/1` for system accounts or automated processes.
+
+  ## Examples
+
+      iex> register_user(%{field: value})
+      {:ok, %User{}}
+
+      iex> register_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec register_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def register_user(attrs \\ %{}) do
+    User.changeset(%User{}, attrs, :register)
     |> Teiserver.Repo.insert()
   end
 
@@ -265,4 +283,22 @@ defmodule Teiserver.Account.UserLib do
   end
 
   def restricted?(_not_a_user, _), do: true
+
+  @doc """
+  Tests is the user name is acceptable. Can be over-ridden using the config [fn_user_name_acceptor](config.html#fn_user_name_acceptor)
+  """
+  @spec user_name_acceptable?(String.t()) :: boolean
+  def user_name_acceptable?(name) do
+    if Application.get_env(:teiserver, :fn_user_name_acceptor) do
+      f = Application.get_env(:teiserver, :fn_user_name_acceptor)
+      f.(name)
+    else
+      default_user_name_acceptable?(name)
+    end
+  end
+
+  @spec default_user_name_acceptable?(String.t()) :: boolean
+  def default_user_name_acceptable?(_name) do
+    true
+  end
 end

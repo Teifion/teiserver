@@ -22,6 +22,11 @@ config :teiserver,
   teiserver_clustering: true,
   teiserver_clustering_post_join_functions: [],
 
+  # User defaults
+  default_behaviour_score: 10_000,
+  default_trust_score: 10_000,
+  default_social_score: 10_000,
+
   # Used for tests
   ecto_repos: [Teiserver.Test.Repo]
 

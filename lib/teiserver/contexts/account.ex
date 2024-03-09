@@ -51,6 +51,10 @@ defmodule Teiserver.Account do
   defdelegate create_user(attrs \\ %{}), to: UserLib
 
   @doc section: :user
+  @spec register_user(map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate register_user(attrs \\ %{}), to: UserLib
+
+  @doc section: :user
   @spec update_user(User, map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   defdelegate update_user(user, attrs), to: UserLib
 
@@ -77,6 +81,10 @@ defmodule Teiserver.Account do
   @doc section: :user
   @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
   defdelegate restricted?(user_or_user_id, permission_or_permissions), to: UserLib
+
+  @doc section: :user
+  @spec user_name_acceptable?(String.t()) :: boolean
+  defdelegate user_name_acceptable?(name), to: UserLib
 
   # Relationships
   # Friends

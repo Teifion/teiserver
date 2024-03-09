@@ -91,7 +91,7 @@ defmodule Teiserver.Account.User do
   def changeset(user, attrs, :full) do
     attrs =
       attrs
-      |> SchemaHelper.trim_strings([:email])
+      |> SchemaHelper.trim_strings(~w(name email)a)
       |> SchemaHelper.uniq_lists(~w(groups)a)
 
     # If password isn't included we won't be doing anything with it
@@ -115,6 +115,33 @@ defmodule Teiserver.Account.User do
       |> unique_constraint(:email)
       |> put_password_hash()
     end
+  end
+
+  @doc false
+  def changeset(user, %{"password" => _} = attrs, :register) do
+    attrs =
+      attrs
+      |> Map.merge(%{
+        "behaviour_score" => Application.get_env(:teiserver, :default_behaviour_score),
+        "trust_score" => Application.get_env(:teiserver, :default_trust_score),
+        "social_score" => Application.get_env(:teiserver, :default_social_score)
+      })
+      |> SchemaHelper.trim_strings(~w(name email)a)
+      |> SchemaHelper.uniq_lists(~w(groups)a)
+
+    user
+    |> cast(
+      attrs,
+      ~w(name email password groups behaviour_score trust_score social_score restrictions restricted_until)a
+    )
+    |> calculate_user_permissions
+    |> validate_required(~w(name email password permissions)a)
+    |> unique_constraint(:email)
+    |> put_password_hash()
+  end
+
+  def changeset(_user, _attrs, :register) do
+    raise "Cannot perform a registration changeset without a password present"
   end
 
   def changeset(struct, permissions, :permissions) do

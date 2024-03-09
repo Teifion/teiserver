@@ -127,12 +127,18 @@ defmodule Teiserver.Game.LobbyLib do
       client.lobby_id != nil ->
         {:error, "Already in a lobby"}
 
+      name == nil ->
+        {:error, "No name supplied"}
+
+      String.trim(name) == "" ->
+        {:error, "No name supplied"}
+
       # All checks are good, lets try to create the lobby!
       true ->
-        with {:ok, lobby_id} <- start_lobby_server(host_id, name),
-             :ok <- cycle_lobby(lobby_id),
-             _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby_id, lobby_host?: true}) do
-          {:ok, lobby_id}
+        with {:ok, lobby} <- start_lobby_server(host_id, name),
+             :ok <- cycle_lobby(lobby.id),
+             _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby.id, lobby_host?: true}) do
+          {:ok, lobby.id}
         else
           :failure1 -> :fail_result1
           :failure2 -> :fail_result2
@@ -250,16 +256,15 @@ defmodule Teiserver.Game.LobbyLib do
   end
 
   @doc false
-  @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
+  @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.t()}
   def start_lobby_server(host_id, name) do
-    lobby_id = Ecto.UUID.generate()
+    lobby = Lobby.new(host_id, name)
 
     {:ok, _pid} =
-      lobby_id
-      |> Lobby.new(host_id, name)
+      lobby
       |> do_start_lobby_server()
 
-    {:ok, lobby_id}
+    {:ok, lobby}
   end
 
   # Process stuff
@@ -346,5 +351,23 @@ defmodule Teiserver.Game.LobbyLib do
         DynamicSupervisor.terminate_child(Teiserver.LobbySupervisor, p)
         :ok
     end
+  end
+
+  @doc """
+  Tests is the lobby name is acceptable. Can be over-ridden using the config [fn_lobby_name_acceptor](config.html#fn_lobby_name_acceptor)
+  """
+  @spec lobby_name_acceptable?(String.t()) :: boolean
+  def lobby_name_acceptable?(name) do
+    if Application.get_env(:teiserver, :fn_lobby_name_acceptor) do
+      f = Application.get_env(:teiserver, :fn_lobby_name_acceptor)
+      f.(name)
+    else
+      default_lobby_name_acceptable?(name)
+    end
+  end
+
+  @spec default_lobby_name_acceptable?(String.t()) :: boolean
+  def default_lobby_name_acceptable?(_name) do
+    true
   end
 end

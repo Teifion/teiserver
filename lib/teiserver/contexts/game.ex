@@ -85,6 +85,10 @@ defmodule Teiserver.Game do
   @spec remove_client_from_lobby(Teiserver.user_id(), Lobby.id()) :: :ok | nil
   defdelegate remove_client_from_lobby(user_id, lobby_id), to: LobbyLib
 
+  @doc section: :lobby
+  @spec lobby_name_acceptable?(String.t()) :: boolean
+  defdelegate lobby_name_acceptable?(name), to: LobbyLib
+
   @doc false
   @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
   defdelegate start_lobby_server(host_id, name), to: LobbyLib

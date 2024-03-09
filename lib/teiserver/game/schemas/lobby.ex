@@ -70,12 +70,12 @@ defmodule Teiserver.Game.Lobby do
     field(:members, [Teiserver.user_id()], default: [])
   end
 
-  @spec new(id(), Teiserver.user_id(), name()) :: __MODULE__.t()
-  def new(id, host_id, name) when is_binary(host_id) do
+  @spec new(Teiserver.user_id(), name()) :: __MODULE__.t()
+  def new(host_id, name) when is_binary(host_id) do
     %__MODULE__{
-      id: id,
+      id: Ecto.UUID.generate(),
       host_id: host_id,
-      name: name || "Lobby ##{id}"
+      name: name
     }
   end
 end

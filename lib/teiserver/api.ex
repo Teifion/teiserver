@@ -8,6 +8,8 @@ defmodule Teiserver.Api do
   alias Teiserver.{Account, Communication, Connections}
   alias Account.UserLib
 
+  alias Connections.ClientLib
+
   alias Communication.{
     Room,
     RoomLib,
@@ -90,7 +92,7 @@ defmodule Teiserver.Api do
   @spec register_user(String.t(), String.t(), String.t()) ::
           {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_user(name, email, password) do
-    Teiserver.Account.create_user(%{
+    Teiserver.Account.register_user(%{
       "name" => name,
       "password" => password,
       "email" => email
@@ -105,6 +107,12 @@ defmodule Teiserver.Api do
   @doc section: :user
   @spec get_user_by_name(String.t()) :: User.t() | nil
   defdelegate get_user_by_name(name), to: UserLib
+
+  ### Connections
+  # Client
+  @doc section: :client
+  @spec get_client(Teiserver.user_id()) :: Client.t() | nil
+  defdelegate get_client(user_id), to: ClientLib
 
   ### Game
   # Lobby
