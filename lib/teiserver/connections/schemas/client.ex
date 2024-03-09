@@ -23,6 +23,9 @@ defmodule Teiserver.Connections.Client do
 
   use TypedStruct
 
+  @derive {Jason.Encoder,
+           only:
+             ~w(id connected? last_disconnected afk? party_id in_game? lobby_id ready? player? player_number team_number team_colour sync lobby_host?)a}
   typedstruct do
     field(:id, Teiserver.user_id())
     field(:connected?, boolean, default: false)

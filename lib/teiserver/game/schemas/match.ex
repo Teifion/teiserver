@@ -11,7 +11,6 @@ defmodule Teiserver.Game.Match do
   * `:rated?` - The rated flag at time of the match starting, updated to false if the match is later decided to be unrated
   * `:game_name` - The game_name at time of the match starting, in most cases I expect game name to always be the same but this is in place to allow for multiple games to be run from a single server
   * `:game_version` - The game_version at time of the match starting
-  * `:map_name` - The map_name at time of the match starting
   * `:winning_team` - The ID of the winning team, set to nil in a draw
   * `:team_count` - The number of teams in the game
   * `:team_size` - The size of the largest team
@@ -36,9 +35,6 @@ defmodule Teiserver.Game.Match do
 
     field(:game_name, :string)
     field(:game_version, :string)
-
-    # Game stuff
-    field(:map_name, :string)
 
     # Outcome
     field(:winning_team, :integer)
@@ -81,7 +77,6 @@ defmodule Teiserver.Game.Match do
           game_version: String.t(),
 
           # Game stuff
-          map_name: String.t(),
           team_count: non_neg_integer(),
           team_size: non_neg_integer(),
 
@@ -111,7 +106,7 @@ defmodule Teiserver.Game.Match do
     struct
     |> cast(
       attrs,
-      ~w(name tags public? rated? game_name game_version map_name winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds host_id type_id)a
+      ~w(name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds host_id type_id)a
     )
     |> validate_required(~w(public? rated? host_id)a)
   end

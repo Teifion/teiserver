@@ -29,7 +29,6 @@ defmodule Teiserver.GameFixtures do
 
       # Game stuff
       game_settings: data["game_settings"] || %{},
-      map_name: data["map_name"] || "map_name_#{r}",
       players: data["players"] || [],
       spectators: data["spectators"] || [],
       members: data["members"] || (data["players"] || []) ++ (data["spectators"] || [])
@@ -93,9 +92,6 @@ defmodule Teiserver.GameFixtures do
         game_name: data["game_name"] || "match_game_name_#{r}",
         game_version: data["game_version"] || "123.456.789",
 
-        # Game stuff
-        map_name: data["map_name"] || "match_map_name_#{r}",
-
         # Outcome
         team_count: data["team_count"] || 2,
         team_size: data["team_size"] || 2,
@@ -127,7 +123,6 @@ defmodule Teiserver.GameFixtures do
         rated?: data["rated?"] || true,
         game_name: data["game_name"] || "match_game_name_#{r}",
         game_version: data["game_version"] || "123.456.789",
-        map_name: data["map_name"] || "match_map_name_#{r}",
         winning_team: data["winning_team"] || 1,
         team_count: data["team_count"] || 2,
         team_size: data["team_size"] || 2,

@@ -74,7 +74,6 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
       add(:game_name, :string)
       add(:game_version, :string)
-      add(:map_name, :string)
 
       add(:winning_team, :integer)
       add(:team_count, :integer)

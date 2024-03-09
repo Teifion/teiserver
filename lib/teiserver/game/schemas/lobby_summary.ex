@@ -17,7 +17,6 @@ defmodule Teiserver.Game.LobbySummary do
   * `:queue_id` - The ID of the queue (matchmaking) this lobby belongs to
   * `:game_name` - String of the game name
   * `:game_version` - String of the game version
-  * `:map_name` - Name of the map selected
   * `:player_count` - Count of the number of players
   * `:spectator_count` - Count of the number of spectators
 
@@ -45,9 +44,6 @@ defmodule Teiserver.Game.LobbySummary do
     field(:game_name, String.t())
     field(:game_version, String.t())
 
-    # Game stuff
-    field(:map_name, String.t())
-
     field(:player_count, non_neg_integer(), default: [])
     field(:spectator_count, non_neg_integer(), default: [])
   end
@@ -67,7 +63,6 @@ defmodule Teiserver.Game.LobbySummary do
       queue_id: lobby.queue_id,
       game_name: lobby.game_name,
       game_version: lobby.game_version,
-      map_name: lobby.map_name,
       player_count: Enum.count(lobby.players),
       spectator_count: Enum.count(lobby.spectators)
     }

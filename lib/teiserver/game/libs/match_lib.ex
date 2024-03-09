@@ -45,7 +45,6 @@ defmodule Teiserver.Game.MatchLib do
         game_version: lobby.game_version,
         team_count: team_count,
         team_size: team_size,
-        map_name: lobby.map_name,
         match_started_at: Timex.now(),
         type_id: type_id
       })

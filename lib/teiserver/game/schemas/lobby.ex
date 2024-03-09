@@ -23,7 +23,6 @@ defmodule Teiserver.Game.Lobby do
   * `:game_name` - String of the game name
   * `:game_version` - String of the game version
   * `:game_settings` - Map of the settings to be used in starting the game
-  * `:map_name` - Name of the map selected
   * `:players` - List of user_ids as players, source of truth is still client state
   * `:spectators` - List of user_ids spectating, source of truth is still client state
   * `:members` - Total list of all user_ids who are members of the lobby
@@ -35,6 +34,9 @@ defmodule Teiserver.Game.Lobby do
   @type id :: Ecto.UUID.t()
   @type name :: String.t()
 
+  @derive {Jason.Encoder,
+           only:
+             ~w(id match_id match_ongoing? host_id host_data name tags password locked? public? match_type rated? queue_id game_name game_version game_settings players spectators members)a}
   typedstruct do
     @typedoc "A lobby"
 
@@ -63,7 +65,6 @@ defmodule Teiserver.Game.Lobby do
 
     # Game stuff
     field(:game_settings, map(), default: %{})
-    field(:map_name, String.t())
 
     field(:players, [Teiserver.user_id()], default: [])
     field(:spectators, [Teiserver.user_id()], default: [])
