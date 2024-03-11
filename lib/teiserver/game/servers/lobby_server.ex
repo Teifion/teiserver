@@ -190,7 +190,10 @@ defmodule Teiserver.Game.LobbyServer do
 
   @spec update_lobby(State.t(), map()) :: State.t()
   def update_lobby(state, changes) do
-    new_lobby = struct(state.lobby, changes)
+    new_lobby = state.lobby
+      |> struct(changes)
+      |> apply_calculated_changes
+
     do_update_lobby(state, new_lobby)
   end
 
@@ -213,6 +216,15 @@ defmodule Teiserver.Game.LobbyServer do
 
       %{state | lobby: new_lobby, update_id: new_update_id}
     end
+  end
+
+  @spec apply_calculated_changes(Lobby.t()) :: Lobby.t()
+  defp apply_calculated_changes(lobby_state) do
+    changes = %{
+      passworded?: (lobby_state.password != nil && lobby_state.password != "")
+    }
+
+    struct(lobby_state, changes)
   end
 
   @spec do_add_client(Teiserver.user_id(), State.t()) :: State.t()

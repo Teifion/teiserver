@@ -18,15 +18,27 @@ Sent whenever the client in question is updated.
 }
 ```
 
-### Connected client - `:client_connected`
-Sent when the client goes from 0 to 1 connections. Will not re-send unless the client server first disconnects again.
+### Joined lobby - `:joined_lobby`
+Sent whenever the client is added to a lobby; if you are subscribed to this topic you should also received a `client_updated` message. This separate message is to make matching on changing state easier.
 
-- `:client` - A `Teiserver.Connections.Client` of the new client values
+- `:lobby_id` - The ID of the lobby joined
 
 ```elixir
 %{
-  event: :client_connected,
-  client: Client.t()
+  event: :joined_lobby,
+  lobby_id: Lobby.id()
+}
+```
+
+### Left lobby - `:left_lobby`
+Sent whenever the client leaves a lobby; if you are subscribed to this topic you should also received a `client_updated` message. This separate message is to make matching on changing state easier.
+
+- `:lobby_id` - The ID of the lobby left
+
+```elixir
+%{
+  event: :left_lobby,
+  lobby_id: Lobby.id()
 }
 ```
 

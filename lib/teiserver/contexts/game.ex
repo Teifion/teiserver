@@ -50,12 +50,12 @@ defmodule Teiserver.Game do
   defdelegate list_local_lobby_ids, to: LobbyLib
 
   @doc section: :lobby
-  @spec list_lobby_summaries() :: [LobbySummary.t()]
-  defdelegate list_lobby_summaries(), to: LobbyLib
+  @spec stream_lobby_summaries() :: Enumerable.t(LobbySummary.t())
+  defdelegate stream_lobby_summaries(), to: LobbyLib
 
   @doc section: :lobby
-  @spec list_lobby_summaries([Lobby.id()]) :: [LobbySummary.t()]
-  defdelegate list_lobby_summaries(lobby_ids), to: LobbyLib
+  @spec stream_lobby_summaries(map) :: Enumerable.t(LobbySummary.t())
+  defdelegate stream_lobby_summaries(filters), to: LobbyLib
 
   @doc section: :lobby
   @spec open_lobby(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, String.t()}

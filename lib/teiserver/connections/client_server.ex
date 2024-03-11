@@ -161,31 +161,47 @@ defmodule Teiserver.Connections.ClientServer do
         )
       end
 
-      cond do
+      new_state = cond do
         state.client.lobby_id == nil && new_client.lobby_id != nil ->
-          added_to_lobby(state)
+          added_to_lobby(new_client.lobby_id, state)
 
         state.client.lobby_id != nil && new_client.lobby_id == nil ->
-          removed_from_lobby(state)
+          removed_from_lobby(state.client.lobby_id, state)
 
         true ->
-          :nop
+          state
       end
 
-      %{state | client: new_client, update_id: new_update_id}
+      %{new_state | client: new_client, update_id: new_update_id}
     end
   end
 
-  @spec added_to_lobby(Teiserver.lobby_id()) :: State.t()
-  defp added_to_lobby(_lobby_id) do
-    :nop
+  @spec added_to_lobby(Teiserver.lobby_id(), State.t()) :: State.t()
+  defp added_to_lobby(lobby_id, state) do
+    Teiserver.broadcast(
+      state.client_topic,
+      %{
+        event: :joined_lobby,
+        lobby_id: lobby_id
+      }
+    )
+
     # LobbyLib.subscribe_to_lobby(lobby_id)
+    %{state | lobby_topic: LobbyLib.lobby_topic(lobby_id)}
   end
 
-  @spec removed_from_lobby(Teiserver.lobby_id()) :: State.t()
-  defp removed_from_lobby(_lobby_id) do
-    :nop
-    # LobbyLib.unsubscribe_from_lobby(lobby_id)
+  @spec removed_from_lobby(Teiserver.lobby_id(), State.t()) :: State.t()
+  defp removed_from_lobby(lobby_id, state) do
+    Teiserver.broadcast(
+      state.client_topic,
+      %{
+        event: :left_lobby,
+        lobby_id: lobby_id
+      }
+    )
+
+    # LobbyLib.unsubscribe(lobby_id)
+    %{state | lobby_topic: nil}
   end
 
   @impl true

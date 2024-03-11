@@ -24,6 +24,9 @@ defmodule Teiserver.Game.LobbySummary do
 
   use TypedStruct
 
+  @derive {Jason.Encoder,
+           only:
+             ~w(id match_ongoing? host_id name tags passworded? locked? public? rated? game_name game_version player_count spectator_count)a}
   typedstruct do
     @typedoc "A lobby"
 
@@ -34,11 +37,10 @@ defmodule Teiserver.Game.LobbySummary do
 
     field(:name, String.t())
     field(:tags, [String.t()], default: [])
-    field(:password, String.t(), default: nil)
+    field(:passworded?, boolean(), default: false)
     field(:locked?, boolean(), default: false)
     field(:public?, boolean(), default: true)
     field(:rated?, boolean(), default: true)
-    field(:queue_id, Teiserver.queue_id(), default: nil)
 
     # Game version stuff
     field(:game_name, String.t())
@@ -56,11 +58,10 @@ defmodule Teiserver.Game.LobbySummary do
       match_ongoing?: lobby.match_ongoing?,
       name: lobby.name,
       tags: lobby.tags,
-      password: lobby.password,
+      passworded?: lobby.passworded?,
       locked?: lobby.locked?,
       public?: lobby.public?,
       rated?: lobby.rated?,
-      queue_id: lobby.queue_id,
       game_name: lobby.game_name,
       game_version: lobby.game_version,
       player_count: Enum.count(lobby.players),

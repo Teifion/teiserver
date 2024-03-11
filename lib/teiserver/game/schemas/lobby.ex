@@ -15,6 +15,7 @@ defmodule Teiserver.Game.Lobby do
   * `:name` - The name of the lobby as displayed in lobby lists
   * `:tags` - A list of strings representing tagged values
   * `:password` - The (plaintext) password for the lobby, nil if no password
+  * `:passworded?` - Boolean of the room having a password or not, overloads the :password property for ease of use
   * `:locked?` - Boolean of the room being locked to the general public at this stage
   * `:public?` - Boolean of the room being public or not, when set to false updates to this lobby won't appear in global_battle updates
   * `:match_type` - MatchType.id of the type of match this will be
@@ -36,7 +37,7 @@ defmodule Teiserver.Game.Lobby do
 
   @derive {Jason.Encoder,
            only:
-             ~w(id match_id match_ongoing? host_id host_data name tags password locked? public? match_type rated? queue_id game_name game_version game_settings players spectators members)a}
+             ~w(id match_id match_ongoing? host_id host_data name tags password passworded? locked? public? match_type rated? queue_id game_name game_version game_settings players spectators members)a}
   typedstruct do
     @typedoc "A lobby"
 
@@ -52,6 +53,7 @@ defmodule Teiserver.Game.Lobby do
     field(:name, name())
     field(:tags, [String.t()], default: [])
     field(:password, String.t(), default: nil)
+    field(:passworded?, boolean(), default: false)
     field(:locked?, boolean(), default: false)
     field(:public?, boolean(), default: true)
     field(:match_type, Teiserver.Game.MatchType.id(), default: nil)

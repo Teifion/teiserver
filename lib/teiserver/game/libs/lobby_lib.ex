@@ -85,19 +85,100 @@ defmodule Teiserver.Game.LobbyLib do
   @doc """
 
   """
-  @spec list_lobby_summaries() :: [LobbySummary.t()]
-  def list_lobby_summaries() do
+  @spec stream_lobby_summaries() :: Enumerable.t(LobbySummary.t())
+  def stream_lobby_summaries() do
     list_lobby_ids()
-    |> Enum.map(&get_lobby_summary/1)
-    |> Enum.reject(&(&1 == nil))
+    |> Stream.map(&get_lobby_summary/1)
+    |> Stream.reject(&(&1 == nil))
   end
 
-  @spec list_lobby_summaries([Lobby.id()]) :: [LobbySummary.t()]
-  def list_lobby_summaries(lobby_ids) do
-    lobby_ids
-    |> Enum.map(&get_lobby_summary/1)
-    |> Enum.reject(&(&1 == nil))
+  @spec stream_lobby_summaries(map) :: Enumerable.t(LobbySummary.t())
+  def stream_lobby_summaries(filters) do
+    ids = filters["ids"] || list_lobby_ids()
+
+    ids
+    |> Stream.map(&get_lobby_summary/1)
+    |> Stream.filter(fn l -> include_lobby?(l, filters) end)
   end
+
+  @spec include_lobby?(LobbySummary.t(), map()) :: boolean
+  defp include_lobby?(nil, _), do: false
+  defp include_lobby?(lobby, filters) do
+    [
+      test_match_ongoing?(filters["match_ongoing?"], lobby),
+      test_require_any_tags(filters["require_any_tags"], lobby),
+      test_require_all_tags(filters["require_all_tags"], lobby),
+      test_exclude_tags(filters["exclude_tags"], lobby),
+      test_passworded?(filters["passworded?"], lobby),
+      test_locked?(filters["locked?"], lobby),
+      test_public?(filters["public?"], lobby),
+      # test_match_type(filters["match_type"], lobby),
+      test_rated?(filters["rated?"], lobby),
+      test_game_version(filters["game_version"], lobby),
+      test_game_name(filters["game_name"], lobby),
+      test_min_player_count(filters["min_player_count"], lobby),
+      test_max_player_count(filters["max_player_count"], lobby)
+    ]
+    |> Enum.all?
+  end
+
+  @spec test_match_ongoing?(nil | boolean, LobbySummary.t()) :: boolean
+  defp test_match_ongoing?(nil, _), do: true
+  defp test_match_ongoing?(value, lobby), do: lobby.match_ongoing? == value
+
+  defp test_require_any_tags(nil, _), do: true
+  defp test_require_any_tags(tags, lobby) do
+    tags
+    |> Enum.any?(fn tag ->
+      Enum.member?(lobby.tags, tag)
+    end)
+  end
+
+  defp test_require_all_tags(nil, _), do: true
+  defp test_require_all_tags(tags, lobby) do
+    tags
+    |> Enum.all?(fn tag ->
+      Enum.member?(lobby.tags, tag)
+    end)
+  end
+
+  defp test_exclude_tags(nil, _), do: true
+  defp test_exclude_tags(tags, lobby) do
+    tags
+    |> Enum.all?(fn tag ->
+      not Enum.member?(lobby.tags, tag)
+    end)
+  end
+
+  defp test_passworded?(nil, _), do: true
+  defp test_passworded?(value, lobby), do: lobby.passworded? == value
+
+  # defp test_match_type(nil, _), do: true
+  # defp test_match_type(types, lobby) do
+  #   Enum.member?(lobby.match_type, types)
+  # end
+
+  defp test_locked?(nil, _), do: true
+  defp test_locked?(value, lobby), do: lobby.locked? == value
+
+  defp test_public?(nil, _), do: true
+  defp test_public?(value, lobby), do: lobby.public? == value
+
+  defp test_rated?(nil, _), do: true
+  defp test_rated?(value, lobby), do: lobby.rated? == value
+
+  defp test_game_version(nil, _), do: true
+  defp test_game_version(value, lobby), do: lobby.game_version == value
+
+  defp test_game_name(nil, _), do: true
+  defp test_game_name(value, lobby), do: lobby.game_name == value
+
+  defp test_min_player_count(nil, _), do: true
+  defp test_min_player_count(value, lobby), do: lobby.player_count >= value
+
+  defp test_max_player_count(nil, _), do: true
+  defp test_max_player_count(value, lobby), do: lobby.player_count <= value
+
 
   @doc """
   Given a user_id of the host and the initial lobby name, starts a process
