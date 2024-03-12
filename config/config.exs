@@ -26,6 +26,7 @@ config :teiserver,
   default_behaviour_score: 10_000,
   default_trust_score: 10_000,
   default_social_score: 10_000,
+  default_min_user_password_length: 6,
 
   # Used for tests
   ecto_repos: [Teiserver.Test.Repo]

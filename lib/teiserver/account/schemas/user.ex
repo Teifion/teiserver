@@ -112,6 +112,7 @@ defmodule Teiserver.Account.User do
       )
       |> calculate_user_permissions
       |> validate_required(~w(name email password permissions)a)
+      |> validate_password
       |> unique_constraint(:email)
       |> put_password_hash()
     end
@@ -136,6 +137,7 @@ defmodule Teiserver.Account.User do
     )
     |> calculate_user_permissions
     |> validate_required(~w(name email password permissions)a)
+    |> validate_password
     |> unique_constraint(:email)
     |> put_password_hash()
   end
@@ -221,7 +223,7 @@ defmodule Teiserver.Account.User do
   defp change_password(user, attrs) do
     user
     |> cast(attrs, [:password])
-    |> validate_length(:password, min: 6)
+    |> validate_password
     |> validate_confirmation(:password, message: "Does not match password")
     |> put_password_hash()
   end
@@ -248,6 +250,14 @@ defmodule Teiserver.Account.User do
   @spec verify_password(User.t(), String.t()) :: boolean
   def verify_password(plain_text_password, encrypted) do
     Argon2.verify_pass(plain_text_password, encrypted)
+  end
+
+  @spec validate_password(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp validate_password(changeset) do
+    min_length = Application.get_env(:teiserver, :default_min_user_password_length)
+
+    changeset
+    |> validate_length(:password, min: min_length)
   end
 
   @doc """

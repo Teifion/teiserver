@@ -30,6 +30,9 @@ The `trust_score` given to users registered using `Teiserver.Account.UserLib.reg
 ## default_social_score - Default: `10_000`
 The `social_score` given to users registered using `Teiserver.Account.UserLib.register_user/1`.
 
+## default_min_user_password_length - Default: 6
+The minimum length for a user password.
+
 # Clustering
 ## `teiserver_clustering` - Default: true
 When enabled Teiserver will attempt to handle the clustering of nodes using a database table. Turning it off will mean this behaves like any other application and you can either not cluster it or use things like `libcluster` as you desire. See `Teiserver.System.ClusterManager` for more details.
