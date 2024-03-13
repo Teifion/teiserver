@@ -68,6 +68,7 @@ config :teiserver,
   default_behaviour_score: 10_000,
   default_trust_score: 10_000,
   default_social_score: 10_000,
+  default_min_user_password_length: 6,
 
   # Overrides
   fn_calculate_match_type: &HelloWorldServer.Game.calculate_match_type/1,

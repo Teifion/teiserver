@@ -182,6 +182,7 @@ defmodule Teiserver.Connections.ClientServer do
       state.client_topic,
       %{
         event: :joined_lobby,
+        user_id: state.user_id,
         lobby_id: lobby_id
       }
     )
@@ -196,6 +197,7 @@ defmodule Teiserver.Connections.ClientServer do
       state.client_topic,
       %{
         event: :left_lobby,
+        user_id: state.user_id,
         lobby_id: lobby_id
       }
     )

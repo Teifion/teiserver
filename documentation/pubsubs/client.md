@@ -22,11 +22,13 @@ Sent whenever the client in question is updated.
 Sent whenever the client is added to a lobby; if you are subscribed to this topic you should also received a `client_updated` message. This separate message is to make matching on changing state easier.
 
 - `:lobby_id` - The ID of the lobby joined
+- `:user_id` - The ID of the user (which should also be present in the topic)
 
 ```elixir
 %{
   event: :joined_lobby,
-  lobby_id: Lobby.id()
+  lobby_id: Lobby.id(),
+  user_id: User.id()
 }
 ```
 
@@ -34,11 +36,13 @@ Sent whenever the client is added to a lobby; if you are subscribed to this topi
 Sent whenever the client leaves a lobby; if you are subscribed to this topic you should also received a `client_updated` message. This separate message is to make matching on changing state easier.
 
 - `:lobby_id` - The ID of the lobby left
+- `:user_id` - The ID of the user (which should also be present in the topic)
 
 ```elixir
 %{
   event: :left_lobby,
-  lobby_id: Lobby.id()
+  lobby_id: Lobby.id(),
+  user_id: User.id()
 }
 ```
 
