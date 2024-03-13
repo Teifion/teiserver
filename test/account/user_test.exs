@@ -25,7 +25,7 @@ defmodule Account.UserTest do
       refute bad_email.valid?
 
       with_password =
-        User.changeset(user, %{"email" => user.email <> "abc", "password" => "123"}, :full)
+        User.changeset(user, %{"email" => user.email <> "abc", "password" => "123456"}, :full)
 
       assert with_password.valid?
 

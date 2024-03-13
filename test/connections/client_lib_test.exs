@@ -13,12 +13,14 @@ defmodule Connections.ClientLibTest do
       Connections.get_client_pid(user.id)
 
       # These are used elsewhere in general but we want to ensure they are delegated
-      Connections.cast_client(user.id, {:update_client, %{}})
+      Connections.cast_client(user.id, {:update_client, %{}, "test"})
       Connections.call_client(user.id, :get_client_state)
       Connections.stop_client_server(user.id)
     end
 
     test "update client" do
+      uuid = Ecto.UUID.generate()
+
       {conn, user} = ConnectionFixtures.client_fixture()
       TestConn.subscribe(conn, Connections.client_topic(user.id))
 
@@ -30,7 +32,7 @@ defmodule Connections.ClientLibTest do
       refute client.afk?
 
       # Now update it
-      Connections.update_client(user.id, %{afk?: true, team_number: 123})
+      Connections.update_client(user.id, %{afk?: true, team_number: 123}, uuid)
 
       # Check the client has updated
       client = Connections.get_client(user.id)
@@ -58,14 +60,15 @@ defmodule Connections.ClientLibTest do
                    team_colour: nil,
                    sync: nil,
                    lobby_host?: false,
-                   party_id: nil
+                   party_id: nil,
+                   update_id: 1
                  },
-                 update_id: 1
+                 reason: uuid
                }
              ]
 
       # Now try to update with the same details, should result in no change
-      Connections.update_client(user.id, %{afk?: true, team_number: 123})
+      Connections.update_client(user.id, %{afk?: true, team_number: 123}, "test")
 
       client = Connections.get_client(user.id)
       assert client.afk?
@@ -75,7 +78,7 @@ defmodule Connections.ClientLibTest do
       assert msgs == []
 
       # Now swap the value around to ensure we get a new update
-      Connections.update_client(user.id, %{afk?: false, team_number: 123})
+      Connections.update_client(user.id, %{afk?: false, team_number: 123}, "test2")
 
       client = Connections.get_client(user.id)
       refute client.afk?
@@ -87,10 +90,11 @@ defmodule Connections.ClientLibTest do
 
       refute update_msg.client.afk?
       assert client.team_number == nil
-      assert update_msg.update_id == 2
+      assert update_msg.reason == "test2"
     end
 
     test "update_client_full" do
+      uuid = Ecto.UUID.generate()
       {conn, user} = ConnectionFixtures.client_fixture()
       TestConn.subscribe(conn, Connections.client_topic(user.id))
 
@@ -103,7 +107,7 @@ defmodule Connections.ClientLibTest do
       assert client.team_number == nil
 
       # Now update it
-      ClientLib.update_client_full(user.id, %{afk?: true, team_number: 123})
+      ClientLib.update_client_full(user.id, %{afk?: true, team_number: 123}, uuid)
 
       # Check the client has updated
       client = Connections.get_client(user.id)
@@ -131,14 +135,15 @@ defmodule Connections.ClientLibTest do
                    team_colour: nil,
                    sync: nil,
                    lobby_host?: false,
-                   party_id: nil
+                   party_id: nil,
+                   update_id: 1
                  },
-                 update_id: 1
+                 reason: uuid
                }
              ]
 
       # Now try to update with the same details, should result in no change
-      ClientLib.update_client_full(user.id, %{afk?: true, team_number: 123})
+      ClientLib.update_client_full(user.id, %{afk?: true, team_number: 123}, "test")
 
       client = Connections.get_client(user.id)
       assert client.afk?
@@ -148,7 +153,7 @@ defmodule Connections.ClientLibTest do
       assert msgs == []
 
       # Now swap the value around to ensure we get a new update
-      ClientLib.update_client_full(user.id, %{afk?: false, team_number: 456})
+      ClientLib.update_client_full(user.id, %{afk?: false, team_number: 456}, "test2")
 
       client = Connections.get_client(user.id)
       refute client.afk?
@@ -160,7 +165,7 @@ defmodule Connections.ClientLibTest do
 
       refute update_msg.client.afk?
       assert client.team_number == 456
-      assert update_msg.update_id == 2
+      assert update_msg.reason == "test2"
     end
 
     test "get_client_list" do
@@ -188,7 +193,7 @@ defmodule Connections.ClientLibTest do
       assert msgs == []
 
       # Now update it
-      Connections.update_client(user.id, %{not_a_key: "abc"})
+      Connections.update_client(user.id, %{not_a_key: "abc"}, "test")
 
       # Check the client has updated
       client = Connections.get_client(user.id)

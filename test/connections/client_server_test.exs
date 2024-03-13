@@ -107,7 +107,7 @@ defmodule Connections.ClientServerTest do
 
       # Set the last_disconnected to something okay
       disconnected_at = Timex.now() |> Timex.shift(seconds: -100)
-      Connections.update_client(user.id, %{last_disconnected: disconnected_at})
+      Connections.update_client(user.id, %{last_disconnected: disconnected_at}, "test-heartbeat")
 
       client = Connections.get_client(user.id)
       refute client.connected?
@@ -121,7 +121,7 @@ defmodule Connections.ClientServerTest do
 
       # Set the last_disconnected to something much larger, it should result in the client process being destroyed
       disconnected_at = Timex.now() |> Timex.shift(seconds: -1_000_000)
-      Connections.update_client(user.id, %{last_disconnected: disconnected_at})
+      Connections.update_client(user.id, %{last_disconnected: disconnected_at}, "test-heartbeat2")
 
       client = Connections.get_client(user.id)
       refute client.connected?

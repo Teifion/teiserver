@@ -107,9 +107,9 @@ defmodule Teiserver.Connections.ClientLib do
       nil
 
   """
-  @spec update_client(Teiserver.user_id(), map) :: :ok | nil
-  def update_client(user_id, data) do
-    cast_client(user_id, {:update_client, data})
+  @spec update_client(Teiserver.user_id(), map, String.t()) :: :ok | nil
+  def update_client(user_id, data, reason) do
+    cast_client(user_id, {:update_client, data, reason})
   end
 
   @doc """
@@ -126,9 +126,9 @@ defmodule Teiserver.Connections.ClientLib do
       nil
 
   """
-  @spec update_client_in_lobby(Teiserver.user_id(), map) :: :ok | nil
-  def update_client_in_lobby(user_id, data) do
-    cast_client(user_id, {:update_client_in_lobby, data})
+  @spec update_client_in_lobby(Teiserver.user_id(), map, String.t()) :: :ok | nil
+  def update_client_in_lobby(user_id, data, reason) do
+    cast_client(user_id, {:update_client_in_lobby, data, reason})
   end
 
   @doc """
@@ -145,9 +145,9 @@ defmodule Teiserver.Connections.ClientLib do
       nil
 
   """
-  @spec update_client_full(Teiserver.user_id(), map) :: :ok | nil
-  def update_client_full(user_id, data) do
-    cast_client(user_id, {:update_client_full, data})
+  @spec update_client_full(Teiserver.user_id(), map, String.t()) :: :ok | nil
+  def update_client_full(user_id, data, reason) do
+    cast_client(user_id, {:update_client_full, data, reason})
   end
 
   @doc """

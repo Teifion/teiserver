@@ -136,13 +136,13 @@ defmodule Teiserver.MatchLibAsyncTest do
       assert lobby.players == []
 
       # Update the clients by making them players and putting them on teams
-      Connections.update_client_in_lobby(u1.id, %{player_number: 1, team_number: 1, player?: true})
+      Connections.update_client_in_lobby(u1.id, %{player_number: 1, team_number: 1, player?: true}, "test")
 
-      Connections.update_client_in_lobby(u2.id, %{player_number: 2, team_number: 1, player?: true})
+      Connections.update_client_in_lobby(u2.id, %{player_number: 2, team_number: 1, player?: true}, "test")
 
-      Connections.update_client_in_lobby(u3.id, %{player_number: 3, team_number: 2, player?: true})
+      Connections.update_client_in_lobby(u3.id, %{player_number: 3, team_number: 2, player?: true}, "test")
 
-      Connections.update_client_in_lobby(u4.id, %{player_number: 4, team_number: 2, player?: true})
+      Connections.update_client_in_lobby(u4.id, %{player_number: 4, team_number: 2, player?: true}, "test")
 
       # Give the lobby time to read and update
       :timer.sleep(100)

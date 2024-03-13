@@ -7,7 +7,7 @@ The pubsub messages received by anybody watching this account.
 ### Updated client - `:client_updated`
 Sent whenever the client in question is updated.
 
-- `:update_id` - An incremental number to allow for out of order messages
+- `:reason` - The reason for the change
 - `:client` - A `Teiserver.Connections.Client` of the new client values
 
 ```elixir

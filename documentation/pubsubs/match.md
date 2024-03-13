@@ -27,6 +27,7 @@ Fired off whenever a user is added to the lobby member list.
 ```elixir
 %{
   event: :lobby_user_joined,
+  lobby_id: Lobby.id(),
   client: Client.t()
 }
 ```
@@ -39,7 +40,8 @@ Indicating a user has left the lobby
 ```elixir
 %{
   event: :lobby_user_left,
-  user_id: user_id
+  lobby_id: Lobby.id(),
+  user_id: User.id()
 }
 ```
 

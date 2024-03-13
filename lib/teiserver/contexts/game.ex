@@ -90,7 +90,7 @@ defmodule Teiserver.Game do
   defdelegate lobby_name_acceptable?(name), to: LobbyLib
 
   @doc false
-  @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()}
+  @spec start_lobby_server(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.t()}
   defdelegate start_lobby_server(host_id, name), to: LobbyLib
 
   @doc false

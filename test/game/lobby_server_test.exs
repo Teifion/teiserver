@@ -11,7 +11,7 @@ defmodule Teiserver.Game.LobbyServerTest do
       {conn, user} = ConnectionFixtures.client_fixture()
 
       # Now we host a game with this user
-      {:ok, lobby_id} = Game.start_lobby_server(user.id, "Lobby #{r}}")
+      {:ok, %{id: lobby_id}} = Game.start_lobby_server(user.id, "Lobby #{r}}")
 
       lobby = Game.get_lobby(lobby_id)
       assert lobby.host_id == user.id

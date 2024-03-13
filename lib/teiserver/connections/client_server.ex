@@ -19,7 +19,7 @@ defmodule Teiserver.Connections.ClientServer do
 
   defmodule State do
     @moduledoc false
-    defstruct [:client, :user_id, :connections, :update_id, :client_topic, :lobby_topic]
+    defstruct [:client, :user_id, :connections, :client_topic, :lobby_topic]
   end
 
   @standard_data_keys ~w(connected? last_disconnected in_game? afk? party_id)a
@@ -49,19 +49,19 @@ defmodule Teiserver.Connections.ClientServer do
     end
   end
 
-  def handle_cast({:update_client, partial_client}, state) do
+  def handle_cast({:update_client, partial_client, reason}, state) do
     partial_client = Map.take(partial_client, @standard_data_keys)
 
     if partial_client != %{} do
       new_client = struct(state.client, partial_client)
-      new_state = update_client(state, new_client)
+      new_state = update_client(state, new_client, reason)
       {:noreply, new_state}
     else
       {:noreply, state}
     end
   end
 
-  def handle_cast({:update_client_in_lobby, partial_client}, state) do
+  def handle_cast({:update_client_in_lobby, partial_client, reason}, state) do
     partial_client =
       partial_client
       |> Map.take(@lobby_data_keys)
@@ -70,16 +70,16 @@ defmodule Teiserver.Connections.ClientServer do
 
     if partial_client != %{} do
       new_client = struct(state.client, partial_client)
-      new_state = update_client(state, new_client)
+      new_state = update_client(state, new_client, reason)
       {:noreply, new_state}
     else
       {:noreply, state}
     end
   end
 
-  def handle_cast({:update_client_full, partial_client}, state) do
+  def handle_cast({:update_client_full, partial_client, reason}, state) do
     new_client = struct(state.client, partial_client)
-    new_state = update_client(state, new_client)
+    new_state = update_client(state, new_client, reason)
     {:noreply, new_state}
   end
 
@@ -133,20 +133,22 @@ defmodule Teiserver.Connections.ClientServer do
     GenServer.start_link(__MODULE__, opts[:data], [])
   end
 
-  @spec update_client(State.t(), Client.t()) :: State.t()
-  defp update_client(%State{} = state, %Client{} = new_client) do
+  @spec update_client(State.t(), Client.t(), String.t()) :: State.t()
+  defp update_client(%State{} = state, %Client{} = new_client, reason) do
     if new_client == state.client do
       # Nothing changed, we don't do anything
       state
     else
-      new_update_id = state.update_id + 1
+      # Client has changed, we need to increment the update_id
+      new_update_id = state.client.update_id + 1
+      new_client = struct(new_client, %{update_id: new_update_id})
 
       Teiserver.broadcast(
         state.client_topic,
         %{
           event: :client_updated,
-          update_id: new_update_id,
-          client: new_client
+          client: new_client,
+          reason: reason
         }
       )
 
@@ -155,8 +157,8 @@ defmodule Teiserver.Connections.ClientServer do
           state.lobby_topic,
           %{
             event: :lobby_client_change,
-            update_id: new_update_id,
-            client: new_client
+            client: new_client,
+            reason: reason
           }
         )
       end
@@ -172,7 +174,7 @@ defmodule Teiserver.Connections.ClientServer do
           state
       end
 
-      %{new_state | client: new_client, update_id: new_update_id}
+      %{new_state | client: new_client}
     end
   end
 
@@ -187,7 +189,6 @@ defmodule Teiserver.Connections.ClientServer do
       }
     )
 
-    # LobbyLib.subscribe_to_lobby(lobby_id)
     %{state | lobby_topic: LobbyLib.lobby_topic(lobby_id)}
   end
 
@@ -202,7 +203,6 @@ defmodule Teiserver.Connections.ClientServer do
       }
     )
 
-    # LobbyLib.unsubscribe(lobby_id)
     %{state | lobby_topic: nil}
   end
 
@@ -231,8 +231,7 @@ defmodule Teiserver.Connections.ClientServer do
        connections: [],
        user_id: id,
        client_topic: ClientLib.client_topic(id),
-       lobby_topic: nil,
-       update_id: 0
+       lobby_topic: nil
      }}
   end
 end

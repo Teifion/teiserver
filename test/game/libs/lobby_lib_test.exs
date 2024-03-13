@@ -11,14 +11,14 @@ defmodule Teiserver.Game.LobbyLibTest do
 
       # The fact it's not got a working userid isn't important, we don't check the DB
       # it just needs to not be nil
-      {:ok, lobby_id1} = Game.start_lobby_server(Ecto.UUID.generate(), nil)
+      {:ok, %{id: lobby_id1}} = Game.start_lobby_server(Ecto.UUID.generate(), "lobby1_name")
       assert is_binary(lobby_id1)
       assert lobby_id1 > 0
-      assert Game.get_lobby(lobby_id1).name == "Lobby ##{lobby_id1}"
+      assert Game.get_lobby(lobby_id1).name == "lobby1_name"
 
       {_conn, user} = ConnectionFixtures.client_fixture()
 
-      {:ok, lobby_id2} = Game.start_lobby_server(user.id, "Lobby name")
+      {:ok, %{id: lobby_id2}} = Game.start_lobby_server(user.id, "Lobby name")
       assert is_binary(lobby_id2)
       assert lobby_id2 > 0
       assert Game.get_lobby(lobby_id2).name == "Lobby name"
@@ -48,7 +48,7 @@ defmodule Teiserver.Game.LobbyLibTest do
       {_host_conn, _host_user, lobby3_id} = GameFixtures.lobby_fixture_with_process()
 
       # The test is async so it's possible other lobbies are being created while this runs
-      lobby_list = Game.list_lobby_summaries()
+      lobby_list = Game.stream_lobby_summaries() |> Enum.to_list()
       lobby_list_ids = Enum.map(lobby_list, fn l -> l.id end)
 
       assert Enum.member?(lobby_list_ids, lobby1_id)
@@ -56,13 +56,18 @@ defmodule Teiserver.Game.LobbyLibTest do
       assert Enum.member?(lobby_list_ids, lobby3_id)
 
       # Now just two of them
-      lobby_list = Game.list_lobby_summaries([lobby1_id, lobby2_id])
+      lobby_list = Game.stream_lobby_summaries(%{"ids" => [lobby1_id, lobby2_id]}) |> Enum.to_list()
       assert Enum.count(lobby_list) == 2
       lobby_list_ids = Enum.map(lobby_list, fn l -> l.id end)
 
       assert Enum.member?(lobby_list_ids, lobby1_id)
       assert Enum.member?(lobby_list_ids, lobby2_id)
       refute Enum.member?(lobby_list_ids, lobby3_id)
+
+      # Cleanup
+      Game.stop_lobby_server(lobby1_id)
+      Game.stop_lobby_server(lobby2_id)
+      Game.stop_lobby_server(lobby3_id)
     end
 
     test "list_lobby_ids" do
@@ -76,24 +81,38 @@ defmodule Teiserver.Game.LobbyLibTest do
       assert Enum.member?(lobby_ids, lobby1_id)
       assert Enum.member?(lobby_ids, lobby2_id)
       assert Enum.member?(lobby_ids, lobby3_id)
+
+      # Cleanup
+      Game.stop_lobby_server(lobby1_id)
+      Game.stop_lobby_server(lobby2_id)
+      Game.stop_lobby_server(lobby3_id)
     end
 
     test "get_lobby_attribute/2" do
       {_host_conn, host_user, lobby_id} = GameFixtures.lobby_fixture_with_process()
 
       assert Game.get_lobby_attribute(lobby_id, :host_id) == host_user.id
+
+      # Cleanup
+      Game.stop_lobby_server(lobby_id)
     end
 
     test "get_lobby/1" do
       {_host_conn, host_user, lobby_id} = GameFixtures.lobby_fixture_with_process()
 
       assert Game.get_lobby(lobby_id).host_id == host_user.id
+
+      # Cleanup
+      Game.stop_lobby_server(lobby_id)
     end
 
     test "get_lobby_summary/1" do
       {_host_conn, host_user, lobby_id} = GameFixtures.lobby_fixture_with_process()
 
       assert Game.get_lobby_summary(lobby_id).host_id == host_user.id
+
+      # Cleanup
+      Game.stop_lobby_server(lobby_id)
     end
   end
 end

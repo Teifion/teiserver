@@ -238,7 +238,7 @@ defmodule Teiserver.Game.LobbyServer do
       team_colour: nil,
       sync: nil,
       lobby_host?: false
-    })
+    }, "joined_lobby")
 
     client = ClientLib.get_client(user_id)
 
@@ -246,6 +246,7 @@ defmodule Teiserver.Game.LobbyServer do
       state.lobby_topic,
       %{
         event: :lobby_user_joined,
+        lobby_id: state.lobby_id,
         client: client
       }
     )
@@ -271,12 +272,13 @@ defmodule Teiserver.Game.LobbyServer do
       team_colour: nil,
       sync: nil,
       lobby_host?: false
-    })
+    }, "left_lobby")
 
     Teiserver.broadcast(
       state.lobby_topic,
       %{
         event: :lobby_user_left,
+        lobby_id: state.lobby_id,
         user_id: user_id
       }
     )

@@ -19,6 +19,8 @@ defmodule Teiserver.Connections.Client do
   * `:sync` - A map used for storing keys of items the client needs to sync and the values representing their state of syncing
   * `:lobby_host?` - Set to true if the client is the host of the lobby in question
   * `:party_id` - The ID of the party the client is part of or nil if not in a party
+
+  * `:update_id` - The version ID of the update to ensure updates can be discarded if out of date or duplicates
   """
 
   use TypedStruct
@@ -44,12 +46,16 @@ defmodule Teiserver.Connections.Client do
     field(:team_colour, String.t())
     field(:sync, map | nil)
     field(:lobby_host?, boolean, default: false)
+
+    # Meta
+    field(:update_id, non_neg_integer())
   end
 
   @spec new(Teiserver.user_id()) :: __MODULE__.t()
   def new(user_id) do
     %__MODULE__{
-      id: user_id
+      id: user_id,
+      update_id: 0
     }
   end
 end

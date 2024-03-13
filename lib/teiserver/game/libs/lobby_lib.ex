@@ -218,7 +218,7 @@ defmodule Teiserver.Game.LobbyLib do
       true ->
         with {:ok, lobby} <- start_lobby_server(host_id, name),
              :ok <- cycle_lobby(lobby.id),
-             _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby.id, lobby_host?: true}) do
+             _ <- ClientLib.update_client_full(host_id, %{lobby_id: lobby.id, lobby_host?: true}, "opened lobby") do
           {:ok, lobby.id}
         else
           :failure1 -> :fail_result1
@@ -303,10 +303,10 @@ defmodule Teiserver.Game.LobbyLib do
     if lobby do
       lobby.members
       |> Enum.each(fn user_id ->
-        ClientLib.update_client_full(user_id, %{lobby_id: nil, lobby_host?: false})
+        ClientLib.update_client_full(user_id, %{lobby_id: nil, lobby_host?: false}, "lobby closed")
       end)
 
-      ClientLib.update_client_full(lobby.host_id, %{lobby_id: nil, lobby_host?: false})
+      ClientLib.update_client_full(lobby.host_id, %{lobby_id: nil, lobby_host?: false}, "closed lobby")
     end
 
     stop_lobby_server(lobby_id)
