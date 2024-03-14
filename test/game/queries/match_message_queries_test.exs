@@ -29,13 +29,13 @@ defmodule Teiserver.MatchMembershipQueriesTest do
       all_values =
         MatchMembershipQueries.match_membership_query(
           where: [
-            user_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            user_id: Ecto.UUID.generate(),
-            match_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            match_id: Ecto.UUID.generate(),
+            user_id: [Teiserver.uuid(), Teiserver.uuid()],
+            user_id: Teiserver.uuid(),
+            match_id: [Teiserver.uuid(), Teiserver.uuid()],
+            match_id: Teiserver.uuid(),
             win?: true,
-            party_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            party_id: Ecto.UUID.generate(),
+            party_id: [Teiserver.uuid(), Teiserver.uuid()],
+            party_id: Teiserver.uuid(),
             team_number: [1, 2],
             team_number: 1
           ],

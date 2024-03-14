@@ -29,7 +29,8 @@ config :teiserver,
   default_min_user_password_length: 6,
 
   # Used for tests
-  ecto_repos: [Teiserver.Test.Repo]
+  ecto_repos: [Teiserver.Test.Repo],
+  fn_uuid_generator: &Ecto.UUID.generate/0
 
 # Import environment specific config
 try do

@@ -76,7 +76,7 @@ defmodule Teiserver.Game.Lobby do
   @spec new(Teiserver.user_id(), name()) :: __MODULE__.t()
   def new(host_id, name) when is_binary(host_id) do
     %__MODULE__{
-      id: Ecto.UUID.generate(),
+      id: Teiserver.uuid(),
       host_id: host_id,
       name: name
     }

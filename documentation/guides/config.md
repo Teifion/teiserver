@@ -55,6 +55,9 @@ A function used to determine if a lobby name is acceptable. Defaults to `Teiserv
 ## `fn_user_name_acceptor`
 A function used to determine if a lobby name is acceptable. Defaults to `Teiserver.Account.UserLib.default_user_name_acceptable/1` which always returns true.
 
+## `fn_uuid_generator`
+The function used to generate UUIDs. Defaults to `&Ecto.UUID.generate/0`.
+
 
 # Complete example config
 ```elixir
@@ -73,7 +76,9 @@ config :teiserver,
   # Overrides
   fn_calculate_match_type: &HelloWorldServer.Game.calculate_match_type/1,
   fn_calculate_user_permissions: &HelloWorldServer.Account.calculate_user_permissions/1,
-  
+
   fn_lobby_name_acceptor: &HelloWorldServer.Account.lobby_name_acceptor/1,
   fn_user_name_acceptor: &HelloWorldServer.Account.user_name_acceptor/1,
+
+  fn_uuid_generator: &Ecto.UUID.generate/0
 ```

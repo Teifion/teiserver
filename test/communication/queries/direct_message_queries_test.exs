@@ -31,12 +31,12 @@ defmodule Teiserver.DirectMessageQueriesTest do
           where: [
             id: [1, 2],
             id: 1,
-            from_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            from_id: Ecto.UUID.generate(),
-            to_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            to_id: Ecto.UUID.generate(),
-            to_or_from_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            to_or_from_id: Ecto.UUID.generate(),
+            from_id: [Teiserver.uuid(), Teiserver.uuid()],
+            from_id: Teiserver.uuid(),
+            to_id: [Teiserver.uuid(), Teiserver.uuid()],
+            to_id: Teiserver.uuid(),
+            to_or_from_id: [Teiserver.uuid(), Teiserver.uuid()],
+            to_or_from_id: Teiserver.uuid(),
             inserted_after: Timex.now(),
             inserted_before: Timex.now()
           ],

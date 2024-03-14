@@ -65,6 +65,18 @@ defmodule Teiserver do
             limit: non_neg_integer() | nil
           )
 
+  # UUIDs
+  @spec uuid() :: String.t()
+  def uuid() do
+    f = Application.get_env(:teiserver, :fn_uuid_generator, &Ecto.UUID.generate/0)
+    f.()
+  end
+
+  @spec deterministic_uuid(String.t()) :: String.t()
+  def deterministic_uuid(base) do
+    UUID.uuid5(:nil, base)
+  end
+
   # PubSub delegation
   @doc false
   @spec broadcast(String.t(), map()) :: :ok

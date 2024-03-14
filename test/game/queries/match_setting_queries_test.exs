@@ -31,8 +31,8 @@ defmodule Teiserver.MatchSettingQueriesTest do
           where: [
             type_id: [1, 2],
             type_id: 1,
-            match_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            match_id: Ecto.UUID.generate(),
+            match_id: [Teiserver.uuid(), Teiserver.uuid()],
+            match_id: Teiserver.uuid(),
             value: ["abc", "def"],
             value: "abc"
           ],

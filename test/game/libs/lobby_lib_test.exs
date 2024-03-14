@@ -11,7 +11,7 @@ defmodule Teiserver.Game.LobbyLibTest do
 
       # The fact it's not got a working userid isn't important, we don't check the DB
       # it just needs to not be nil
-      {:ok, %{id: lobby_id1}} = Game.start_lobby_server(Ecto.UUID.generate(), "lobby1_name")
+      {:ok, %{id: lobby_id1}} = Game.start_lobby_server(Teiserver.uuid(), "lobby1_name")
       assert is_binary(lobby_id1)
       assert lobby_id1 > 0
       assert Game.get_lobby(lobby_id1).name == "lobby1_name"

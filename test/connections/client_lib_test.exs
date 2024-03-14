@@ -19,7 +19,7 @@ defmodule Connections.ClientLibTest do
     end
 
     test "update client" do
-      uuid = Ecto.UUID.generate()
+      uuid = Teiserver.uuid()
 
       {conn, user} = ConnectionFixtures.client_fixture()
       TestConn.subscribe(conn, Connections.client_topic(user.id))
@@ -94,7 +94,7 @@ defmodule Connections.ClientLibTest do
     end
 
     test "update_client_full" do
-      uuid = Ecto.UUID.generate()
+      uuid = Teiserver.uuid()
       {conn, user} = ConnectionFixtures.client_fixture()
       TestConn.subscribe(conn, Connections.client_topic(user.id))
 

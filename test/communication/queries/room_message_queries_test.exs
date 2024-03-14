@@ -31,8 +31,8 @@ defmodule Teiserver.RoomMessageQueriesTest do
           where: [
             id: [1, 2],
             id: 1,
-            sender_id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            sender_id: Ecto.UUID.generate(),
+            sender_id: [Teiserver.uuid(), Teiserver.uuid()],
+            sender_id: Teiserver.uuid(),
             room_id: [1, 2],
             room_id: 1,
             inserted_after: Timex.now(),

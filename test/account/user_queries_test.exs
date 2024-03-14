@@ -29,8 +29,8 @@ defmodule Teiserver.UserQueriesTest do
       all_values =
         UserQueries.user_query(
           where: [
-            id: [Ecto.UUID.generate(), Ecto.UUID.generate()],
-            id: Ecto.UUID.generate(),
+            id: [Teiserver.uuid(), Teiserver.uuid()],
+            id: Teiserver.uuid(),
             name: "name",
             name_lower: "name_lower",
             email: "email",
@@ -46,7 +46,7 @@ defmodule Teiserver.UserQueriesTest do
             not_has_permission: "not_has_permission",
             has_restriction: "has_restriction",
             not_has_restriction: "not_has_restriction",
-            smurf_of: Ecto.UUID.generate(),
+            smurf_of: Teiserver.uuid(),
             smurf_of: "Smurf",
             smurf_of: "Non-smurf",
             behaviour_score_gt: 123,
