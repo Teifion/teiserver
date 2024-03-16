@@ -212,9 +212,9 @@ defmodule Teiserver.Account.UserLib do
   correct for the user. Note it does this via a secure method to prevent timing
   attacks, never manually verify the password with standard string comparison.
   """
-  @spec verify_user_password(User.t(), String.t()) :: boolean
-  def verify_user_password(user, plaintext_password) do
-    User.verify_password(plaintext_password, user.password)
+  @spec valid_password?(User.t(), String.t()) :: boolean
+  def valid_password?(user, plaintext_password) do
+    User.valid_password?(plaintext_password, user.password)
   end
 
   @doc """

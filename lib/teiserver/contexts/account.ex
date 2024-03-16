@@ -67,8 +67,8 @@ defmodule Teiserver.Account do
   defdelegate change_user(user, attrs \\ %{}), to: UserLib
 
   @doc section: :user
-  @spec verify_user_password(User.t(), String.t()) :: boolean
-  defdelegate verify_user_password(user, plaintext_password), to: UserLib
+  @spec valid_password?(User.t(), String.t()) :: boolean
+  defdelegate valid_password?(user, plaintext_password), to: UserLib
 
   @doc section: :user
   @spec generate_password() :: String.t()

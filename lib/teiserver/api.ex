@@ -51,7 +51,7 @@ defmodule Teiserver.Api do
         {:error, :no_user}
 
       user ->
-        if Teiserver.Account.verify_user_password(user, password) do
+        if Teiserver.Account.valid_password?(user, password) do
           {:ok, user}
         else
           {:error, :bad_password}

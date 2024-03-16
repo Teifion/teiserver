@@ -7,7 +7,7 @@ defmodule Teiserver.Account.User do
 
   * `:name` - The name of the user
   * `:email` - The email of the user
-  * `:password` - The encrypted password of the user; if you ever want to compare the password please make user of `verify_password/2` (which can be called from `Teiserver.Account`).
+  * `:password` - The encrypted password of the user; if you ever want to compare the password please make user of `valid_password?/2` (which can be called from `Teiserver.Account`).
   * `:groups` - A list of the groups possessed by the user, these are used to inform permissions
   * `:permissions` - A list of the things the user is allowed to do, typically derived from a combination of groups and restrictions
   * `:behaviour_score` - Numerical score representing the behaviour of the user, a high score means they are better behaved
@@ -176,7 +176,7 @@ defmodule Teiserver.Account.User do
           "Please enter your password to change your account details."
         )
 
-      verify_password(attrs["password"], user.password) == false ->
+      valid_password?(attrs["password"], user.password) == false ->
         user
         |> cast(attrs, [:name, :email])
         |> validate_required([:name, :email])
@@ -203,7 +203,7 @@ defmodule Teiserver.Account.User do
           "Please enter your existing password to change your password."
         )
 
-      verify_password(attrs["existing"], user.password) == false ->
+      valid_password?(attrs["existing"], user.password) == false ->
         user
         |> change_password(attrs)
         |> add_error(:existing, "Incorrect password")
@@ -241,14 +241,14 @@ defmodule Teiserver.Account.User do
 
   ## Examples
 
-      iex> verify_password(plaintext, user.password)
+      iex> valid_password?(plaintext, user.password)
       true
 
-      iex> verify_password("bad_password", user.password)
+      iex> valid_password?("bad_password", user.password)
       false
   """
-  @spec verify_password(User.t(), String.t()) :: boolean
-  def verify_password(plain_text_password, encrypted) do
+  @spec valid_password?(User.t(), String.t()) :: boolean
+  def valid_password?(plain_text_password, encrypted) do
     Argon2.verify_pass(plain_text_password, encrypted)
   end
 

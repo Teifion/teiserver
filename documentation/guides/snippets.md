@@ -10,7 +10,7 @@ def connect_user(name, password) do
     nil ->
       {:error, "User not found"}
     user ->
-      if Teiserver.Account.verify_user_password(user, password) do
+      if Teiserver.Account.valid_password?(user, password) do
         Teiserver.Connections.connect_user(user)
         {:ok, user}
       else

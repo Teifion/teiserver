@@ -100,10 +100,10 @@ defmodule Teiserver.UserLibTest do
       assert %Ecto.Changeset{} = Account.change_user(user)
     end
 
-    test "verify_password/2" do
+    test "valid_password?/2" do
       user = AccountFixtures.user_fixture(%{"password" => "password"})
-      assert Account.verify_user_password(user, "password")
-      refute Account.verify_user_password(user, "bad_password")
+      assert Account.valid_password?(user, "password")
+      refute Account.valid_password?(user, "bad_password")
     end
 
     test "allow?/2" do
