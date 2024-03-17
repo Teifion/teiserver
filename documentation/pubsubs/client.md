@@ -8,13 +8,14 @@ The pubsub messages received by anybody watching this account.
 Sent whenever the client in question is updated.
 
 - `:reason` - The reason for the change
-- `:client` - A `Teiserver.Connections.Client` of the new client values
+- `:user_id` - The ID of the user (which should also be present in the topic)
+- `:changes` - A map of the changed values
 
 ```elixir
 %{
   event: :client_updated,
-  update_id: integer(),
-  client: Client.t()
+  user_id: User.id(),
+  changes: map()
 }
 ```
 

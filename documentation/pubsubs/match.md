@@ -50,26 +50,28 @@ Indicating a user has left the lobby
 Note this will be sent in addition to normal client updated messages but by doing this we prevent people having to subscribe/unsubscribe from client update messages.
 
 - `:update_id` - An incremental number to allow for out of order messages
-- `:client` - A `Teiserver.Connections.Client` of the new client values
+- `:changes` - A map of the changes to the client
 
 ```elixir
 %{
   event: :client_updated,
   update_id: integer(),
-  client: Client.t()
+  user_id: User.id(),
+  changes: map()
 }
 ```
 
 ### State update - `:lobby_updated`
 
 - `:update_id` - An incremental number to allow for out of order messages
-- `:client` - A `Teiserver.Connections.Client` of the new client values
+- `:changes` - A map of the changes to the lobby
 
 ```elixir
 %{
   event: :lobby_updated,
+  lobby_id: Lobby.id(),
   update_id: integer(),
-  lobby: Lobby.t()
+  changes: map()
 }
 ```
 

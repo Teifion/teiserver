@@ -46,24 +46,12 @@ defmodule Connections.ClientLibTest do
                %{
                  topic: Connections.client_topic(user.id),
                  event: :client_updated,
-                 client: %Teiserver.Connections.Client{
-                   id: user.id,
-                   last_disconnected: nil,
-                   connected?: true,
-                   lobby_id: nil,
-                   in_game?: false,
+                 changes: %{
                    afk?: true,
-                   ready?: false,
-                   player?: false,
-                   player_number: nil,
-                   team_number: nil,
-                   team_colour: nil,
-                   sync: nil,
-                   lobby_host?: false,
-                   party_id: nil,
                    update_id: 1
                  },
-                 reason: uuid
+                 reason: uuid,
+                 user_id: user.id
                }
              ]
 
@@ -88,7 +76,7 @@ defmodule Connections.ClientLibTest do
       assert Enum.count(msgs) == 1
       [update_msg] = msgs
 
-      refute update_msg.client.afk?
+      refute update_msg.changes.afk?
       assert client.team_number == nil
       assert update_msg.reason == "test2"
     end
@@ -121,24 +109,13 @@ defmodule Connections.ClientLibTest do
                %{
                  topic: Connections.client_topic(user.id),
                  event: :client_updated,
-                 client: %Teiserver.Connections.Client{
-                   id: user.id,
-                   last_disconnected: nil,
-                   connected?: true,
-                   lobby_id: nil,
-                   in_game?: false,
+                 changes: %{
                    afk?: true,
-                   ready?: false,
-                   player?: false,
-                   player_number: nil,
-                   team_number: 123,
-                   team_colour: nil,
-                   sync: nil,
-                   lobby_host?: false,
-                   party_id: nil,
-                   update_id: 1
+                   update_id: 1,
+                   team_number: 123
                  },
-                 reason: uuid
+                 reason: uuid,
+                 user_id: user.id
                }
              ]
 
@@ -163,7 +140,7 @@ defmodule Connections.ClientLibTest do
       assert Enum.count(msgs) == 1
       [update_msg] = msgs
 
-      refute update_msg.client.afk?
+      refute update_msg.changes.afk?
       assert client.team_number == 456
       assert update_msg.reason == "test2"
     end

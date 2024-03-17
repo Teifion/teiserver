@@ -28,6 +28,7 @@ defmodule Teiserver.Game.Lobby do
   * `:spectators` - List of user_ids spectating, source of truth is still client state
   * `:members` - Total list of all user_ids who are members of the lobby
 
+  * `:update_id` - The version ID of the update to ensure updates can be discarded if out of date or duplicates
   """
 
   use TypedStruct
@@ -71,6 +72,9 @@ defmodule Teiserver.Game.Lobby do
     field(:players, [Teiserver.user_id()], default: [])
     field(:spectators, [Teiserver.user_id()], default: [])
     field(:members, [Teiserver.user_id()], default: [])
+
+    # Meta
+    field(:update_id, non_neg_integer())
   end
 
   @spec new(Teiserver.user_id(), name()) :: __MODULE__.t()
@@ -78,7 +82,8 @@ defmodule Teiserver.Game.Lobby do
     %__MODULE__{
       id: Teiserver.uuid(),
       host_id: host_id,
-      name: name
+      name: name,
+      update_id: 0
     }
   end
 end

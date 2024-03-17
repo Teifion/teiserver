@@ -8,6 +8,7 @@ defmodule Teiserver.Game.LobbyServer do
   alias Teiserver.{Connections}
   alias Teiserver.Game.{Lobby, LobbyLib, LobbySummary}
   alias Teiserver.Connections.ClientLib
+  alias Teiserver.Helpers.MapHelper
 
   @heartbeat_frequency_ms 5_000
 
@@ -118,23 +119,24 @@ defmodule Teiserver.Game.LobbyServer do
   end
 
   def handle_info(
-        %{topic: "Teiserver.Connections.Client" <> _, event: :client_updated} = msg,
+        %{topic: "Teiserver.Connections.Client" <> _, event: :client_updated, user_id: user_id} = msg,
         state
       ) do
-    client = msg.client
-    user_id = client.id
     lobby = state.lobby
 
     # Are they now a player?
     changes =
       cond do
-        client.player? && Enum.member?(lobby.spectators, user_id) ->
+        not Map.has_key?(msg.changes, :player?) ->
+          %{}
+
+        msg.changes.player? && Enum.member?(lobby.spectators, user_id) ->
           %{
             spectators: List.delete(lobby.spectators, user_id),
             players: [user_id | lobby.players]
           }
 
-        not client.player? && Enum.member?(lobby.players, user_id) ->
+        not msg.changes.player? && Enum.member?(lobby.players, user_id) ->
           %{
             players: List.delete(lobby.players, user_id),
             spectators: [user_id | lobby.players]
@@ -199,22 +201,28 @@ defmodule Teiserver.Game.LobbyServer do
 
   @spec do_update_lobby(State.t(), Lobby.t()) :: State.t()
   defp do_update_lobby(%State{} = state, %Lobby{} = new_lobby) do
-    if new_lobby == state.lobby do
+    diffs = MapHelper.map_diffs(state.lobby, new_lobby)
+
+    if diffs == %{} do
       # Nothing changed, we don't do anything
       state
     else
-      new_update_id = state.update_id + 1
+      new_update_id = state.lobby.update_id + 1
+      new_lobby = struct(new_lobby, %{update_id: new_update_id})
+
+      diffs = Map.put(diffs, :update_id, new_update_id)
 
       Teiserver.broadcast(
         state.lobby_topic,
         %{
           event: :lobby_updated,
           update_id: new_update_id,
-          lobby: new_lobby
+          lobby_id: state.lobby_id,
+          changes: diffs
         }
       )
 
-      %{state | lobby: new_lobby, update_id: new_update_id}
+      %{state | lobby: new_lobby}
     end
   end
 
@@ -319,8 +327,7 @@ defmodule Teiserver.Game.LobbyServer do
        match_id: nil,
        lobby: lobby,
        lobby_topic: LobbyLib.lobby_topic(id),
-       match_topic: nil,
-       update_id: 0
+       match_topic: nil
      }}
   end
 end

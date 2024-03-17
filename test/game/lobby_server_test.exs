@@ -25,17 +25,16 @@ defmodule Teiserver.Game.LobbyServerTest do
 
       [m] = TestConn.get(listener)
 
-      assert match?(
-               %{
-                 topic: ^topic,
-                 update_id: 1,
-                 event: :lobby_updated,
-                 lobby: %{
-                   host_data: nil
-                 }
-               },
-               m
-             )
+      assert m == %{
+        topic: topic,
+        update_id: 1,
+        event: :lobby_updated,
+        changes: %{
+          host_data: nil,
+          update_id: 1
+        },
+        lobby_id: lobby_id
+      }
 
       # Now destroy the client process
       Connections.stop_client_server(user.id)

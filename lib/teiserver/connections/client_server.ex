@@ -7,6 +7,7 @@ defmodule Teiserver.Connections.ClientServer do
   require Logger
   alias Teiserver.Game.LobbyLib
   alias Teiserver.Connections.{Client, ClientLib}
+  alias Teiserver.Helpers.MapHelper
 
   @heartbeat_frequency_ms 5_000
 
@@ -135,7 +136,9 @@ defmodule Teiserver.Connections.ClientServer do
 
   @spec update_client(State.t(), Client.t(), String.t()) :: State.t()
   defp update_client(%State{} = state, %Client{} = new_client, reason) do
-    if new_client == state.client do
+    diffs = MapHelper.map_diffs(state.client, new_client)
+
+    if diffs == %{} do
       # Nothing changed, we don't do anything
       state
     else
@@ -143,11 +146,14 @@ defmodule Teiserver.Connections.ClientServer do
       new_update_id = state.client.update_id + 1
       new_client = struct(new_client, %{update_id: new_update_id})
 
+      diffs = Map.put(diffs, :update_id, new_update_id)
+
       Teiserver.broadcast(
         state.client_topic,
         %{
           event: :client_updated,
-          client: new_client,
+          changes: diffs,
+          user_id: state.user_id,
           reason: reason
         }
       )
@@ -157,7 +163,8 @@ defmodule Teiserver.Connections.ClientServer do
           state.lobby_topic,
           %{
             event: :lobby_client_change,
-            client: new_client,
+            changes: diffs,
+            user_id: state.user_id,
             reason: reason
           }
         )
