@@ -34,7 +34,7 @@ defmodule Teiserver.Connections.ClientServer do
   @impl true
   def handle_cast({:add_connection, conn_pid}, state) when is_pid(conn_pid) do
     Process.monitor(conn_pid)
-    new_connections = [conn_pid | state.connections]
+    new_connections = Enum.uniq([conn_pid | state.connections])
 
     if state.client.connected? do
       {:noreply, %State{state | connections: new_connections}}
@@ -231,6 +231,14 @@ defmodule Teiserver.Connections.ClientServer do
       id,
       id
     )
+
+    # After being created a client will typically have
+    # a connection be added, it is possible in some cases
+    # for a timing issue to happen where the connection will not correctly
+    # add itself and thus the client will count as disconnected but
+    # with no last_disconnect value
+    # Putting in this 50ms sleep solves the issue
+    :timer.sleep(50)
 
     {:ok,
      %State{
