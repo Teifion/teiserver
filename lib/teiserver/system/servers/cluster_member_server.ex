@@ -13,7 +13,7 @@ defmodule Teiserver.System.ClusterManager do
     GenServer.start_link(
       __MODULE__,
       params,
-      name: Teiserver.System.ClusterManager
+      name: __MODULE__
     )
   end
 
@@ -28,7 +28,7 @@ defmodule Teiserver.System.ClusterManager do
 
   @impl GenServer
   def handle_call(other, from, state) do
-    Logger.warning("unhandled call to ClusterManager: #{inspect(other)}.  From: #{inspect(from)}")
+    Logger.warning("unhandled call to ClusterManager: #{inspect(other)}. From: #{inspect(from)}")
     {:reply, :not_implemented, state}
   end
 
