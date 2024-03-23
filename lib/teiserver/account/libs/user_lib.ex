@@ -177,6 +177,42 @@ defmodule Teiserver.Account.UserLib do
   end
 
   @doc """
+  Updates a user's password.
+
+  ## Examples
+
+      iex> update_password(user, %{field: new_value})
+      {:ok, %User{}}
+
+      iex> update_password(user, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec update_password(User.t(), map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def update_password(%User{} = user, attrs) do
+    User.changeset(user, attrs, :change_password)
+    |> Teiserver.Repo.update()
+  end
+
+  @doc """
+  Updates a user but only the fields users are allowed to alter themselves.
+
+  ## Examples
+
+      iex> update_limited_user(user, %{field: new_value})
+      {:ok, %User{}}
+
+      iex> update_limited_user(user, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec update_limited_user(User.t(), map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def update_limited_user(%User{} = user, attrs) do
+    User.changeset(user, attrs, :user_form)
+    |> Teiserver.Repo.update()
+  end
+
+  @doc """
   Deletes a user.
 
   ## Examples

@@ -31,6 +31,10 @@ defmodule Teiserver.Connections.ClientServer do
     {:reply, state.client, state}
   end
 
+  def handle_call(:get_connections, _from, state) do
+    {:reply, state.connections, state}
+  end
+
   @impl true
   def handle_cast({:add_connection, conn_pid}, state) when is_pid(conn_pid) do
     Process.monitor(conn_pid)

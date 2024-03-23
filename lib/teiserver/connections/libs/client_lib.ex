@@ -171,6 +171,20 @@ defmodule Teiserver.Connections.ClientLib do
     end
   end
 
+  @doc """
+
+  """
+  @spec disconnect_user(Teiserver.user_id()) :: :ok
+  def disconnect_user(user_id) do
+    call_client(user_id, :get_connections)
+    |> Enum.each(fn pid ->
+      send(pid, :disconnect)
+    end)
+
+    :timer.sleep(1000)
+    stop_client_server(user_id)
+  end
+
   # Process stuff
   @doc false
   @spec start_client_server(Client.t()) :: pid()

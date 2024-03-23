@@ -59,6 +59,14 @@ defmodule Teiserver.Account do
   defdelegate update_user(user, attrs), to: UserLib
 
   @doc section: :user
+  @spec update_password(User.t(), map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate update_password(user, attrs), to: UserLib
+
+  @doc section: :user
+  @spec update_limited_user(User.t(), map) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate update_limited_user(user, attrs), to: UserLib
+
+  @doc section: :user
   @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   defdelegate delete_user(user), to: UserLib
 
