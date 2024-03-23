@@ -137,6 +137,10 @@ defmodule Teiserver.Api do
   defdelegate unsubscribe_from_lobby(lobby_or_lobby_id), to: LobbyLib
 
   @doc section: :lobby
+  @spec lobby_exists?(Lobby.id()) :: boolean
+  defdelegate lobby_exists?(lobby_id), to: LobbyLib
+
+  @doc section: :lobby
   @spec get_lobby(Lobby.id()) :: Lobby.t() | nil
   defdelegate get_lobby(lobby_id), to: LobbyLib
 
@@ -173,8 +177,13 @@ defmodule Teiserver.Api do
   defdelegate close_lobby(lobby_id), to: LobbyLib
 
   @doc section: :lobby
-  @spec can_add_client_to_lobby?(Teiserver.user_id(), Lobby.id()) :: boolean()
-  defdelegate can_add_client_to_lobby?(user_id, lobby_id), to: LobbyLib
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: {boolean(), String.t() | nil}
+  defdelegate can_add_client_to_lobby(user_id, lobby_id), to: LobbyLib
+
+  @doc section: :lobby
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t()) :: {boolean(), String.t() | nil}
+  defdelegate can_add_client_to_lobby(user_id, lobby_id, password), to: LobbyLib
+
 
   @doc section: :lobby
   @spec add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: :ok | {:error, String.t()}

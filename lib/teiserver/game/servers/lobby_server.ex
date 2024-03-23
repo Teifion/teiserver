@@ -30,8 +30,8 @@ defmodule Teiserver.Game.LobbyServer do
     {:reply, Map.get(state.lobby, key), state}
   end
 
-  def handle_call({:can_add_client?, user_id}, _from, state) do
-    {:reply, can_add_client?(user_id, state), state}
+  def handle_call({:can_add_client, user_id, password}, _from, state) do
+    {:reply, can_add_client({user_id, password}, state), state}
   end
 
   def handle_call({:client_update_request, %{id: _user_id} = changes}, _from, state) do
@@ -40,13 +40,13 @@ defmodule Teiserver.Game.LobbyServer do
 
   # Attempts to add a client to the lobby
   def handle_call({:add_client, user_id}, _from, state) do
-    case can_add_client?(user_id, state) do
+    case can_add_client({user_id, state.lobby.password}, state) do
       {false, reason} ->
         {:reply, {:error, reason}, state}
 
       {true, _} ->
-        new_state = do_add_client(user_id, state)
-        {:reply, :ok, new_state}
+        {shared_secret, new_state} = do_add_client(user_id, state)
+        {:reply, {:ok, shared_secret, state.lobby}, new_state}
     end
   end
 
@@ -165,8 +165,8 @@ defmodule Teiserver.Game.LobbyServer do
     GenServer.start_link(__MODULE__, opts[:data], [])
   end
 
-  @spec can_add_client?(Teiserver.user_id(), State.t()) :: {boolean(), String.t() | nil}
-  defp can_add_client?(user_id, %{lobby: lobby} = _state) do
+  @spec can_add_client({Teiserver.user_id(), String.t()}, State.t()) :: {boolean(), String.t() | nil}
+  defp can_add_client({user_id, password}, %{lobby: lobby} = _state) do
     cond do
       Enum.member?(lobby.members, user_id) ->
         {false, "Existing member"}
@@ -182,7 +182,10 @@ defmodule Teiserver.Game.LobbyServer do
             {false, "Client is disconnected"}
 
           client.lobby_id != nil ->
-            {:error, "Already in a lobby"}
+            {false, "Already in a lobby"}
+
+          lobby.password && lobby.password != password ->
+            {false, "Incorrect password"}
 
           true ->
             {true, nil}
@@ -235,8 +238,10 @@ defmodule Teiserver.Game.LobbyServer do
     struct(lobby_state, changes)
   end
 
-  @spec do_add_client(Teiserver.user_id(), State.t()) :: State.t()
+  @spec do_add_client(Teiserver.user_id(), State.t()) :: {String.t(), State.t()}
   defp do_add_client(user_id, state) do
+    shared_secret = Teiserver.Account.generate_password()
+
     ClientLib.update_client_full(user_id, %{
       lobby_id: state.lobby_id,
       ready?: false,
@@ -255,16 +260,17 @@ defmodule Teiserver.Game.LobbyServer do
       %{
         event: :lobby_user_joined,
         lobby_id: state.lobby_id,
-        client: client
+        client: client,
+        shared_secret: shared_secret
       }
     )
 
     Connections.subscribe_to_client(user_id)
 
-    update_lobby(state, %{
+    {shared_secret, update_lobby(state, %{
       members: [user_id | state.lobby.members],
       spectators: [user_id | state.lobby.spectators]
-    })
+    })}
   end
 
   @spec do_remove_client(Teiserver.user_id(), State.t()) :: State.t()

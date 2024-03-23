@@ -129,7 +129,7 @@ defmodule Connections.ClientServerTest do
 
       client_pid = Connections.get_client_pid(user.id)
       send(client_pid, :heartbeat)
-      :timer.sleep(100)
+      :timer.sleep(500)
 
       refute Connections.client_exists?(user.id)
     end

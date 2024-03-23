@@ -315,9 +315,16 @@ defmodule Teiserver.Game.LobbyLib do
   @doc """
   Adds a client to the lobby
   """
-  @spec can_add_client_to_lobby?(Teiserver.user_id(), Lobby.id()) :: boolean()
-  def can_add_client_to_lobby?(user_id, lobby_id) do
-    call_lobby(lobby_id, {:can_add_client?, user_id})
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: {boolean(), String.t() | nil}
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t()) :: {boolean(), String.t() | nil}
+  def can_add_client_to_lobby(user_id, lobby_id, password \\ nil) do
+    case call_lobby(lobby_id, {:can_add_client, user_id, password}) do
+      nil ->
+        {false, "No lobby"}
+
+      result ->
+        result
+    end
   end
 
   @doc """
@@ -362,7 +369,7 @@ defmodule Teiserver.Game.LobbyLib do
   end
 
   @doc false
-  @spec lobby_exists?(Lobby.id()) :: pid() | boolean
+  @spec lobby_exists?(Lobby.id()) :: boolean
   def lobby_exists?(lobby_id) do
     case Horde.Registry.lookup(Teiserver.LobbyRegistry, lobby_id) do
       [{_pid, _}] -> true

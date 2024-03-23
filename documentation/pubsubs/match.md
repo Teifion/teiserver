@@ -23,12 +23,15 @@ Messages relating to updates to the lobby in question.
 Fired off whenever a user is added to the lobby member list.
 
 - `:client` - A `Teiserver.Connections.Client` of the client
+- `:shared_secret` - A string used to identify clients to the game host (since the in-game connection will be separate from the server). Though this value is broadcast to all subscribers it should only be forwarded to the host and relevant user.
+
 
 ```elixir
 %{
   event: :lobby_user_joined,
   lobby_id: Lobby.id(),
-  client: Client.t()
+  client: Client.t(),
+  shared_secret: String.t()
 }
 ```
 

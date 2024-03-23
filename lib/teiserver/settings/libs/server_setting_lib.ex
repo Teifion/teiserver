@@ -35,9 +35,9 @@ defmodule Teiserver.Settings.ServerSettingLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_server_setting!(non_neg_integer()) :: ServerSetting.t()
-  def get_server_setting!(server_setting_id, query_args \\ []) do
-    (query_args ++ [id: server_setting_id])
+  @spec get_server_setting!(String.t()) :: ServerSetting.t()
+  def get_server_setting!(key, query_args \\ []) do
+    (query_args ++ [key: key])
     |> ServerSettingQueries.server_setting_query()
     |> Teiserver.Repo.one!()
   end
@@ -57,8 +57,8 @@ defmodule Teiserver.Settings.ServerSettingLib do
 
   """
   @spec get_server_setting(non_neg_integer(), list) :: ServerSetting.t() | nil
-  def get_server_setting(server_setting_id, query_args \\ []) do
-    (query_args ++ [id: server_setting_id])
+  def get_server_setting(key, query_args \\ []) do
+    (query_args ++ [key: key])
     |> ServerSettingQueries.server_setting_query()
     |> Teiserver.Repo.one()
   end

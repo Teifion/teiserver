@@ -25,8 +25,8 @@ defmodule Teiserver.Settings do
   defdelegate get_server_setting!(server_setting_id, query_args \\ []), to: ServerSettingLib
 
   @doc section: :server_setting
-  @spec get_server_setting(non_neg_integer(), list) :: ServerSetting.t() | nil
-  defdelegate get_server_setting(server_setting_id, query_args \\ []), to: ServerSettingLib
+  @spec get_server_setting(String.t(), list) :: ServerSetting.t() | nil
+  defdelegate get_server_setting(key, query_args \\ []), to: ServerSettingLib
 
   @doc section: :server_setting
   @spec create_server_setting(map) :: {:ok, ServerSetting.t()} | {:error, Ecto.Changeset.t()}

@@ -118,15 +118,15 @@ defmodule Teiserver.MatchLibAsyncTest do
       {_, u4} = ConnectionFixtures.client_fixture()
       u5 = AccountFixtures.user_fixture()
 
-      assert Game.can_add_client_to_lobby?(u1.id, lobby_id) == {true, nil}
-      assert Game.can_add_client_to_lobby?(u5.id, lobby_id) == {false, "Client is not connected"}
+      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {true, nil}
+      assert Game.can_add_client_to_lobby(u5.id, lobby_id) == {false, "Client is not connected"}
 
       Game.add_client_to_lobby(u1.id, lobby_id)
       Game.add_client_to_lobby(u2.id, lobby_id)
       Game.add_client_to_lobby(u3.id, lobby_id)
       Game.add_client_to_lobby(u4.id, lobby_id)
 
-      assert Game.can_add_client_to_lobby?(u1.id, lobby_id) == {false, "Existing member"}
+      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {false, "Existing member"}
 
       lobby = Game.get_lobby(lobby_id)
 

@@ -27,6 +27,7 @@ defmodule Teiserver.Game.Lobby do
   * `:players` - List of user_ids as players, source of truth is still client state
   * `:spectators` - List of user_ids spectating, source of truth is still client state
   * `:members` - Total list of all user_ids who are members of the lobby
+  * `:approved_members` - A list of users approved to join the lobby bypassing some of the normal checks
 
   * `:update_id` - The version ID of the update to ensure updates can be discarded if out of date or duplicates
   """
@@ -38,7 +39,7 @@ defmodule Teiserver.Game.Lobby do
 
   @derive {Jason.Encoder,
            only:
-             ~w(id match_id match_ongoing? host_id host_data name tags password passworded? locked? public? match_type rated? queue_id game_name game_version game_settings players spectators members)a}
+             ~w(id match_id match_ongoing? host_id host_data name tags password passworded? locked? public? match_type rated? queue_id game_name game_version game_settings players spectators members approved_members)a}
   typedstruct do
     @typedoc "A lobby"
 
@@ -72,6 +73,7 @@ defmodule Teiserver.Game.Lobby do
     field(:players, [Teiserver.user_id()], default: [])
     field(:spectators, [Teiserver.user_id()], default: [])
     field(:members, [Teiserver.user_id()], default: [])
+    field(:approved_members, [Teiserver.user_id()], default: [])
 
     # Meta
     field(:update_id, non_neg_integer())

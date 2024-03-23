@@ -28,6 +28,7 @@ To add a client to the lobby you will need to call `Teiserver.Game.add_client_to
 - The lobby state will be updated to add this user to the member list and the spectator list
 - The lobby process will subscribe to updates about the client
 - The client process will be updated with default lobby details
+- Subscribers to the lobby pubsub will receive information about this including a `shared_secret`. This secret is passed on to the user themselves and the host to allow for authentication outside of the server connection.
 
 ### Leaving
 To remove a client from a lobby you will need to call `Teiserver.Game.remove_client_from_lobby/2`. When this is called the following takes place:

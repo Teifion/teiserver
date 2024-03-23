@@ -74,8 +74,12 @@ defmodule Teiserver.Game do
   defdelegate close_lobby(lobby_id), to: LobbyLib
 
   @doc section: :lobby
-  @spec can_add_client_to_lobby?(Teiserver.user_id(), Lobby.id()) :: boolean()
-  defdelegate can_add_client_to_lobby?(user_id, lobby_id), to: LobbyLib
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: {boolean(), String.t() | nil}
+  defdelegate can_add_client_to_lobby(user_id, lobby_id), to: LobbyLib
+
+  @doc section: :lobby
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t()) :: {boolean(), String.t() | nil}
+  defdelegate can_add_client_to_lobby(user_id, lobby_id, password), to: LobbyLib
 
   @doc section: :lobby
   @spec add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: :ok | {:error, String.t()}
