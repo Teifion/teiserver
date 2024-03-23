@@ -43,6 +43,7 @@ defmodule Teiserver.Connections.ClientServer do
 
       Teiserver.broadcast(state.client_topic, %{
         event: :client_connected,
+        user_id: state.user_id,
         client: new_client
       })
 
@@ -115,6 +116,7 @@ defmodule Teiserver.Connections.ClientServer do
 
         Teiserver.broadcast(state.client_topic, %{
           event: :client_disconnected,
+          user_id: state.user_id,
           client: new_client
         })
 
