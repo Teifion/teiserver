@@ -9,6 +9,8 @@
   <a href="https://hexdocs.pm/teiserver"><img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat"></a>
   &nbsp;
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="Apache 2 License" src="https://img.shields.io/hexpm/l/teiserver"></a>
+  &nbsp;
+  <a href="https://github.com/Teifion/teiserver/actions/workflows/elixir.yml/badge.svg?branch=0.0.5"><img alt="Tests" src="https://github.com/Teifion/teiserver/actions/workflows/elixir.yml/badge.svg?branch=0.0.5"></a>  
 </p>
 
 _Note: This README is for the unreleased master branch, please reference the
