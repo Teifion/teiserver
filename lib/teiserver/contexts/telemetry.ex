@@ -69,6 +69,8 @@ defmodule Teiserver.Telemetry do
 
   def event_list() do
     [
+      [:teiserver, :user, :failed_login],
+
       [:teiserver, :client, :added_connection],
       [:teiserver, :client, :new_connection],
       [:teiserver, :client, :updated],

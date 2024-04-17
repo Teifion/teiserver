@@ -288,6 +288,12 @@ defmodule Teiserver.Account.UserLib do
     Cachex.incr(:ts_login_count_ip, ip)
     Cachex.incr(:ts_login_count_user, user_id)
 
+    :telemetry.execute(
+      [:teiserver, :user, :failed_login],
+      %{reason: reason},
+      %{user_id: user_id, ip: ip}
+    )
+
     Teiserver.Logging.create_audit_log(user_id, ip, "failed-login", %{reason: reason})
 
     :ok
