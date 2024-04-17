@@ -25,10 +25,36 @@ defmodule Teiserver.Settings.ServerSettingTypeLib do
     v
   end
 
+  @doc """
+  ### Required keys
+  * `:key` - The string key of the setting, this is the internal name used for the setting
+  * `:label` - The user-facing label used for the setting
+  * `:section` - A string referencing how the setting should be grouped
+  * `:type` - The type of value which should be parsed out, can be one of: `string`, `boolean`, `integer`
+
+  ### Optional attributes
+  * `:permissions` - A permission set (string or list of strings) used to check if a given user can edit this setting
+  * `:choices` - A list of acceptable choices for `string` based types
+  * `:default` - The default value for a setting if one is not set, defaults to `nil`
+  * `:description` - A longer description which can be used to provide more information to users
+
+  ## Examples
+  ```
+  add_server_setting_type(%{
+    key: "login.ip_rate_limit",
+    label: "Login rate limit per IP",
+    section: "Login",
+    type: "integer",
+    permissions: "Admin",
+    default: 3,
+    description: "The upper bound on how many failed attempts a given IP can perform before all further attempts will be blocked"
+  })
+  ```
+  """
   @spec add_server_setting_type(map()) :: {:ok, ServerSettingType.t()} | {:error, String.t()}
   def add_server_setting_type(args) do
     if not Enum.member?(~w(string integer boolean), args.type) do
-      raise "Invalid type, must be one of `string`, `integer` or `boolean`"
+      raise "Invalid type of '#{args.type}', must be one of 'string', 'integer' or 'boolean'"
     end
 
     existing_keys = list_server_setting_type_keys()

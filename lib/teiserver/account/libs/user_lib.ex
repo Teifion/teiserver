@@ -281,6 +281,65 @@ defmodule Teiserver.Account.UserLib do
     User.valid_password?(plaintext_password, user.password)
   end
 
+  @spec register_failed_login(User.id(), String.t() | nil, String.t() | atom) :: :ok
+  def register_failed_login(_, _, :rate_limit), do: :ok
+  def register_failed_login(nil, _, _), do: :ok
+  def register_failed_login(user_id, ip, reason) do
+    Cachex.incr(:ts_login_count_ip, ip)
+    Cachex.incr(:ts_login_count_user, user_id)
+
+    Teiserver.Logging.create_audit_log(user_id, ip, "failed-login", %{reason: reason})
+
+    :ok
+  end
+
+  @doc """
+  Given a userid and optionally an IP, check if we have hit the maximum number of
+  login attempts for this user.
+  """
+  @spec allow_login_attempt?(User.id(), String.t() | nil) :: boolean
+  def allow_login_attempt?(userid, ip \\ nil) do
+    cond do
+      allow_ip_login_attempt?(ip) == false ->
+        false
+
+      allow_user_login_attempt?(userid) == false ->
+        false
+
+      true ->
+        true
+    end
+  end
+
+  @spec allow_ip_login_attempt?(String.t()) :: boolean
+  defp allow_ip_login_attempt?(nil), do: true
+  defp allow_ip_login_attempt?(ip) do
+    max_allowed_ip = Teiserver.Settings.get_server_setting_value("login.ip_rate_limit")
+
+    if max_allowed_ip == nil do
+      true
+    else
+      current_ip_count = Cachex.fetch!(:ts_login_count_ip, ip, fn -> 0 end)
+
+      # As long as we're below the max it's okay
+      current_ip_count <= max_allowed_ip
+    end
+  end
+
+  @spec allow_user_login_attempt?(User.id()) :: boolean
+  defp allow_user_login_attempt?(userid) do
+    max_allowed_user = Teiserver.Settings.get_server_setting_value("login.user_rate_limit")
+
+    if max_allowed_user == nil do
+      true
+    else
+      current_user_count = Cachex.fetch!(:ts_login_count_user, userid, fn -> 0 end)
+
+      # As long as we're below the max it's okay
+      current_user_count <= max_allowed_user
+    end
+  end
+
   @doc """
   Generates a strong, though not very human readable, password.
 

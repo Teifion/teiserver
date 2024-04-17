@@ -31,32 +31,113 @@ defmodule Teiserver.Api do
   @doc """
   Takes a name and password, tries to authenticate the user.
 
+  Optionally accepts an IP for rate limiting purposes.
+
   ## Examples
 
-      iex> maybe_authenticate_user("Alice", "password1")
+      iex> maybe_authenticate_user_by_name("Alice", "password1", "127.0.0.1")
       {:ok, %User{}}
 
-      iex> maybe_authenticate_user("Bob", "bad password")
+      iex> maybe_authenticate_user_by_name("Bob", "bad password", "127.0.0.1")
       {:error, :bad_password}
 
-      iex> maybe_authenticate_user("Chris", "password1")
+      iex> maybe_authenticate_user_by_name("Chris", "password1", "127.0.0.1")
       {:error, :no_user}
   """
   @doc section: :user
-  @spec maybe_authenticate_user(String.t(), String.t()) ::
-          {:ok, Account.User.t()} | {:error, :no_user | :bad_password}
-  def maybe_authenticate_user(name, password) do
+  @spec maybe_authenticate_user_by_name(String.t(), String.t(), String.t() | nil) ::
+          {:ok, Account.User.t()} | {:error, :no_user | :bad_password | :rate_limit}
+  def maybe_authenticate_user_by_name(name, password, ip \\ nil) do
     case Account.get_user_by_name(name) do
       nil ->
         {:error, :no_user}
 
       user ->
-        if Teiserver.Account.valid_password?(user, password) do
-          {:ok, user}
-        else
-          {:error, :bad_password}
-        end
+        do_maybe_authenticate_user(user, password, ip)
     end
+  end
+
+  @doc """
+  Takes a email and password, tries to authenticate the user.
+
+  Optionally accepts an IP for rate limiting purposes.
+
+  ## Examples
+
+      iex> maybe_authenticate_user_by_email("alice@domain", "password1", "127.0.0.1")
+      {:ok, %User{}}
+
+      iex> maybe_authenticate_user_by_email("bob@domain", "bad password", "127.0.0.1")
+      {:error, :bad_password}
+
+      iex> maybe_authenticate_user_by_email("chris@domain", "password1", "127.0.0.1")
+      {:error, :no_user}
+  """
+  @doc section: :user
+  @spec maybe_authenticate_user_by_email(String.t(), String.t(), String.t() | nil) ::
+          {:ok, Account.User.t()} | {:error, :no_user | :bad_password | :rate_limit}
+  def maybe_authenticate_user_by_email(email, password, ip \\ nil) do
+    case Account.get_user_by_email(email) do
+      nil ->
+        {:error, :no_user}
+
+      user ->
+        do_maybe_authenticate_user(user, password, ip)
+    end
+  end
+
+  @doc """
+  Takes a id and password, tries to authenticate the user.
+
+  Optionally accepts an IP for rate limiting purposes.
+
+  ## Examples
+
+      iex> maybe_authenticate_user_by_id("a5f2e06b-a89b-45b2-aeae-87e45d02f8f8", "password1", "127.0.0.1")
+      {:ok, %User{}}
+
+      iex> maybe_authenticate_user_by_id("7f50a62b-1e7c-440a-b851-5dc076f1a6cc", "bad password", "127.0.0.1")
+      {:error, :bad_password}
+
+      iex> maybe_authenticate_user_by_id("f8cfc144-eb45-4b09-b738-07705baae6c8", "password1", "127.0.0.1")
+      {:error, :no_user}
+  """
+  @doc section: :user
+  @spec maybe_authenticate_user_by_id(String.t(), String.t(), String.t() | nil) ::
+          {:ok, Account.User.t()} | {:error, :no_user | :bad_password | :rate_limit}
+  def maybe_authenticate_user_by_id(id, password, ip \\ nil) do
+    case Account.get_user_by_id(id) do
+      nil ->
+        {:error, :no_user}
+
+      user ->
+        do_maybe_authenticate_user(user, password, ip)
+    end
+  end
+
+  @spec do_maybe_authenticate_user(Account.User.t(), String.t(), String.t() | nil) :: {:ok, Account.User.t()} | {:error, :no_user | :bad_password | :rate_limit}
+  defp do_maybe_authenticate_user(user, password, ip) do
+    rate_limit_allow? = UserLib.allow_login_attempt?(user.id, ip)
+
+    result = if rate_limit_allow? do
+      if Teiserver.Account.valid_password?(user, password) do
+        {:ok, user}
+      else
+        {:error, :bad_password}
+      end
+    else
+      {:error, :rate_limit}
+    end
+
+    # We might want to register the failed login attempt
+    case result do
+      {:error, reason} ->
+        UserLib.register_failed_login(user.id, ip, reason)
+      _ ->
+        :ok
+    end
+
+    result
   end
 
   @doc """
@@ -70,11 +151,14 @@ defmodule Teiserver.Api do
   @doc section: :client
   @spec connect_user(Teiserver.user_id()) :: Connections.Client.t()
   def connect_user(user_id) when is_binary(user_id) do
-    Connections.connect_user(user_id)
+    client = Connections.connect_user(user_id)
     # Sleep to prevent this current process getting the messages related to the connection
     :timer.sleep(100)
     Teiserver.subscribe(Connections.client_topic(user_id))
     Teiserver.subscribe(Communication.user_messaging_topic(user_id))
+
+    # Return the client
+    client
   end
 
   @doc """

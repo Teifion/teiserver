@@ -42,7 +42,11 @@ defmodule Teiserver.Application do
       add_cache(:ts_server_setting_cache, ttl: :timer.minutes(1)),
       add_cache(:ts_user_setting_type_store),
       add_cache(:ts_user_setting_cache, ttl: :timer.minutes(1)),
-      add_cache(:ts_user_by_user_id_cache, ttl: :timer.minutes(5))
+      add_cache(:ts_user_by_user_id_cache, ttl: :timer.minutes(5)),
+
+      # Login rate limiting
+      add_cache(:ts_login_count_ip, ttl: :timer.minutes(5)),
+      add_cache(:ts_login_count_user, ttl: :timer.minutes(5))
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]
@@ -51,6 +55,8 @@ defmodule Teiserver.Application do
     if Application.get_env(:teiserver, :teiserver_clustering, true) do
       Teiserver.System.ClusterManagerSupervisor.start_cluster_manager_supervisor_children()
     end
+
+    Teiserver.System.StartupLib.perform()
 
     start_result
   end

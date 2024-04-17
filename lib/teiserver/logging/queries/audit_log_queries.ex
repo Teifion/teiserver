@@ -44,6 +44,18 @@ defmodule Teiserver.Logging.AuditLogQueries do
     )
   end
 
+  def _where(query, :user_id, user_id_list) when is_list(user_id_list) do
+    from(audit_logs in query,
+      where: audit_logs.user_id in ^user_id_list
+    )
+  end
+
+  def _where(query, :user_id, user_id) do
+    from(audit_logs in query,
+      where: audit_logs.user_id == ^user_id
+    )
+  end
+
   def _where(query, :action, action_list) when is_list(action_list) do
     from(audit_logs in query,
       where: audit_logs.action in ^action_list
