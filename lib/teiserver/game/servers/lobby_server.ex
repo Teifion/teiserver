@@ -42,8 +42,8 @@ defmodule Teiserver.Game.LobbyServer do
 
       {true, _} ->
         :telemetry.execute(
-          [:teiserver, :lobby, :add_client],
-          %{},
+          [:teiserver, :lobby, :event],
+          %{type: :add_client},
           %{user_id: user_id}
         )
         {shared_secret, new_state} = do_add_client(user_id, state)
@@ -70,8 +70,8 @@ defmodule Teiserver.Game.LobbyServer do
   def handle_cast({:remove_client, user_id}, state) do
     if Enum.member?(state.lobby.members, user_id) do
       :telemetry.execute(
-        [:teiserver, :lobby, :remove_client],
-        %{},
+        [:teiserver, :lobby, :event],
+        %{type: :remove_client},
         %{user_id: user_id}
       )
       new_state = do_remove_client(user_id, state)
@@ -90,8 +90,8 @@ defmodule Teiserver.Game.LobbyServer do
       })
 
     :telemetry.execute(
-      [:teiserver, :lobby, :cycle],
-      %{},
+      [:teiserver, :lobby, :event],
+      %{type: :cycle},
       %{match_id: match_id}
     )
 
@@ -105,8 +105,8 @@ defmodule Teiserver.Game.LobbyServer do
       })
 
     :telemetry.execute(
-      [:teiserver, :lobby, :start_match],
-      %{players: state.lobby.players},
+      [:teiserver, :lobby, :event],
+      %{type: :start_match},
       %{match_id: state.match_id}
     )
 

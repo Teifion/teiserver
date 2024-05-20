@@ -67,20 +67,15 @@ defmodule Teiserver.Telemetry do
     :telemetry.attach_many(@handler_id, events, &__MODULE__.handle_event/4, opts)
   end
 
+  @spec event_list() :: list(list(atom))
   def event_list() do
     [
       [:teiserver, :user, :failed_login],
 
-      [:teiserver, :client, :added_connection],
-      [:teiserver, :client, :new_connection],
-      [:teiserver, :client, :updated],
-      [:teiserver, :client, :update_in_lobby],
+      [:teiserver, :client, :event],
       [:teiserver, :client, :disconnect],
 
-      [:teiserver, :lobby, :add_client],
-      [:teiserver, :lobby, :remove_client],
-      [:teiserver, :lobby, :cycle],
-      [:teiserver, :lobby, :start_match],
+      [:teiserver, :lobby, :event],
 
       [:teiserver, :logging, :add_audit_log]
     ]

@@ -39,16 +39,16 @@ defmodule Teiserver.Connections.ClientServer do
 
     if state.client.connected? do
       :telemetry.execute(
-        [:teiserver, :client, :added_connection],
-        %{},
+        [:teiserver, :client, :event],
+        %{type: :added_connection},
         %{user_id: state.user_id}
       )
 
       {:noreply, %State{state | connections: new_connections}}
     else
       :telemetry.execute(
-        [:teiserver, :client, :new_connection],
-        %{},
+        [:teiserver, :client, :event],
+        %{type: :new_connection},
         %{user_id: state.user_id}
       )
 
@@ -69,8 +69,8 @@ defmodule Teiserver.Connections.ClientServer do
       {:noreply, state}
     else
       :telemetry.execute(
-        [:teiserver, :client, :updated],
-        %{},
+        [:teiserver, :client, :event],
+        %{type: :updated},
         %{user_id: state.user_id}
       )
 
@@ -97,8 +97,8 @@ defmodule Teiserver.Connections.ClientServer do
 
   def handle_cast({:do_update_client_in_lobby, new_client, reason}, state) do
     :telemetry.execute(
-      [:teiserver, :client, :update_in_lobby],
-      %{},
+      [:teiserver, :client, :event],
+      %{type: :update_in_lobby},
       %{user_id: state.user_id}
     )
 
@@ -263,7 +263,7 @@ defmodule Teiserver.Connections.ClientServer do
 
   @impl true
   @spec init(map) :: {:ok, map}
-  def init(%{client: %Client{id: id} = client}) do
+  def init(%{client: %Client{id: id} = client, opts: opts}) do
     # Logger.metadata(request_id: "ClientServer##{id}")
     :timer.send_interval(@heartbeat_frequency_ms, :heartbeat)
 
@@ -279,6 +279,11 @@ defmodule Teiserver.Connections.ClientServer do
       id,
       id
     )
+
+    # Handle opts
+    client = struct(client, %{
+      bot?: (opts[:bot?] || false)
+    })
 
     # After being created a client will typically have
     # a connection be added, it is possible in some cases
