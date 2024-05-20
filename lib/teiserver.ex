@@ -76,6 +76,14 @@ defmodule Teiserver do
     UUID.uuid5(nil, base)
   end
 
+  @doc """
+  Gets the custom node name as set in the config `:teiserver, :node_name`
+  """
+  @spec get_node_name() :: atom
+  def get_node_name() do
+    to_string(Application.get_env(:teiserver, :node_name) || Node.self())
+  end
+
   # PubSub delegation
   @doc false
   @spec broadcast(String.t(), map()) :: :ok

@@ -48,7 +48,11 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps()
     end
 
-    # execute "CREATE INDEX IF NOT EXISTS lower_username ON #{prefix}.account_users (LOWER(name))"
+    if prefix do
+      execute "CREATE INDEX IF NOT EXISTS lower_username ON #{prefix}.account_users (LOWER(name))"
+    else
+      execute "CREATE INDEX IF NOT EXISTS lower_username ON account_users (LOWER(name))"
+    end
     create_if_not_exists(unique_index(:account_users, [:email], prefix: prefix))
 
     create_if_not_exists table(:account_extra_user_data, primary_key: false, prefix: prefix) do

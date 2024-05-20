@@ -430,4 +430,29 @@ defmodule Teiserver.Account.UserLib do
   def default_user_name_acceptable?(_name) do
     true
   end
+
+  @name_parts1 ~w(serene energised humble auspicious decisive exemplary cheerful determined playful spry springy)
+  @name_parts2 ~w(
+      maroon cherry rose ruby
+      amber carrot
+      lemon beige
+      mint lime cadmium
+      aqua cerulean
+      lavender indigo
+      magenta amethyst
+    )
+  @name_parts3 ~w(hamster gerbil cat dog falcon eagle mole fox tiger panda elephant lion cow dove whale dolphin squid dragon snake platypus badger)
+
+  @doc """
+  Generates a name for guests
+  """
+  @spec generate_guest_name() :: String.t()
+  def generate_guest_name() do
+    case :rand.uniform(3) do
+      1 -> [@name_parts1, @name_parts2]
+      2 -> [@name_parts1, @name_parts3]
+      3 -> [@name_parts2, @name_parts3]
+    end
+    |> Enum.map_join(" ", fn l -> Enum.random(l) |> String.capitalize() end)
+  end
 end

@@ -144,18 +144,20 @@ defmodule Teiserver.Connections.ClientLib do
   Given a user_id, log them in. If the user already exists as a client then the existing
   client is returned.
 
+  The optional `opts` argument is passed through to the ClientServer starting up.
+
   The calling process will be listed as a connection for the client
   the client will monitor it for the purposes of tracking if the
   given client is still connected.
   """
-  @spec connect_user(Teiserver.user_id()) :: Client.t()
-  def connect_user(user_id) do
+  @spec connect_user(Teiserver.user_id(), list()) :: Client.t()
+  def connect_user(user_id, opts \\ []) do
     if client_exists?(user_id) do
       cast_client(user_id, {:add_connection, self()})
       get_client(user_id)
     else
       client = Client.new(user_id)
-      _pid = start_client_server(client)
+      _pid = start_client_server(client, opts)
       cast_client(user_id, {:add_connection, self()})
       client
     end
@@ -188,14 +190,15 @@ defmodule Teiserver.Connections.ClientLib do
 
   # Process stuff
   @doc false
-  @spec start_client_server(Client.t()) :: pid()
-  def start_client_server(%Client{} = client) do
+  @spec start_client_server(Client.t(), list) :: pid()
+  def start_client_server(%Client{} = client, opts) do
     {:ok, server_pid} =
       DynamicSupervisor.start_child(Teiserver.ClientSupervisor, {
         Teiserver.Connections.ClientServer,
         name: "client_#{client.id}",
         data: %{
-          client: client
+          client: client,
+          opts: opts
         }
       })
 

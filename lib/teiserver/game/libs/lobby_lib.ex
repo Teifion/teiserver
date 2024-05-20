@@ -11,21 +11,21 @@ defmodule Teiserver.Game.LobbyLib do
   def lobby_topic(lobby_id), do: "Teiserver.Game.Lobby:#{lobby_id}"
 
   @doc """
-  Subscribes the process to lobby updates for this user
+  Subscribes the process to lobby updates for this lobby
   """
-  @spec subscribe_to_lobby(User.id() | User.t() | Client.t()) :: :ok
-  def subscribe_to_lobby(lobby_or_lobby_id) do
-    lobby_or_lobby_id
+  @spec subscribe_to_lobby(Lobby.id()) :: :ok
+  def subscribe_to_lobby(lobby_id) do
+    lobby_id
     |> lobby_topic()
     |> Teiserver.subscribe()
   end
 
   @doc """
-  Unsubscribes the process to lobby updates for this user
+  Unsubscribes the process to lobby updates for this lobby
   """
-  @spec unsubscribe_from_lobby(User.id() | User.t() | Client.t()) :: :ok
-  def unsubscribe_from_lobby(lobby_or_lobby_id) do
-    lobby_or_lobby_id
+  @spec unsubscribe_from_lobby(Lobby.id()) :: :ok
+  def unsubscribe_from_lobby(lobby_id) do
+    lobby_id
     |> lobby_topic()
     |> Teiserver.unsubscribe()
   end
@@ -229,9 +229,11 @@ defmodule Teiserver.Game.LobbyLib do
                ) do
           {:ok, lobby.id}
         else
-          :failure1 -> :fail_result1
-          :failure2 -> :fail_result2
-          :failure3 -> :fail_result3
+          {:error, reason} ->
+            {:error, reason}
+
+          nil ->
+            {:error, "Unable to cycle lobby, cycle_lobby returned nil indicating the process does not exist"}
         end
     end
   end
@@ -375,11 +377,13 @@ defmodule Teiserver.Game.LobbyLib do
   def start_lobby_server(host_id, name) do
     lobby = Lobby.new(host_id, name)
 
-    {:ok, _pid} =
-      lobby
-      |> do_start_lobby_server()
+    case do_start_lobby_server(lobby) do
+      {:ok, _pid} ->
+        {:ok, lobby}
 
-    {:ok, lobby}
+      v ->
+        v
+    end
   end
 
   # Process stuff

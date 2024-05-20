@@ -10,6 +10,7 @@ defmodule Teiserver.Connections.Client do
   * `:last_disconnected` - When disconnected, stores a DateTime of when the client was last connected
   * `:lobby_id` - nil or the id of the lobby current occupied by this client
   * `:in_game?` - True when the client is in-game
+  * `:bot?` - True when the client connects and registers itself as a bot, a bot cannot play games but can engage in things outside of them (e.g. chatting, hosting lobbies)
   * `:afk?` - True when the client has not sent an activity message for a while
   * `:ready?` - A flag set by the client to show it is ready to proceed in the current lobby
   * `:player?` - When in a lobby or match, set to true if the client is playing and false if not (e.g. spectator)
@@ -27,12 +28,13 @@ defmodule Teiserver.Connections.Client do
 
   @derive {Jason.Encoder,
            only:
-             ~w(id connected? last_disconnected afk? party_id in_game? lobby_id ready? player? player_number team_number player_colour sync lobby_host? update_id)a}
+             ~w(id connected? last_disconnected bot? afk? party_id in_game? lobby_id ready? player? player_number team_number player_colour sync lobby_host? update_id)a}
   typedstruct do
     field(:id, Teiserver.user_id())
     field(:connected?, boolean, default: false)
     field(:last_disconnected, DateTime.t())
 
+    field(:bot?, boolean, default: false)
     field(:afk?, boolean, default: false)
     field(:party_id, Teiserver.party_id())
     field(:in_game?, boolean, default: false)

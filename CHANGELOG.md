@@ -3,6 +3,9 @@
 - Refactored the client update process
 - Added User and Server runtime settings
 - Added Telemetry events
+- Added rate limiting of login attempts
+- Added more options for connecting clients (currently just `bot?`)
+- Added support for Angen to provide guest accounts
 
 ## v0.0.4
 - Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries

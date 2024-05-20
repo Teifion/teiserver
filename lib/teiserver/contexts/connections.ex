@@ -52,8 +52,8 @@ defmodule Teiserver.Connections do
   defdelegate update_client_in_lobby(user_id, updates, reason), to: ClientLib
 
   @doc section: :client
-  @spec connect_user(Teiserver.user_id()) :: Client.t()
-  defdelegate connect_user(user_id), to: ClientLib
+  @spec connect_user(Teiserver.user_id(), list) :: Client.t()
+  defdelegate connect_user(user_id, opts \\ []), to: ClientLib
 
   @doc section: :client
   @spec disconnect_user(Teiserver.user_id()) :: :ok
