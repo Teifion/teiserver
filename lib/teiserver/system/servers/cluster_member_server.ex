@@ -10,7 +10,7 @@ defmodule Teiserver.System.ClusterMemberServer do
   """
   use GenServer
   require Logger
-  alias Teiserver.System.ClusterMemberLib
+  alias Teiserver.System.{ClusterMember, ClusterMemberLib}
 
   @startup_delay 500
 
@@ -111,29 +111,33 @@ defmodule Teiserver.System.ClusterMemberServer do
 
       members ->
         members
-        |> Enum.reduce_while(false, fn cluster_member_entity, acc ->
-          node_name = String.to_atom(cluster_member_entity.host)
-
-          case Node.connect(node_name) do
-            true ->
-              {:halt, true}
-
-            false ->
-              {:cont, acc}
-
-            :ignored ->
-              {:cont, acc}
-          end
-        end)
+        |> Enum.reduce_while(false, &attempt_connection/2)
         |> case do
           true ->
             Logger.info("Node successfully joined the cluster: #{inspect(Node.self())}")
             true
 
           false ->
-            Logger.error("Node failed to successfully join the cluster: #{inspect(Node.self())}")
+            names = members
+              |> Enum.map_join(", ", fn m -> m.host end)
+
+            Logger.error("Node #{inspect(Node.self())} failed to successfully join the cluster, tried: #{names}")
             false
         end
+    end
+  end
+
+  @spec attempt_connection(ClusterMember.t(), boolean()) :: {:halt | :cont, boolean()}
+  defp attempt_connection(%ClusterMember{host: host}, acc) do
+    case Node.connect(String.to_atom(host)) do
+      true ->
+        {:halt, true}
+
+      false ->
+        {:cont, acc}
+
+      :ignored ->
+        {:cont, acc}
     end
   end
 
