@@ -39,7 +39,7 @@ defmodule Teiserver.Connections.ClientServer do
 
     if state.client.connected? do
       :telemetry.execute(
-        [:teiserver, :client, :event],
+        [:teiserver, :client, :connect],
         %{type: :added_connection},
         %{user_id: state.user_id}
       )
@@ -47,7 +47,7 @@ defmodule Teiserver.Connections.ClientServer do
       {:noreply, %State{state | connections: new_connections}}
     else
       :telemetry.execute(
-        [:teiserver, :client, :event],
+        [:teiserver, :client, :connect],
         %{type: :new_connection},
         %{user_id: state.user_id}
       )

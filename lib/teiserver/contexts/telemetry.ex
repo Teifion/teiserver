@@ -72,8 +72,10 @@ defmodule Teiserver.Telemetry do
     [
       [:teiserver, :user, :failed_login],
 
-      [:teiserver, :client, :event],
+      [:teiserver, :client, :connect],
       [:teiserver, :client, :disconnect],
+
+      [:teiserver, :client, :event],
 
       [:teiserver, :lobby, :event],
 
