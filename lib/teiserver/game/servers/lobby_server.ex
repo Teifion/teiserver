@@ -90,8 +90,8 @@ defmodule Teiserver.Game.LobbyServer do
       })
 
     :telemetry.execute(
-      [:teiserver, :lobby, :event],
-      %{type: :cycle},
+      [:teiserver, :lobby, :cycle],
+      %{},
       %{match_id: match_id}
     )
 
@@ -105,8 +105,8 @@ defmodule Teiserver.Game.LobbyServer do
       })
 
     :telemetry.execute(
-      [:teiserver, :lobby, :event],
-      %{type: :start_match},
+      [:teiserver, :lobby, :start_match],
+      %{},
       %{match_id: state.match_id}
     )
 

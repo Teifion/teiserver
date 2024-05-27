@@ -77,6 +77,9 @@ defmodule Teiserver.Telemetry do
 
       [:teiserver, :client, :event],
 
+
+      [:teiserver, :lobby, :start_match],
+      [:teiserver, :lobby, :cycle],
       [:teiserver, :lobby, :event],
 
       [:teiserver, :logging, :add_audit_log]
