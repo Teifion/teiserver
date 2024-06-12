@@ -69,8 +69,8 @@ defmodule Teiserver.Connections.ClientServer do
       {:noreply, state}
     else
       :telemetry.execute(
-        [:teiserver, :client, :event],
-        %{type: :updated},
+        [:teiserver, :client, :updated],
+        %{change_count: Enum.count(partial_client)},
         %{user_id: state.user_id}
       )
 
@@ -97,8 +97,8 @@ defmodule Teiserver.Connections.ClientServer do
 
   def handle_cast({:do_update_client_in_lobby, new_client, reason}, state) do
     :telemetry.execute(
-      [:teiserver, :client, :event],
-      %{type: :update_in_lobby},
+      [:teiserver, :client, :updated_in_lobby],
+      %{},
       %{user_id: state.user_id}
     )
 

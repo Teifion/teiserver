@@ -70,18 +70,22 @@ defmodule Teiserver.Telemetry do
   @spec event_list() :: list(list(atom))
   def event_list() do
     [
+      # User
       [:teiserver, :user, :failed_login],
 
+      # Client
       [:teiserver, :client, :connect],
       [:teiserver, :client, :disconnect],
+      [:teiserver, :client, :updated],
+      [:teiserver, :client, :updated_in_lobby],
 
-      [:teiserver, :client, :event],
-
-
+      # Lobby
       [:teiserver, :lobby, :start_match],
       [:teiserver, :lobby, :cycle],
-      [:teiserver, :lobby, :event],
+      [:teiserver, :lobby, :add_client],
+      [:teiserver, :lobby, :remove_client],
 
+      # Logging
       [:teiserver, :logging, :add_audit_log]
     ]
   end

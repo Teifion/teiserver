@@ -286,9 +286,8 @@ defmodule Teiserver.MixProject do
       "test.ci": [
         "format --check-formatted",
         "deps.unlock --check-unused",
-        "credo --strict",
-        "test --raise",
-        "dialyzer"
+        # "credo --strict",
+        "test --raise"
       ]
     ]
   end

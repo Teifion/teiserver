@@ -42,9 +42,9 @@ defmodule Teiserver.Game.LobbyServer do
 
       {true, _} ->
         :telemetry.execute(
-          [:teiserver, :lobby, :event],
-          %{type: :add_client},
-          %{user_id: user_id}
+          [:teiserver, :lobby, :add_client],
+          %{},
+          %{user_id: user_id, lobby_id: state.lobby_id}
         )
         {shared_secret, new_state} = do_add_client(user_id, state)
         {:reply, {:ok, shared_secret, state.lobby}, new_state}
@@ -70,9 +70,9 @@ defmodule Teiserver.Game.LobbyServer do
   def handle_cast({:remove_client, user_id}, state) do
     if Enum.member?(state.lobby.members, user_id) do
       :telemetry.execute(
-        [:teiserver, :lobby, :event],
-        %{type: :remove_client},
-        %{user_id: user_id}
+        [:teiserver, :lobby, :remove_client],
+        %{},
+        %{lobby_id: state.lobby_id, user_id: user_id}
       )
       new_state = do_remove_client(user_id, state)
       {:noreply, new_state}
@@ -92,7 +92,7 @@ defmodule Teiserver.Game.LobbyServer do
     :telemetry.execute(
       [:teiserver, :lobby, :cycle],
       %{},
-      %{match_id: match_id}
+      %{match_id: match_id, lobby_id: state.lobby_id}
     )
 
     {:noreply, %{new_state | match_id: match_id}}
@@ -107,7 +107,7 @@ defmodule Teiserver.Game.LobbyServer do
     :telemetry.execute(
       [:teiserver, :lobby, :start_match],
       %{},
-      %{match_id: state.match_id}
+      %{match_id: state.match_id, lobby_id: state.lobby_id}
     )
 
     {:noreply, new_state}
