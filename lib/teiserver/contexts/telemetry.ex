@@ -166,9 +166,9 @@ defmodule Teiserver.Telemetry do
   # end
 
   def handle_event([:teiserver, a, b], measure, meta, opts) do
-    IO.puts "#{__MODULE__}:#{__ENV__.line}"
-    IO.inspect {{a, b}, measure, meta, opts}
-    IO.puts ""
+    IO.puts("#{__MODULE__}:#{__ENV__.line}")
+    IO.inspect({{a, b}, measure, meta, opts})
+    IO.puts("")
 
     # log(opts, fn ->
     #   case mode do

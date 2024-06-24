@@ -233,7 +233,8 @@ defmodule Teiserver.Game.LobbyLib do
             {:error, reason}
 
           nil ->
-            {:error, "Unable to cycle lobby, cycle_lobby returned nil indicating the process does not exist"}
+            {:error,
+             "Unable to cycle lobby, cycle_lobby returned nil indicating the process does not exist"}
         end
     end
   end

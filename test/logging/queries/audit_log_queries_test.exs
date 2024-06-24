@@ -31,7 +31,10 @@ defmodule Teiserver.AuditLogQueriesTest do
           where: [
             id: [1, 2],
             id: 1,
-            user_id: ["0ea89483-80da-4041-9e41-fcb152c24168", "7fa72464-e3b6-42e8-935e-608adc65608e"],
+            user_id: [
+              "0ea89483-80da-4041-9e41-fcb152c24168",
+              "7fa72464-e3b6-42e8-935e-608adc65608e"
+            ],
             user_id: "57b86216-5a32-4e76-bad0-1012a825667b",
             action: ["action1", "action2"],
             action: "action",

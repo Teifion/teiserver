@@ -46,6 +46,7 @@ defmodule Teiserver.Game.LobbyServer do
           %{},
           %{user_id: user_id, lobby_id: state.lobby_id}
         )
+
         {shared_secret, new_state} = do_add_client(user_id, state)
         {:reply, {:ok, shared_secret, state.lobby}, new_state}
     end
@@ -74,6 +75,7 @@ defmodule Teiserver.Game.LobbyServer do
         %{},
         %{lobby_id: state.lobby_id, user_id: user_id}
       )
+
       new_state = do_remove_client(user_id, state)
       {:noreply, new_state}
     else

@@ -115,24 +115,27 @@ defmodule Teiserver.Api do
     end
   end
 
-  @spec do_maybe_authenticate_user(Account.User.t(), String.t(), String.t() | nil) :: {:ok, Account.User.t()} | {:error, :no_user | :bad_password | :rate_limit}
+  @spec do_maybe_authenticate_user(Account.User.t(), String.t(), String.t() | nil) ::
+          {:ok, Account.User.t()} | {:error, :no_user | :bad_password | :rate_limit}
   defp do_maybe_authenticate_user(user, password, ip) do
     rate_limit_allow? = UserLib.allow_login_attempt?(user.id, ip)
 
-    result = if rate_limit_allow? do
-      if Teiserver.Account.valid_password?(user, password) do
-        {:ok, user}
+    result =
+      if rate_limit_allow? do
+        if Teiserver.Account.valid_password?(user, password) do
+          {:ok, user}
+        else
+          {:error, :bad_password}
+        end
       else
-        {:error, :bad_password}
+        {:error, :rate_limit}
       end
-    else
-      {:error, :rate_limit}
-    end
 
     # We might want to register the failed login attempt
     case result do
       {:error, reason} ->
         UserLib.register_failed_login(user.id, ip, reason)
+
       _ ->
         :ok
     end

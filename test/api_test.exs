@@ -12,23 +12,33 @@ defmodule ApiTest do
     test "maybe_authenticate_user_by_name/2" do
       user = AccountFixtures.user_fixture()
 
-      assert Api.maybe_authenticate_user_by_name("--- no name ---", "password") == {:error, :no_user}
-      assert Api.maybe_authenticate_user_by_name(user.name, "bad_password") == {:error, :bad_password}
+      assert Api.maybe_authenticate_user_by_name("--- no name ---", "password") ==
+               {:error, :no_user}
+
+      assert Api.maybe_authenticate_user_by_name(user.name, "bad_password") ==
+               {:error, :bad_password}
+
       assert Api.maybe_authenticate_user_by_name(user.name, "password") == {:ok, user}
     end
 
     test "maybe_authenticate_user_by_email/2" do
       user = AccountFixtures.user_fixture()
 
-      assert Api.maybe_authenticate_user_by_email("--- no email ---", "password") == {:error, :no_user}
-      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password") == {:error, :bad_password}
+      assert Api.maybe_authenticate_user_by_email("--- no email ---", "password") ==
+               {:error, :no_user}
+
+      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password") ==
+               {:error, :bad_password}
+
       assert Api.maybe_authenticate_user_by_email(user.email, "password") == {:ok, user}
     end
 
     test "maybe_authenticate_user_by_id/2" do
       user = AccountFixtures.user_fixture()
 
-      assert Api.maybe_authenticate_user_by_id("e986ed95-b46f-4ad5-8168-fdb575a623f6", "password") == {:error, :no_user}
+      assert Api.maybe_authenticate_user_by_id("e986ed95-b46f-4ad5-8168-fdb575a623f6", "password") ==
+               {:error, :no_user}
+
       assert Api.maybe_authenticate_user_by_id(user.id, "bad_password") == {:error, :bad_password}
       assert Api.maybe_authenticate_user_by_id(user.id, "password") == {:ok, user}
     end
@@ -37,18 +47,26 @@ defmodule ApiTest do
       user = AccountFixtures.user_fixture()
 
       # No attempts so far, lets check for audit logs
-      logs = Teiserver.Logging.list_audit_logs(where: [
-        user_id: user.id
-      ])
+      logs =
+        Teiserver.Logging.list_audit_logs(
+          where: [
+            user_id: user.id
+          ]
+        )
+
       assert Enum.empty?(logs)
 
       # Bad login
-      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") == {:error, :bad_password}
+      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") ==
+               {:error, :bad_password}
 
       # Ensure it was logged
-      [log] = Teiserver.Logging.list_audit_logs(where: [
-        user_id: user.id
-      ])
+      [log] =
+        Teiserver.Logging.list_audit_logs(
+          where: [
+            user_id: user.id
+          ]
+        )
 
       assert log.ip == "my-ip"
       assert log.details == %{"reason" => "bad_password"}
@@ -56,11 +74,17 @@ defmodule ApiTest do
       assert log.user_id == user.id
 
       # Now do it a few more times to trip the breaker
-      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") == {:error, :bad_password}
-      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") == {:error, :bad_password}
-      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") == {:error, :bad_password}
+      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") ==
+               {:error, :bad_password}
 
-      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") == {:error, :rate_limit}
+      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") ==
+               {:error, :bad_password}
+
+      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") ==
+               {:error, :bad_password}
+
+      assert Api.maybe_authenticate_user_by_email(user.email, "bad_password", "my-ip") ==
+               {:error, :rate_limit}
     end
 
     test "register_user/3" do

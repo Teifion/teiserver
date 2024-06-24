@@ -13,7 +13,8 @@ defmodule Teiserver.System.StartupLib do
       type: "integer",
       permissions: "Admin",
       default: 3,
-      description: "The upper bound on how many failed attempts a given IP can perform before all further attempts will be blocked"
+      description:
+        "The upper bound on how many failed attempts a given IP can perform before all further attempts will be blocked"
     })
 
     Settings.add_server_setting_type(%{
@@ -23,7 +24,8 @@ defmodule Teiserver.System.StartupLib do
       type: "integer",
       permissions: "Admin",
       default: nil,
-      description: "The upper bound on how many failed attempts a given user can have before their logins are blocked."
+      description:
+        "The upper bound on how many failed attempts a given user can have before their logins are blocked."
     })
   end
 end

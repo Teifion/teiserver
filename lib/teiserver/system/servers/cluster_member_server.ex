@@ -34,7 +34,10 @@ defmodule Teiserver.System.ClusterMemberServer do
 
   @impl GenServer
   def handle_call(other, from, state) do
-    Logger.warning("unhandled call to ClusterMemberServer: #{inspect(other)}. From: #{inspect(from)}")
+    Logger.warning(
+      "unhandled call to ClusterMemberServer: #{inspect(other)}. From: #{inspect(from)}"
+    )
+
     {:reply, :not_implemented, state}
   end
 
@@ -118,10 +121,14 @@ defmodule Teiserver.System.ClusterMemberServer do
             true
 
           false ->
-            names = members
+            names =
+              members
               |> Enum.map_join(", ", fn m -> m.host end)
 
-            Logger.error("Node #{inspect(Node.self())} failed to successfully join the cluster, tried: #{names}")
+            Logger.error(
+              "Node #{inspect(Node.self())} failed to successfully join the cluster, tried: #{names}"
+            )
+
             false
         end
     end

@@ -123,8 +123,10 @@ defmodule Teiserver.Logging.AuditLogLib do
       %{action: audit_log.action},
       %{log_id: audit_log.id}
     )
+
     {:ok, audit_log}
   end
+
   defp maybe_emit_event(v), do: v
 
   @doc """

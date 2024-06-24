@@ -281,9 +281,10 @@ defmodule Teiserver.Connections.ClientServer do
     )
 
     # Handle opts
-    client = struct(client, %{
-      bot?: (opts[:bot?] || false)
-    })
+    client =
+      struct(client, %{
+        bot?: opts[:bot?] || false
+      })
 
     # After being created a client will typically have
     # a connection be added, it is possible in some cases
