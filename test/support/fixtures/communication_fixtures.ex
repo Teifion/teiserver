@@ -1,7 +1,7 @@
-defmodule Teiserver.CommunicationFixtures do
+defmodule Teiserver.Fixtures.CommunicationFixtures do
   @moduledoc false
-  import Teiserver.AccountFixtures, only: [user_fixture: 0]
-  import Teiserver.GameFixtures, only: [incomplete_match_fixture: 0]
+  import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
+  import Teiserver.Fixtures.GameFixtures, only: [incomplete_match_fixture: 0]
   alias Teiserver.Communication.{Room, RoomMessage, DirectMessage, MatchMessage}
 
   @spec room_fixture() :: Room.t()

@@ -4,7 +4,13 @@ defmodule Teiserver.MatchMessageLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Communication
-  alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures, GameFixtures}
+
+  alias Teiserver.Fixtures.{
+    CommunicationFixtures,
+    AccountFixtures,
+    ConnectionFixtures,
+    GameFixtures
+  }
 
   defp valid_attrs do
     %{

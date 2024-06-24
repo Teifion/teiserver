@@ -1,6 +1,6 @@
-defmodule Teiserver.LoggingFixtures do
+defmodule Teiserver.Fixtures.LoggingFixtures do
   @moduledoc false
-  import Teiserver.AccountFixtures, only: [user_fixture: 0]
+  import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
   alias Teiserver.Logging.{AuditLog}
 
   @spec audit_log_fixture() :: AuditLog.t()

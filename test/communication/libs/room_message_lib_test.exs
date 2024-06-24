@@ -5,7 +5,7 @@ defmodule Teiserver.RoomMessageLibTest do
 
   alias Teiserver.Communication
   alias Phoenix.PubSub
-  alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
+  alias Teiserver.Fixtures.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
 
   defp valid_attrs do
     %{

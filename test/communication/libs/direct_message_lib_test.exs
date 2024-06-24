@@ -4,7 +4,7 @@ defmodule Teiserver.DirectMessageLibTest do
   alias Teiserver.Communication
   use Teiserver.Case, async: true
 
-  alias Teiserver.{CommunicationFixtures, ConnectionFixtures, AccountFixtures}
+  alias Teiserver.Fixtures.{CommunicationFixtures, ConnectionFixtures, AccountFixtures}
 
   defp valid_attrs do
     %{

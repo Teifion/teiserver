@@ -152,13 +152,16 @@ defmodule Teiserver.Api do
   Always returns `:ok`
   """
   @doc section: :client
-  @spec connect_user(Teiserver.user_id(), list) :: Connections.Client.t()
+  @spec connect_user(Teiserver.user_id(), list) :: Connections.Client.t() | nil
   def connect_user(user_id, opts \\ []) when is_binary(user_id) do
     client = Connections.connect_user(user_id, opts)
-    # Sleep to prevent this current process getting the messages related to the connection
-    :timer.sleep(100)
-    Teiserver.subscribe(Connections.client_topic(user_id))
-    Teiserver.subscribe(Communication.user_messaging_topic(user_id))
+
+    if client do
+      # Sleep to prevent this current process getting the messages related to the connection
+      :timer.sleep(100)
+      Teiserver.subscribe(Connections.client_topic(user_id))
+      Teiserver.subscribe(Communication.user_messaging_topic(user_id))
+    end
 
     # Return the client
     client

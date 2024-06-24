@@ -3,7 +3,7 @@ defmodule Connections.ClientServerTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Connections
-  alias Teiserver.{AccountFixtures, ConnectionFixtures}
+  alias Teiserver.Fixtures.{AccountFixtures, ConnectionFixtures}
 
   describe "Client server" do
     test "server lifecycle" do

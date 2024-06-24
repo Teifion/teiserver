@@ -3,7 +3,7 @@ defmodule Connections.ClientInLobbyLibTest do
   use Teiserver.Case, async: false
 
   alias Teiserver.{Connections, Game}
-  alias Teiserver.{ConnectionFixtures, GameFixtures}
+  alias Teiserver.Fixtures.{ConnectionFixtures, GameFixtures}
 
   describe "ClientLib" do
     test "update_client_in_lobby" do

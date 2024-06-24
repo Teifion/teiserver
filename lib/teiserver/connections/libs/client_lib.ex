@@ -150,7 +150,7 @@ defmodule Teiserver.Connections.ClientLib do
   the client will monitor it for the purposes of tracking if the
   given client is still connected.
   """
-  @spec connect_user(Teiserver.user_id(), list()) :: Client.t()
+  @spec connect_user(Teiserver.user_id(), list()) :: Client.t() | nil
   def connect_user(user_id, opts \\ []) do
     if client_exists?(user_id) do
       cast_client(user_id, {:add_connection, self()})

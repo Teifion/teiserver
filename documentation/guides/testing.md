@@ -4,14 +4,14 @@ Teiserver aims to have as many functions tested as possible. More importantly Te
 ## Fixtures
 Teiserver includes at least one fixture for every schema located in `/test/support/fixtures`. They follow a consistent naming pattern:
 ```elixir
-Teiserver.Account.User -> Teiserver.AccountFixtures.user_fixture()
+Teiserver.Account.User -> Teiserver.Fixtures.AccountFixtures.user_fixture()
 Teiserver.Game.Match -> Teiserver.GameFixtures.incomplete_match_fixture()
 ```
 
 Each fixture can be called as is or with a map which will dictate overrides for otherwise static or random values.
 
 ```elixir
-Teiserver.AccountFixtures.user_fixture(%{
+Teiserver.Fixtures.AccountFixtures.user_fixture(%{
   name: "MySpecific TestUser",
   password: "A special password"
 })

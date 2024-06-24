@@ -4,7 +4,7 @@ defmodule Teiserver.MatchLibAsyncTest do
   use Teiserver.Case, async: false
 
   alias Teiserver.{Game, Connections}
-  alias Teiserver.{GameFixtures, AccountFixtures, ConnectionFixtures}
+  alias Teiserver.Fixtures.{GameFixtures, AccountFixtures, ConnectionFixtures}
 
   defp valid_attrs do
     %{

@@ -1,4 +1,5 @@
 ## v0.0.5
+- Swapped to Elixir 1.17
 - Swapped `team_colour` for `player_colour`
 - Refactored the client update process
 - Added User and Server runtime settings

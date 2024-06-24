@@ -3,7 +3,7 @@ defmodule Teiserver.Game.LobbyLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Game
-  alias Teiserver.{ConnectionFixtures, GameFixtures}
+  alias Teiserver.Fixtures.{ConnectionFixtures, GameFixtures}
 
   describe "LobbyLib" do
     test "Creating and stopping server" do

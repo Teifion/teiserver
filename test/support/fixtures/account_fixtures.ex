@@ -1,4 +1,4 @@
-defmodule Teiserver.AccountFixtures do
+defmodule Teiserver.Fixtures.AccountFixtures do
   @moduledoc false
   alias Teiserver.Account.{User, ExtraUserData}
 

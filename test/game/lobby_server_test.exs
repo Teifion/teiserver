@@ -3,7 +3,7 @@ defmodule Teiserver.Game.LobbyServerTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.{Game, Connections}
-  alias Teiserver.ConnectionFixtures
+  alias Teiserver.Fixtures.ConnectionFixtures
 
   describe "Lobby server" do
     test "server lifecycle" do

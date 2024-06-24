@@ -2,7 +2,7 @@ defmodule Account.UserTest do
   @moduledoc false
   use Teiserver.Case, async: true
 
-  alias Teiserver.AccountFixtures
+  alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Account.User
 
   describe "User" do

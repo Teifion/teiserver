@@ -1,9 +1,9 @@
-defmodule Teiserver.GameFixtures do
+defmodule Teiserver.Fixtures.GameFixtures do
   @moduledoc false
   alias Teiserver.Game
   alias Teiserver.Game.{Lobby, Match, MatchType, MatchMembership, MatchSettingType, MatchSetting}
-  import Teiserver.AccountFixtures, only: [user_fixture: 0]
-  import Teiserver.ConnectionFixtures, only: [client_fixture: 0]
+  import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
+  import Teiserver.Fixtures.ConnectionFixtures, only: [client_fixture: 0]
 
   @spec lobby_fixture() :: Lobby.t()
   @spec lobby_fixture(map) :: Lobby.t()

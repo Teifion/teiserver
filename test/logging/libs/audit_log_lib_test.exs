@@ -4,7 +4,7 @@ defmodule Teiserver.AuditLogLibTest do
   alias Teiserver.Logging
   use Teiserver.Case, async: true
 
-  alias Teiserver.{LoggingFixtures, AccountFixtures}
+  alias Teiserver.Fixtures.{LoggingFixtures, AccountFixtures}
 
   defp valid_attrs do
     %{

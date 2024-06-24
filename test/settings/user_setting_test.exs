@@ -4,7 +4,7 @@ defmodule Teiserver.UserSettingTest do
   use Teiserver.Case, async: false
 
   alias Teiserver.Settings
-  alias Teiserver.{AccountFixtures, SettingsFixtures}
+  alias Teiserver.Fixtures.{AccountFixtures, SettingsFixtures}
 
   defp valid_attrs do
     %{

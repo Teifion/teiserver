@@ -1,11 +1,11 @@
 defmodule ApiTest do
   @moduledoc false
-  alias Teiserver.CommunicationFixtures
+  alias Teiserver.Fixtures.CommunicationFixtures
   use Teiserver.Case, async: true
 
   alias Phoenix.PubSub
   alias Teiserver.Api
-  alias Teiserver.AccountFixtures
+  alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Account.User
 
   describe "API functionality" do

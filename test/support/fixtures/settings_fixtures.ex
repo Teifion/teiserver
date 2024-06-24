@@ -1,8 +1,8 @@
-defmodule Teiserver.SettingsFixtures do
+defmodule Teiserver.Fixtures.SettingsFixtures do
   @moduledoc false
   alias Teiserver.Settings
   alias Teiserver.Settings.{ServerSettingType, ServerSetting, UserSetting}
-  import Teiserver.AccountFixtures, only: [user_fixture: 0]
+  import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
 
   @spec server_setting_type_fixture() :: ServerSettingType.t()
   @spec server_setting_type_fixture(map) :: ServerSettingType.t()

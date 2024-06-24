@@ -3,7 +3,7 @@ defmodule Teiserver.UserLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Account
-  alias Teiserver.AccountFixtures
+  alias Teiserver.Fixtures.AccountFixtures
 
   describe "users" do
     alias Teiserver.Account.User
