@@ -242,7 +242,7 @@ defmodule Teiserver.MixProject do
       {:telemetry, "~> 1.2.1"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:argon2_elixir, "~> 3.0"},
+      {:argon2_elixir, "~> 4.0"},
       {:timex, "~> 3.7.5"},
       {:typedstruct, "~> 0.5.2", runtime: false},
       {:horde, "~> 0.9"},
@@ -251,7 +251,7 @@ defmodule Teiserver.MixProject do
 
       # Dev and Test stuff
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.15.3", only: :test, runtime: false},
+      {:excoveralls, "~> 0.18.1", only: :test, runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:floki, ">= 0.34.0", only: :test}
     ]
