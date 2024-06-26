@@ -10,12 +10,12 @@ defmodule Teiserver.Fixtures.AccountFixtures do
     User.changeset(
       %User{},
       %{
-        name: data["name"] || "user_name_#{r}",
-        email: data["email"] || "user_email_#{r}",
-        password: data["password"] || "password",
-        groups: data["groups"] || [],
-        permissions: data["permissions"] || [],
-        restrictions: data["restrictions"] || []
+        name: data[:name] || "user_name_#{r}",
+        email: data[:email] || "user_email_#{r}",
+        password: data[:password] || "password",
+        groups: data[:groups] || [],
+        permissions: data[:permissions] || [],
+        restrictions: data[:restrictions] || []
       },
       :full
     )

@@ -18,7 +18,7 @@ defmodule Teiserver.Logging.AuditLog do
     field(:ip, :string)
     belongs_to(:user, Teiserver.Account.User, type: Ecto.UUID)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: non_neg_integer()

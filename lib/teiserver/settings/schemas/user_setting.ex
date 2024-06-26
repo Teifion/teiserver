@@ -18,7 +18,7 @@ defmodule Teiserver.Settings.UserSetting do
     field(:key, :string)
     field(:value, :string)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type key :: String.t()

@@ -63,7 +63,7 @@ defmodule Teiserver.Game.Match do
     # has_many :rating_logs, Teiserver.Game.RatingLog
     # belongs_to :lobby_policy, Teiserver.Game.LobbyPolicy
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: Ecto.UUID.t()

@@ -14,7 +14,7 @@ defmodule Teiserver.System.ClusterMember do
   schema "teiserver_cluster_members" do
     field(:host, :string)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: Ecto.UUID.t()

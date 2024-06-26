@@ -13,7 +13,7 @@ defmodule Teiserver.Communication.Room do
   schema "communication_rooms" do
     field(:name, :string)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: non_neg_integer()

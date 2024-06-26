@@ -133,6 +133,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
             value: raw_value
           })
 
+        Teiserver.invalidate_cache(:ts_server_setting_cache, key)
         :ok
 
       server_setting ->

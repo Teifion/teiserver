@@ -57,7 +57,7 @@ defmodule Teiserver.Account.User do
 
     has_one(:extra_data, Teiserver.Account.ExtraUserData)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: Ecto.UUID.t()

@@ -17,7 +17,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:id, :uuid, primary_key: true, null: false)
       add(:host, :string, null: false)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     # Accounts
@@ -45,7 +45,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
       add(:smurf_of_id, references(:account_users, on_delete: :nothing, type: :uuid))
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     if prefix do
@@ -99,7 +99,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:host_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:type_id, references(:game_match_types, on_delete: :nothing))
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists table(:game_match_memberships, primary_key: false) do
@@ -139,7 +139,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     # Communications
     create_if_not_exists table(:communication_rooms, prefix: prefix) do
       add(:name, :string)
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists table(:communication_room_messages, prefix: prefix) do
@@ -173,7 +173,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:key, :string, primary_key: true)
       add(:value, :string)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists table(:settings_user_setting_type, prefix: prefix) do
@@ -181,7 +181,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:value, :string)
       add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists table(:settings_user_settings, prefix: prefix) do
@@ -189,7 +189,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:value, :string)
       add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists(index(:settings_user_settings, [:user_id], prefix: prefix))

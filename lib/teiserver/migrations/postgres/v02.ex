@@ -13,7 +13,7 @@ defmodule Teiserver.Migrations.Postgres.V02 do
       add(:ip, :string)
       add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 
