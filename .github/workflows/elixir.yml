@@ -16,8 +16,8 @@ on:
 # Sets the ENV `MIX_ENV` to `test` for running tests
 env:
   MIX_ENV: test
-  ELIXIR_VER: '1.16.2'
-  OTP_VER: '25.0.4'
+  ELIXIR_VER: '1.17.1'
+  OTP_VER: '27.0'
 
 permissions:
   contents: read
