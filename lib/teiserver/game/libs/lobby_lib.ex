@@ -202,6 +202,9 @@ defmodule Teiserver.Game.LobbyLib do
     client = Connections.get_client(host_id)
 
     cond do
+      host_id == nil ->
+        {:error, "No host_id provided"}
+
       client == nil ->
         {:error, "Client is not connected"}
 
