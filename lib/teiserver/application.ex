@@ -37,16 +37,10 @@ defmodule Teiserver.Application do
       # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalMMQueueRegistry]},
       # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalMMMatchRegistry]}
 
-      # DB Lookup caches
-      add_cache(:ts_server_setting_type_store),
-      add_cache(:ts_server_setting_cache, ttl: :timer.minutes(1)),
-      add_cache(:ts_user_setting_type_store),
-      add_cache(:ts_user_setting_cache, ttl: :timer.minutes(1)),
-      add_cache(:ts_user_by_user_id_cache, ttl: :timer.minutes(5)),
-
-      # Login rate limiting
-      add_cache(:ts_login_count_ip, ttl: :timer.minutes(5)),
-      add_cache(:ts_login_count_user, ttl: :timer.minutes(5))
+      # Caches
+      Teiserver.Caches.UserSettingCache,
+      Teiserver.Caches.ServerSettingCache,
+      Teiserver.Caches.LoginCountCache
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]
@@ -59,19 +53,5 @@ defmodule Teiserver.Application do
     Teiserver.System.StartupLib.perform()
 
     start_result
-  end
-
-  @spec add_cache(atom) :: map()
-  @spec add_cache(atom, list) :: map()
-  defp add_cache(name, opts \\ []) when is_atom(name) do
-    %{
-      id: name,
-      start:
-        {Cachex, :start_link,
-         [
-           name,
-           opts
-         ]}
-    }
   end
 end

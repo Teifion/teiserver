@@ -10,21 +10,6 @@ defmodule Teiserver.System.CacheClusterServer do
     GenServer.start_link(__MODULE__, nil, opts)
   end
 
-  @spec invalidate_cache(atom, any) :: :ok
-  def invalidate_cache(table, key_or_keys) do
-    key_or_keys
-    |> List.wrap()
-    |> Enum.each(fn key ->
-      Cachex.del(table, key)
-    end)
-
-    Phoenix.PubSub.broadcast(
-      Teiserver.PubSub,
-      "cache_cluster",
-      {:cache_cluster, :delete, Node.self(), table, key_or_keys}
-    )
-  end
-
   @impl true
   def handle_info({:cache_cluster, :delete, from_node, table, key_or_keys}, state) do
     if from_node != Node.self() do
