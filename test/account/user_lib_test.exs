@@ -101,14 +101,14 @@ defmodule Teiserver.UserLibTest do
     end
 
     test "valid_password?/2" do
-      user = AccountFixtures.user_fixture(%{"password" => "password"})
+      user = AccountFixtures.user_fixture(%{password: "password"})
       assert Account.valid_password?(user, "password")
       refute Account.valid_password?(user, "bad_password")
     end
 
     test "allow?/2" do
       # User must have all of the required permissions
-      user = AccountFixtures.user_fixture(%{"groups" => ["perm1", "perm2"]})
+      user = AccountFixtures.user_fixture(%{groups: ["perm1", "perm2"]})
       assert Account.allow?(user, "perm1")
       assert Account.allow?(user.id, "perm1")
       assert Account.allow?(user.id, ["perm1"])
@@ -129,7 +129,7 @@ defmodule Teiserver.UserLibTest do
 
     test "refute?/2" do
       # Possessing any of the restrictions results in a true value
-      user = AccountFixtures.user_fixture(%{"restrictions" => ["restrict1", "restrict2"]})
+      user = AccountFixtures.user_fixture(%{restrictions: ["restrict1", "restrict2"]})
       assert Account.restricted?(user, "restrict1")
       assert Account.restricted?(user.id, "restrict1")
       assert Account.restricted?(user.id, ["restrict1"])
