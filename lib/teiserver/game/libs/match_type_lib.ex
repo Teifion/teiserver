@@ -27,7 +27,7 @@ defmodule Teiserver.Game.MatchTypeLib do
   Can be over-ridden using the config [fn_calculate_match_type](config.html#fn_calculate_match_type)
   """
   @spec default_calculate_match_type(Lobby.t()) :: String.t()
-  def default_calculate_match_type(lobby) do
+  def default_calculate_match_type(%Lobby{} = lobby) do
     if Enum.count(lobby.members) == 2 do
       "Duel"
     else

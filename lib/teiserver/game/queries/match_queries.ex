@@ -32,21 +32,51 @@ defmodule Teiserver.Game.MatchQueries do
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :id, id_list) when is_list(id_list) do
+  def _where(query, :id, id_list) do
     from(matches in query,
-      where: matches.id in ^id_list
-    )
-  end
-
-  def _where(query, :id, id) do
-    from(matches in query,
-      where: matches.id == ^id
+      where: matches.id in ^List.wrap(id_list)
     )
   end
 
   def _where(query, :name, name) do
     from(matches in query,
       where: matches.name == ^name
+    )
+  end
+
+  def _where(query, :duration_gt, seconds) do
+    from(matches in query,
+      where: matches.match_duration_seconds > ^seconds
+    )
+  end
+
+  def _where(query, :duration_lt, seconds) do
+    from(matches in query,
+      where: matches.match_duration_seconds < ^seconds
+    )
+  end
+
+  def _where(query, :started_after, timestamp) do
+    from(matches in query,
+      where: matches.match_started_at >= ^timestamp
+    )
+  end
+
+  def _where(query, :started_before, timestamp) do
+    from(matches in query,
+      where: matches.match_started_at < ^timestamp
+    )
+  end
+
+  def _where(query, :ended_after, timestamp) do
+    from(matches in query,
+      where: matches.match_ended_at >= ^timestamp
+    )
+  end
+
+  def _where(query, :ended_before, timestamp) do
+    from(matches in query,
+      where: matches.match_ended_at < ^timestamp
     )
   end
 
@@ -101,26 +131,26 @@ defmodule Teiserver.Game.MatchQueries do
   @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
-  defp do_preload(query, _), do: query
-  # defp do_preload(query, preloads) do
-  #   preloads
-  #   |> List.wrap
-  #   |> Enum.reduce(query, fn key, query_acc ->
-  #     _preload(query_acc, key)
-  #   end)
-  # end
+  defp do_preload(query, preloads) do
+    preloads
+    |> List.wrap()
+    |> Enum.reduce(query, fn key, query_acc ->
+      _preload(query_acc, key)
+    end)
+  end
 
-  # @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
-  # def _preload(query, :relation) do
-  #   from match in query,
-  #     left_join: relations in assoc(match, :relation),
-  #     preload: [relation: relations]
-  # end
+  @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
+  def _preload(query, :members) do
+    from(match in query,
+      left_join: members in assoc(match, :members),
+      preload: [members: members]
+    )
+  end
 
-  # def _preload(query, {:relation, join_query}) do
-  #   from match in query,
-  #     left_join: relations in subquery(join_query),
-  #       on: relations.id == query.relation_id,
-  #     preload: [relation: relations]
-  # end
+  def _preload(query, :settings) do
+    from(match in query,
+      left_join: settings in assoc(match, :settings),
+      preload: [settings: settings]
+    )
+  end
 end

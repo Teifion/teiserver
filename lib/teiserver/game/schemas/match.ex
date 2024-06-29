@@ -55,7 +55,7 @@ defmodule Teiserver.Game.Match do
     belongs_to(:host, Teiserver.Account.User, type: Ecto.UUID)
     belongs_to(:type, Teiserver.Game.MatchType)
     has_many(:members, Teiserver.Game.MatchMembership)
-    has_many(:match_settings, Teiserver.Game.MatchSetting)
+    has_many(:settings, Teiserver.Game.MatchSetting)
 
     # Relationships we expect to add
     # belongs_to :queue, Teiserver.Game.MatchmakingQueue
