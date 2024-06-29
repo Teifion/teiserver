@@ -281,8 +281,8 @@ defmodule Teiserver.Api do
 
   # Match
   @doc section: :match
-  @spec start_match(Lobby.t()) :: Match.t()
-  defdelegate start_match(lobby), to: MatchLib
+  @spec start_match(Teiserver.lobby_id()) :: Match.t()
+  defdelegate start_match(lobby_id), to: MatchLib
 
   @doc section: :match
   @spec end_match(Match.id(), map()) :: Match.t()

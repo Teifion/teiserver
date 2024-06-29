@@ -2,6 +2,7 @@
 - Swapped to Elixir 1.17
 - Swapped `team_colour` for `player_colour`
 - Refactored the client update process
+- Added messaging around match start/end
 - Added User and Server runtime settings
 - Added Telemetry events
 - Added rate limiting of login attempts

@@ -97,6 +97,18 @@ defmodule Teiserver.Game.LobbyServer do
       %{match_id: match_id, lobby_id: state.lobby_id}
     )
 
+    # We specifically reference the original state here
+    if state.match_id != nil and state.match_ongoing? do
+      Teiserver.broadcast(
+        state.lobby_topic,
+        %{
+          event: :match_end,
+          match_id: state.match_id,
+          lobby_id: state.lobby_id
+        }
+      )
+    end
+
     {:noreply, %{new_state | match_id: match_id}}
   end
 
@@ -105,6 +117,15 @@ defmodule Teiserver.Game.LobbyServer do
       update_lobby(state, %{
         match_ongoing?: true
       })
+
+    Teiserver.broadcast(
+      state.lobby_topic,
+      %{
+        event: :match_start,
+        match_id: state.match_id,
+        lobby_id: state.lobby_id
+      }
+    )
 
     :telemetry.execute(
       [:teiserver, :lobby, :start_match],
