@@ -98,7 +98,7 @@ defmodule Teiserver.Game.LobbyServer do
     )
 
     # We specifically reference the original state here
-    if state.match_id != nil and state.match_ongoing? do
+    if state.match_id != nil and state.lobby.match_ongoing? do
       Teiserver.broadcast(
         state.lobby_topic,
         %{
