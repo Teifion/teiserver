@@ -40,7 +40,8 @@ defmodule Teiserver.Application do
       # Caches
       Teiserver.Caches.UserSettingCache,
       Teiserver.Caches.ServerSettingCache,
-      Teiserver.Caches.LoginCountCache
+      Teiserver.Caches.LoginCountCache,
+      Teiserver.Caches.TypeLookupCache,
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]

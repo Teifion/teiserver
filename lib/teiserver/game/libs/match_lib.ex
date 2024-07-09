@@ -66,7 +66,7 @@ defmodule Teiserver.Game.MatchLib do
     {:ok, _settings} =
       lobby.game_settings
       |> Enum.map(fn {key, value} ->
-        type_id = Game.get_or_create_match_setting_type(key)
+        type_id = Game.get_or_create_match_setting_type_id(key)
         %{type_id: type_id, match_id: match.id, value: value}
       end)
       |> Game.create_many_match_settings()

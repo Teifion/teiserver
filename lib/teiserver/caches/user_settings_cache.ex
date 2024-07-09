@@ -4,7 +4,7 @@ defmodule Teiserver.Caches.UserSettingCache do
   """
 
   use Supervisor
-  import Teiserver.Helpers.CacheHelper, only: [add_cache: 1, add_cache: 2]
+  import Teiserver.Helpers.CacheHelper, only: [add_cache: 2]
 
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, :ok, opts)
@@ -13,7 +13,7 @@ defmodule Teiserver.Caches.UserSettingCache do
   @impl true
   def init(:ok) do
     children = [
-      add_cache(:ts_user_setting_type_store),
+      add_cache(:ts_user_setting_type_store, ttl: :timer.minutes(5)),
       add_cache(:ts_user_setting_cache, ttl: :timer.minutes(1)),
       add_cache(:ts_user_by_user_id_cache, ttl: :timer.minutes(5))
     ]

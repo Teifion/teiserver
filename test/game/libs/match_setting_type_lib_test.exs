@@ -41,12 +41,12 @@ defmodule Teiserver.MatchSettingTypeLibTest do
       assert Game.list_match_setting_types([]) != []
     end
 
-    test "get_or_create_match_setting_type/1 returns an id" do
+    test "get_or_create_match_setting_type_id/1 returns an id" do
       # No match_setting_type yet
       assert Game.list_match_setting_types([]) == []
 
       # Add a match_setting_type
-      type_id = Game.get_or_create_match_setting_type("test-name")
+      type_id = Game.get_or_create_match_setting_type_id("test-name")
       assert is_integer(type_id)
       [the_type] = Game.list_match_setting_types([])
 

@@ -158,6 +158,19 @@ defmodule Teiserver.Game.MatchTypeLib do
   """
   @spec get_or_create_match_type(String.t()) :: MatchType.t()
   def get_or_create_match_type(match_type_name) do
+    case Cachex.get(:ts_match_type_lookup, match_type_name) do
+      {:ok, nil} ->
+        result = do_get_or_create_match_type(match_type_name)
+        Cachex.put(:ts_match_type_lookup, match_type_name, result)
+        result
+
+      {:ok, value} ->
+        value
+    end
+  end
+
+  @spec do_get_or_create_match_type(String.t()) :: MatchType.t()
+  defp do_get_or_create_match_type(match_type_name) do
     case get_match_type_by_name_or_id(match_type_name) do
       nil ->
         {:ok, match_type} = create_match_type(%{name: match_type_name})

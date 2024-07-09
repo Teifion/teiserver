@@ -1,6 +1,6 @@
-defmodule Teiserver.Caches.ServerSettingCache do
+defmodule Teiserver.Caches.TypeLookupCache do
   @moduledoc """
-  Cache and setup for communication stuff
+  Cache for tracking type_ids of various fields to prevent repeated DB lookups
   """
 
   use Supervisor
@@ -13,8 +13,8 @@ defmodule Teiserver.Caches.ServerSettingCache do
   @impl true
   def init(:ok) do
     children = [
-      add_cache(:ts_server_setting_type_store, ttl: :timer.minutes(5)),
-      add_cache(:ts_server_setting_cache, ttl: :timer.minutes(1))
+      add_cache(:ts_match_type_lookup, ttl: :timer.minutes(5)),
+      add_cache(:ts_match_setting_type_lookup, ttl: :timer.minutes(5)),
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

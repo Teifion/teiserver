@@ -292,8 +292,8 @@ defmodule Teiserver.Game do
   defdelegate create_match_setting_type(attrs), to: MatchSettingTypeLib
 
   @doc section: :match_setting_type
-  @spec get_or_create_match_setting_type(String.t()) :: MatchSettingType.id()
-  defdelegate get_or_create_match_setting_type(name), to: MatchSettingTypeLib
+  @spec get_or_create_match_setting_type_id(String.t()) :: MatchSettingType.id()
+  defdelegate get_or_create_match_setting_type_id(name), to: MatchSettingTypeLib
 
   @doc section: :match_setting_type
   @spec update_match_setting_type(MatchSettingType, map) ::
