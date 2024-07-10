@@ -22,7 +22,7 @@ defmodule Teiserver.Game.MatchMembership do
     field(:team_number, :integer, default: nil)
 
     field(:win?, :boolean, default: nil)
-    field(:party_id, :string, default: nil)
+    field(:party_id, Ecto.UUID, default: nil)
     field(:left_after_seconds, :integer, default: nil)
   end
 

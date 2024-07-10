@@ -95,6 +95,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:match_ended_at, :utc_datetime)
 
       add(:match_duration_seconds, :integer)
+      add(:player_count, :integer)
 
       add(:host_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:type_id, references(:game_match_types, on_delete: :nothing))
@@ -171,15 +172,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     # Settings
     create_if_not_exists table(:settings_server_settings, primary_key: false, prefix: prefix) do
       add(:key, :string, primary_key: true)
-      add(:value, :string)
-
-      timestamps(type: :utc_datetime)
-    end
-
-    create_if_not_exists table(:settings_user_setting_type, prefix: prefix) do
-      add(:key, :string)
-      add(:value, :string)
-      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
+      add(:value, :text)
 
       timestamps(type: :utc_datetime)
     end
@@ -212,7 +205,6 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     # Config
     drop_if_exists(table(:settings_server_settings, prefix: prefix))
-    drop_if_exists(table(:settings_user_setting_type, prefix: prefix))
     drop_if_exists(table(:settings_user_settings, prefix: prefix))
 
     # Accounts

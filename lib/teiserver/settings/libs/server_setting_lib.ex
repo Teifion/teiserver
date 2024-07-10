@@ -3,7 +3,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
   A library of functions for working with `Teiserver.Settings.ServerSetting`
   """
   use TeiserverMacros, :library
-  alias Teiserver.Settings.{ServerSetting, ServerSettingQueries, ServerSettingTypeLib}
+  alias Teiserver.Settings.{ServerSetting, ServerSettingQueries, ServerSettingTypeLib, ServerSettingType}
 
   @doc """
   Returns the list of server_settings.
@@ -35,7 +35,6 @@ defmodule Teiserver.Settings.ServerSettingLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_server_setting!(ServerSetting.key()) :: ServerSetting.t()
   @spec get_server_setting!(ServerSetting.key(), Teiserver.query_args()) :: ServerSetting.t()
   def get_server_setting!(key, query_args \\ []) do
     (query_args ++ [key: key])
@@ -57,7 +56,6 @@ defmodule Teiserver.Settings.ServerSettingLib do
       nil
 
   """
-  @spec get_server_setting(ServerSetting.key()) :: ServerSetting.t() | nil
   @spec get_server_setting(ServerSetting.key(), Teiserver.query_args()) :: ServerSetting.t() | nil
   def get_server_setting(key, query_args \\ []) do
     (query_args ++ [key: key])
@@ -120,27 +118,41 @@ defmodule Teiserver.Settings.ServerSettingLib do
   defp convert_from_raw_value(_, _), do: nil
 
   @spec set_server_setting_value(String.t(), String.t() | non_neg_integer() | boolean() | nil) ::
-          :ok
+          :ok | {:error, String.t()}
   def set_server_setting_value(key, value) do
     type = ServerSettingTypeLib.get_server_setting_type(key)
     raw_value = convert_to_raw_value(value, type.type)
 
-    case get_server_setting(key) do
-      nil ->
-        {:ok, _} =
-          create_server_setting(%{
-            key: key,
-            value: raw_value
-          })
+    case value_is_valid?(type, value) do
+      :ok ->
+        case get_server_setting(key) do
+          nil ->
+            {:ok, _} =
+              create_server_setting(%{
+                key: key,
+                value: raw_value
+              })
 
-        Teiserver.invalidate_cache(:ts_server_setting_cache, key)
-        :ok
+            Teiserver.invalidate_cache(:ts_server_setting_cache, key)
+            :ok
 
-      server_setting ->
-        {:ok, _} = update_server_setting(server_setting, %{"value" => raw_value})
-        Teiserver.invalidate_cache(:ts_server_setting_cache, key)
-        :ok
+          server_setting ->
+            {:ok, _} = update_server_setting(server_setting, %{"value" => raw_value})
+            Teiserver.invalidate_cache(:ts_server_setting_cache, key)
+            :ok
+        end
+    {:error, reason} ->
+      {:error, reason}
     end
+  end
+
+  @doc """
+
+  """
+  @spec value_is_valid?(ServerSettingType.t(), String.t() | non_neg_integer() | boolean() | nil) :: :ok | {:error, String.t()}
+  def value_is_valid?(%{validation: nil}, _), do: :ok
+  def value_is_valid?(%{validation: validator_function}, value) do
+    validator_function.(value)
   end
 
   @spec convert_to_raw_value(String.t(), String.t()) :: String.t() | integer() | boolean() | nil

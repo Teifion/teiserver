@@ -46,6 +46,7 @@ defmodule Teiserver.Game.MatchLib do
         team_count: team_count,
         team_size: team_size,
         match_started_at: Timex.now(),
+        player_count: Enum.count(clients),
         type_id: type_id
       })
 

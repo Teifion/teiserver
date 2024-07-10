@@ -15,6 +15,7 @@ defmodule Teiserver.Settings.ServerSettingType do
   * `:choices` - A list of acceptable choices for `string` based types
   * `:default` - The default value for a setting if one is not set, defaults to `nil`
   * `:description` - A longer description which can be used to provide more information to users
+  * `:validator` - A function taking a single value and returning a `:ok | {:error, String.t()}` of if the value given is acceptable for the setting type
   """
 
   use TypedStruct
@@ -32,5 +33,6 @@ defmodule Teiserver.Settings.ServerSettingType do
     field(:choices, [String.t()] | nil, default: nil)
     field(:default, String.t() | integer() | boolean | nil, default: nil)
     field(:description, String.t() | nil, default: nil)
+    field(:validator, function() | nil, default: nil)
   end
 end

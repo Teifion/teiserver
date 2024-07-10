@@ -9,6 +9,8 @@
 - Added more options for connecting clients (currently just `bot?`)
 - Added support for Angen to provide guest accounts
 - Added caching for some db calls
+- Changed server settings to use `text` type behind the scenes and added ability to validate themz
+- Added `player_count` as a property to matches
 
 ## v0.0.4
 - Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries

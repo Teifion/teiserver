@@ -37,6 +37,7 @@ defmodule Teiserver.Settings.ServerSettingTypeLib do
   * `:choices` - A list of acceptable choices for `string` based types
   * `:default` - The default value for a setting if one is not set, defaults to `nil`
   * `:description` - A longer description which can be used to provide more information to users
+  * `:validator` - A function taking a single value and returning `:ok | {:error, String.t()}` of if the value given is acceptable for the setting type
 
   ## Examples
   ```
@@ -47,7 +48,8 @@ defmodule Teiserver.Settings.ServerSettingTypeLib do
     type: "integer",
     permissions: "Admin",
     default: 3,
-    description: "The upper bound on how many failed attempts a given IP can perform before all further attempts will be blocked"
+    description: "The upper bound on how many failed attempts a given IP can perform before all further attempts will be blocked",
+    validator: (fn v -> if String.length(v) > 6, do: :ok, else: {:error, "Must be at least 6 characters long"} end)
   })
   ```
   """
@@ -71,7 +73,8 @@ defmodule Teiserver.Settings.ServerSettingTypeLib do
       permissions: Map.get(args, :permissions),
       choices: Map.get(args, :choices),
       default: Map.get(args, :default),
-      description: Map.get(args, :description)
+      description: Map.get(args, :description),
+      validator: Map.get(args, :validator)
     }
 
     # Update our list of all keys
