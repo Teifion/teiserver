@@ -44,6 +44,18 @@ defmodule Teiserver.Game.MatchQueries do
     )
   end
 
+  def _where(query, :ended_normally?, ended_normally?) do
+    from(matches in query,
+      where: matches.ended_normally? == ^ended_normally?
+    )
+  end
+
+  def _where(query, :processed?, processed?) do
+    from(matches in query,
+      where: matches.processed? == ^processed?
+    )
+  end
+
   def _where(query, :duration_gt, seconds) do
     from(matches in query,
       where: matches.match_duration_seconds > ^seconds
