@@ -67,6 +67,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:data, :jsonb)
     end
 
+    create_if_not_exists(unique_index(:account_extra_user_data, [:user_id], prefix: prefix))
+
     # Game
     create_if_not_exists table(:game_match_types, prefix: prefix) do
       add(:name, :string)
@@ -103,6 +105,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       timestamps(type: :utc_datetime)
     end
 
+    create_if_not_exists(index(:game_matches, [:match_started_at], prefix: prefix))
+
     create_if_not_exists table(:game_match_memberships, primary_key: false) do
       add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid),
         primary_key: true,
@@ -122,6 +126,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:party_id, :string)
     end
 
+    create_if_not_exists(index(:game_match_memberships, [:match_id], prefix: prefix))
+
     create_if_not_exists table(:game_match_setting_types) do
       add(:name, :string)
     end
@@ -137,6 +143,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:value, :string)
     end
 
+    create_if_not_exists(index(:game_match_settings, [:match_id], prefix: prefix))
+
     # Communications
     create_if_not_exists table(:communication_rooms, prefix: prefix) do
       add(:name, :string)
@@ -151,6 +159,9 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:room_id, references(:communication_rooms, on_delete: :nothing))
     end
 
+    create_if_not_exists(index(:communication_room_messages, [:sender_id], prefix: prefix))
+    create_if_not_exists(index(:communication_room_messages, [:room_id], prefix: prefix))
+
     create_if_not_exists table(:communication_direct_messages, prefix: prefix) do
       add(:content, :text)
       add(:inserted_at, :utc_datetime)
@@ -161,6 +172,9 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:to_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
     end
 
+    create_if_not_exists(index(:communication_direct_messages, [:sender_id], prefix: prefix))
+    create_if_not_exists(index(:communication_direct_messages, [:to_id], prefix: prefix))
+
     create_if_not_exists table(:communication_match_messages, prefix: prefix) do
       add(:content, :text)
       add(:inserted_at, :utc_datetime)
@@ -168,6 +182,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:sender_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), type: :uuid)
     end
+
+    create_if_not_exists(index(:communication_match_messages, [:match_id], prefix: prefix))
 
     # Settings
     create_if_not_exists table(:settings_server_settings, primary_key: false, prefix: prefix) do
