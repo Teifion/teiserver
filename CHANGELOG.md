@@ -12,6 +12,7 @@
 - Changed server settings to use `text` type behind the scenes and added ability to validate themz
 - Added `player_count` as a property to matches
 - Added concept of user choices to represent pre-game choices made by users (e.g. in-game faction)
+- Removed clustering code so it can be handled by the application using Teiserver as a library
 
 ## v0.0.4
 - Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries

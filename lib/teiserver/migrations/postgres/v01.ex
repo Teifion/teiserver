@@ -12,14 +12,6 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     execute("CREATE EXTENSION IF NOT EXISTS citext")
 
-    # Clustering
-    create table(:teiserver_cluster_members, primary_key: false, prefix: prefix) do
-      add(:id, :uuid, primary_key: true, null: false)
-      add(:host, :string, null: false)
-
-      timestamps(type: :utc_datetime)
-    end
-
     # Accounts
     create_if_not_exists table(:account_users, primary_key: false, prefix: prefix) do
       add(:id, :uuid, primary_key: true, null: false)
@@ -249,9 +241,6 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     # Accounts
     drop_if_exists(table(:account_extra_user_data, prefix: prefix))
     drop_if_exists(table(:account_users, prefix: prefix))
-
-    # System
-    drop_if_exists(table(:teiserver_cluster_members, prefix: prefix))
 
     execute("DROP EXTENSION IF EXISTS citext")
   end

@@ -10,5 +10,4 @@ config :teiserver, Teiserver.Test.Repo,
   hostname: "localhost"
 
 config :teiserver,
-  repo: Teiserver.Test.Repo,
-  teiserver_clustering: false
+  repo: Teiserver.Test.Repo

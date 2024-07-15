@@ -33,13 +33,6 @@ The `social_score` given to users registered using `Teiserver.Account.UserLib.re
 ## default_min_user_password_length - Default: 6
 The minimum length for a user password.
 
-# Clustering
-## `teiserver_clustering` - Default: true
-When enabled Teiserver will attempt to handle the clustering of nodes using a database table. Turning it off will mean this behaves like any other application and you can either not cluster it or use things like `libcluster` as you desire. See `Teiserver.System.ClusterManager` for more details.
-
-## `teiserver_clustering_post_join_functions` - Default: []
-When teiserver_clustering is enabled, this will be a list of functions called by the genserver handling the join once it has joined the cluster. See `Teiserver.System.ClusterManager` for more details.
-
 # Function overrides
 Teiserver implements some defaults you may want to overwrite.
 
@@ -67,7 +60,6 @@ config :teiserver,
   repo: HelloWorldServer.Repo,
   client_destroy_timeout_seconds: 300,
   lobby_join_method: :simple,
-  teiserver_clustering: true,
 
   # Users
   default_behaviour_score: 10_000,

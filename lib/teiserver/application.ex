@@ -7,7 +7,6 @@ defmodule Teiserver.Application do
   def start(_type, _args) do
     children = [
       {Phoenix.PubSub, name: Teiserver.PubSub},
-      # Teiserver.System.ClusterManagerSupervisor,
       Teiserver.System.CacheClusterServer,
 
       # Servers not part of the general slew of things
@@ -46,10 +45,6 @@ defmodule Teiserver.Application do
 
     opts = [strategy: :one_for_one, name: __MODULE__]
     start_result = Supervisor.start_link(children, opts)
-
-    # if Application.get_env(:teiserver, :teiserver_clustering, true) do
-    #   Teiserver.System.ClusterManagerSupervisor.start_cluster_manager_supervisor_children()
-    # end
 
     Teiserver.System.StartupLib.perform()
 
