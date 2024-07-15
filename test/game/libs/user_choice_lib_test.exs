@@ -69,7 +69,7 @@ defmodule Teiserver.UserChoiceLibTest do
       user_choice3 = GameFixtures.user_choice_fixture(%{match_id: match.id})
       user_choice4 = GameFixtures.user_choice_fixture(%{user_id: user.id})
 
-      values = Game.get_user_choices_map(match.id, user.id) |> Map.values
+      values = Game.get_user_choices_map(match.id, user.id) |> Map.values()
 
       assert Enum.member?(values, user_choice1.value)
       assert Enum.member?(values, user_choice2.value)
@@ -94,14 +94,28 @@ defmodule Teiserver.UserChoiceLibTest do
       assert Enum.empty?(Game.list_user_choices(where: [match_id: match.id, user_id: user.id]))
 
       attr_list = [
-        %{match_id: match.id, type_id: GameFixtures.user_choice_type_fixture().id, user_id: user.id},
-        %{match_id: match.id, type_id: GameFixtures.user_choice_type_fixture().id, user_id: user.id},
-        %{match_id: match.id, type_id: GameFixtures.user_choice_type_fixture().id, user_id: user.id}
+        %{
+          match_id: match.id,
+          type_id: GameFixtures.user_choice_type_fixture().id,
+          user_id: user.id
+        },
+        %{
+          match_id: match.id,
+          type_id: GameFixtures.user_choice_type_fixture().id,
+          user_id: user.id
+        },
+        %{
+          match_id: match.id,
+          type_id: GameFixtures.user_choice_type_fixture().id,
+          user_id: user.id
+        }
       ]
 
       # Now insert them
       assert {:ok, %{insert_all: {3, nil}}} = Game.create_many_user_choices(attr_list)
-      assert Enum.count(Game.list_user_choices(where: [match_id: match.id, user_id: user.id])) == 3
+
+      assert Enum.count(Game.list_user_choices(where: [match_id: match.id, user_id: user.id])) ==
+               3
     end
 
     test "create_many_user_choices/1 with invalid data returns error" do
@@ -110,9 +124,21 @@ defmodule Teiserver.UserChoiceLibTest do
       assert Enum.empty?(Game.list_user_choices(where: [match_id: match.id, user_id: user.id]))
 
       attr_list = [
-        %{match_id: nil, type_id: GameFixtures.user_choice_type_fixture().id, user_id: AccountFixtures.user_fixture().id},
-        %{match_id: nil, type_id: GameFixtures.user_choice_type_fixture().id, user_id: AccountFixtures.user_fixture().id},
-        %{match_id: nil, type_id: GameFixtures.user_choice_type_fixture().id, user_id: AccountFixtures.user_fixture().id}
+        %{
+          match_id: nil,
+          type_id: GameFixtures.user_choice_type_fixture().id,
+          user_id: AccountFixtures.user_fixture().id
+        },
+        %{
+          match_id: nil,
+          type_id: GameFixtures.user_choice_type_fixture().id,
+          user_id: AccountFixtures.user_fixture().id
+        },
+        %{
+          match_id: nil,
+          type_id: GameFixtures.user_choice_type_fixture().id,
+          user_id: AccountFixtures.user_fixture().id
+        }
       ]
 
       # Now insert them
@@ -136,7 +162,11 @@ defmodule Teiserver.UserChoiceLibTest do
                Game.update_user_choice(user_choice, invalid_attrs())
 
       assert user_choice ==
-               Game.get_user_choice!(user_choice.match_id, user_choice.user_id, user_choice.type_id)
+               Game.get_user_choice!(
+                 user_choice.match_id,
+                 user_choice.user_id,
+                 user_choice.type_id
+               )
     end
 
     test "delete_user_choice/1 deletes the user_choice" do
@@ -147,7 +177,8 @@ defmodule Teiserver.UserChoiceLibTest do
         Game.get_user_choice!(user_choice.match_id, user_choice.user_id, user_choice.type_id)
       end
 
-      assert Game.get_user_choice(user_choice.match_id, user_choice.user_id, user_choice.type_id) == nil
+      assert Game.get_user_choice(user_choice.match_id, user_choice.user_id, user_choice.type_id) ==
+               nil
     end
 
     test "change_user_choice/1 returns a user_choice changeset" do

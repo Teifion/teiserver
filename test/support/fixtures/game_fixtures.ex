@@ -2,7 +2,18 @@ defmodule Teiserver.Fixtures.GameFixtures do
   @moduledoc false
   alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Game
-  alias Teiserver.Game.{Lobby, Match, MatchType, MatchMembership, MatchSettingType, MatchSetting, UserChoice, UserChoiceType}
+
+  alias Teiserver.Game.{
+    Lobby,
+    Match,
+    MatchType,
+    MatchMembership,
+    MatchSettingType,
+    MatchSetting,
+    UserChoice,
+    UserChoiceType
+  }
+
   import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
   import Teiserver.Fixtures.ConnectionFixtures, only: [client_fixture: 0]
 

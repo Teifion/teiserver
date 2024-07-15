@@ -33,7 +33,9 @@ defmodule Teiserver.Game.UserChoiceLib do
       %{}
 
   """
-  @spec get_user_choices_map(Teiserver.match_id(), Teiserver.user_id()) :: %{String.t() => String.t()}
+  @spec get_user_choices_map(Teiserver.match_id(), Teiserver.user_id()) :: %{
+          String.t() => String.t()
+        }
   def get_user_choices_map(match_id, user_id) do
     list_user_choices(where: [match_id: match_id, user_id: user_id], preload: [:type])
     |> Map.new(fn ms ->
@@ -55,7 +57,12 @@ defmodule Teiserver.Game.UserChoiceLib do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user_choice!(Teiserver.match_id(), Teiserver.user_id(),UserChoiceType.id(),  Teiserver.query_args()) ::
+  @spec get_user_choice!(
+          Teiserver.match_id(),
+          Teiserver.user_id(),
+          UserChoiceType.id(),
+          Teiserver.query_args()
+        ) ::
           UserChoice.t()
   def get_user_choice!(match_id, user_id, choice_type_id, query_args \\ []) do
     (query_args ++ [match_id: match_id, user_id: user_id, choice_type_id: choice_type_id])
@@ -77,7 +84,12 @@ defmodule Teiserver.Game.UserChoiceLib do
       nil
 
   """
-  @spec get_user_choice(Teiserver.match_id(), Teiserver.user_id(), UserChoiceType.id(), Teiserver.query_args()) ::
+  @spec get_user_choice(
+          Teiserver.match_id(),
+          Teiserver.user_id(),
+          UserChoiceType.id(),
+          Teiserver.query_args()
+        ) ::
           UserChoice.t() | nil
   def get_user_choice(match_id, user_id, choice_type_id, query_args \\ []) do
     (query_args ++ [match_id: match_id, user_id: user_id, choice_type_id: choice_type_id])

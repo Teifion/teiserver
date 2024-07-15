@@ -109,7 +109,6 @@ defmodule Teiserver.Game.UserChoiceTypeLib do
       {:ok, value} ->
         value
     end
-
   end
 
   @spec do_get_or_create_user_choice_type_id(String.t()) :: UserChoiceType.id()

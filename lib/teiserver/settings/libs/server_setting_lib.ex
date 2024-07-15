@@ -3,7 +3,13 @@ defmodule Teiserver.Settings.ServerSettingLib do
   A library of functions for working with `Teiserver.Settings.ServerSetting`
   """
   use TeiserverMacros, :library
-  alias Teiserver.Settings.{ServerSetting, ServerSettingQueries, ServerSettingTypeLib, ServerSettingType}
+
+  alias Teiserver.Settings.{
+    ServerSetting,
+    ServerSettingQueries,
+    ServerSettingTypeLib,
+    ServerSettingType
+  }
 
   @doc """
   Returns the list of server_settings.
@@ -141,16 +147,19 @@ defmodule Teiserver.Settings.ServerSettingLib do
             Teiserver.invalidate_cache(:ts_server_setting_cache, key)
             :ok
         end
-    {:error, reason} ->
-      {:error, reason}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
   @doc """
 
   """
-  @spec value_is_valid?(ServerSettingType.t(), String.t() | non_neg_integer() | boolean() | nil) :: :ok | {:error, String.t()}
+  @spec value_is_valid?(ServerSettingType.t(), String.t() | non_neg_integer() | boolean() | nil) ::
+          :ok | {:error, String.t()}
   def value_is_valid?(%{validator: nil}, _), do: :ok
+
   def value_is_valid?(%{validator: validator_function}, value) do
     validator_function.(value)
   end

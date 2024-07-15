@@ -15,7 +15,7 @@ defmodule Teiserver.Caches.TypeLookupCache do
     children = [
       add_cache(:ts_match_type_lookup, ttl: :timer.minutes(5)),
       add_cache(:ts_match_setting_type_lookup, ttl: :timer.minutes(5)),
-      add_cache(:ts_user_choice_type_lookup, ttl: :timer.minutes(5)),
+      add_cache(:ts_user_choice_type_lookup, ttl: :timer.minutes(5))
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

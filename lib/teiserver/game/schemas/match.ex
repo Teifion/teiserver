@@ -99,7 +99,6 @@ defmodule Teiserver.Game.Match do
           host: Teiserver.Account.User.t(),
           type_id: Teiserver.Game.MatchType.id(),
           type: Teiserver.Game.MatchType.t(),
-
           members: list,
           settings: list,
           choices: list

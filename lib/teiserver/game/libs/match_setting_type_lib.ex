@@ -111,7 +111,6 @@ defmodule Teiserver.Game.MatchSettingTypeLib do
       {:ok, value} ->
         value
     end
-
   end
 
   @spec do_get_or_create_match_setting_type_id(String.t()) :: MatchSettingType.id()
