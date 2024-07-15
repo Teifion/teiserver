@@ -263,7 +263,7 @@ defmodule Teiserver.MixProject do
       licenses: ["Apache-2.0"],
       files: ~w(lib .formatter.exs mix.exs README* CHANGELOG* LICENSE*),
       links: %{
-        "Changelog" => "#{@source_url}/blob/master/CHANGELOG.md",
+        "Changelog" => "#{@source_url}/blob/main/CHANGELOG.md",
         "GitHub" => @source_url,
         "Discord" => "https://discord.gg/NmrSt9zw2p"
       }

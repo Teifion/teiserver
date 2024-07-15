@@ -150,8 +150,8 @@ defmodule Teiserver.Settings.ServerSettingLib do
 
   """
   @spec value_is_valid?(ServerSettingType.t(), String.t() | non_neg_integer() | boolean() | nil) :: :ok | {:error, String.t()}
-  def value_is_valid?(%{validation: nil}, _), do: :ok
-  def value_is_valid?(%{validation: validator_function}, value) do
+  def value_is_valid?(%{validator: nil}, _), do: :ok
+  def value_is_valid?(%{validator: validator_function}, value) do
     validator_function.(value)
   end
 

@@ -22,7 +22,6 @@ defmodule Teiserver.Game.Match do
   * `:ended_normally?` - True if the match was ended in a normal manner, false if ended in an abnormal manner (e.g. crashed)
   * `:match_duration_seconds` - The duration of the game in seconds as indicated by the game host
   * `:host` - The user account hosting the lobby
-
   """
   use TeiserverMacros, :schema
 
@@ -55,8 +54,10 @@ defmodule Teiserver.Game.Match do
     field(:lobby_id, Ecto.UUID)
     belongs_to(:host, Teiserver.Account.User, type: Ecto.UUID)
     belongs_to(:type, Teiserver.Game.MatchType)
+
     has_many(:members, Teiserver.Game.MatchMembership)
     has_many(:settings, Teiserver.Game.MatchSetting)
+    has_many(:choices, Teiserver.Game.UserChoice)
 
     # Relationships we expect to add
     # belongs_to :queue, Teiserver.Game.MatchmakingQueue
@@ -98,7 +99,10 @@ defmodule Teiserver.Game.Match do
           host: Teiserver.Account.User.t(),
           type_id: Teiserver.Game.MatchType.id(),
           type: Teiserver.Game.MatchType.t(),
-          members: list
+
+          members: list,
+          settings: list,
+          choices: list
         }
 
   @doc """

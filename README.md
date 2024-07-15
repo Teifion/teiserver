@@ -13,7 +13,7 @@
   <a href="https://github.com/Teifion/teiserver/actions/workflows/elixir.yml/badge.svg?branch=0.0.5"><img alt="Tests" src="https://github.com/Teifion/teiserver/actions/workflows/elixir.yml/badge.svg?branch=0.0.5"></a>  
 </p>
 
-_Note: This README is for the unreleased master branch, please reference the
+_Note: This README is for the unreleased main branch, please reference the
 [official documentation on hexdocs][hexdoc] for the latest stable release._
 
 [hexdoc]: https://hexdocs.pm/teiserver/Teiserver.html
@@ -55,11 +55,4 @@ defmodule MyApp.Repo.Migrations.AddTeiserverTables do
     Teiserver.Migration.down(version: 1)
   end
 end
-```
-
-Add this to your Application supervision tree:
-```elixir
-children = [
-  {Teiserver, Application.get_env(:my_app, Teiserver)}
-]
 ```

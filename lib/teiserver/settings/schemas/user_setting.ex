@@ -5,6 +5,8 @@ defmodule Teiserver.Settings.UserSetting do
 
   The intended use case for User settings is anything where you want to store a key-value store against the user.
 
+  Not to be confused with `Teiserver.Game.UserChoice` which is a per-game "setting".
+
   ### Attributes
 
   * `:user_id` - A reference to the User in question

@@ -18,7 +18,8 @@ defmodule Teiserver.Fixtures.SettingsFixtures do
         permissions: data["permissions"] || nil,
         choices: data["choices"] || nil,
         default: data["default"] || nil,
-        description: data["description"] || nil
+        description: data["description"] || nil,
+        validator: data["validator"] || nil
       })
 
     type

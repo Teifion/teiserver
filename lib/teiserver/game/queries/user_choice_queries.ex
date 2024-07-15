@@ -1,12 +1,12 @@
-defmodule Teiserver.Game.MatchSettingQueries do
+defmodule Teiserver.Game.UserChoiceQueries do
   @moduledoc false
   use TeiserverMacros, :queries
-  alias Teiserver.Game.MatchSetting
+  alias Teiserver.Game.UserChoice
   require Logger
 
-  @spec match_setting_query(Teiserver.query_args()) :: Ecto.Query.t()
-  def match_setting_query(args) do
-    query = from(match_settings in MatchSetting)
+  @spec user_choice_query(Teiserver.query_args()) :: Ecto.Query.t()
+  def user_choice_query(args) do
+    query = from(user_choices in UserChoice)
 
     query
     |> do_where(id: args[:id])
@@ -28,43 +28,31 @@ defmodule Teiserver.Game.MatchSettingQueries do
     end)
   end
 
-  @spec _where(Ecto.Query.t(), Atom.t(), any()) :: Ecto.Query.t()
+  @spec _where(Ecto.Query.t(), atom(), any()) :: Ecto.Query.t()
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :match_id, match_ids) when is_list(match_ids) do
-    from(match_settings in query,
-      where: match_settings.match_id in ^match_ids
+  def _where(query, :match_id, match_ids) do
+    from(user_choices in query,
+      where: user_choices.match_id in ^List.wrap(match_ids)
     )
   end
 
-  def _where(query, :match_id, match_id) do
-    from(match_settings in query,
-      where: match_settings.match_id == ^match_id
+  def _where(query, :user_id, user_ids) do
+    from(user_choices in query,
+      where: user_choices.user_id in ^List.wrap(user_ids)
     )
   end
 
-  def _where(query, :type_id, type_ids) when is_list(type_ids) do
-    from(match_settings in query,
-      where: match_settings.type_id in ^type_ids
-    )
-  end
-
-  def _where(query, :type_id, type_id) do
-    from(match_settings in query,
-      where: match_settings.type_id == ^type_id
-    )
-  end
-
-  def _where(query, :value, values) when is_list(values) do
-    from(match_settings in query,
-      where: match_settings.value in ^values
+  def _where(query, :type_id, type_ids) do
+    from(user_choices in query,
+      where: user_choices.type_id in ^List.wrap(type_ids)
     )
   end
 
   def _where(query, :value, value) do
-    from(match_settings in query,
-      where: match_settings.value == ^value
+    from(user_choices in query,
+      where: user_choices.value in ^List.wrap(value)
     )
   end
 
@@ -81,18 +69,18 @@ defmodule Teiserver.Game.MatchSettingQueries do
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
   def _order_by(query, "Value (A-Z)") do
-    from(match_settings in query,
-      order_by: [asc: match_settings.value]
+    from(user_choices in query,
+      order_by: [asc: user_choices.value]
     )
   end
 
   def _order_by(query, "Value (Z-A)") do
-    from(match_settings in query,
-      order_by: [desc: match_settings.value]
+    from(user_choices in query,
+      order_by: [desc: user_choices.value]
     )
   end
 
-  @spec do_preload(Ecto.Query.t(), List.t() | nil) :: Ecto.Query.t()
+  @spec do_preload(Ecto.Query.t(), list() | nil) :: Ecto.Query.t()
   defp do_preload(query, nil), do: query
 
   defp do_preload(query, preloads) do
@@ -105,15 +93,15 @@ defmodule Teiserver.Game.MatchSettingQueries do
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
   def _preload(query, :type) do
-    from(match_settings in query,
-      left_join: types in assoc(match_settings, :type),
+    from(user_choices in query,
+      left_join: types in assoc(user_choices, :type),
       preload: [type: types]
     )
   end
 
   def _preload(query, :match) do
-    from(match_settings in query,
-      left_join: matches in assoc(match_settings, :match),
+    from(user_choices in query,
+      left_join: matches in assoc(user_choices, :match),
       preload: [match: matches]
     )
   end

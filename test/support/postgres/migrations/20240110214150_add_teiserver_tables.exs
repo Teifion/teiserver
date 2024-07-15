@@ -1,4 +1,4 @@
-defmodule Teiserver.Test.Repo.Postgres.Migrations.AddTeiseverTables do
+defmodule Teiserver.Test.Repo.Postgres.Migrations.AddTeiserverTables do
   @moduledoc false
   use Ecto.Migration
 

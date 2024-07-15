@@ -12,7 +12,7 @@ defmodule Teiserver.MatchMembershipLibTest do
       user_id: AccountFixtures.user_fixture().id,
       team_number: 123,
       win?: true,
-      party_id: "some party_id",
+      party_id: "f3d93d6b-cf27-4d64-9882-ca42d220cd6b",
       left_after_seconds: 123
     }
   end
@@ -23,7 +23,7 @@ defmodule Teiserver.MatchMembershipLibTest do
       user_id: AccountFixtures.user_fixture().id,
       team_number: 1234,
       win?: true,
-      party_id: "some updated party_id",
+      party_id: "17b33fb6-89fe-4d70-b299-b1ad27a1a852",
       left_after_seconds: 1234
     }
   end
@@ -70,7 +70,7 @@ defmodule Teiserver.MatchMembershipLibTest do
       assert {:ok, %MatchMembership{} = match_membership} =
                Game.create_match_membership(valid_attrs())
 
-      assert match_membership.party_id == "some party_id"
+      assert match_membership.party_id == "f3d93d6b-cf27-4d64-9882-ca42d220cd6b"
     end
 
     test "create_match_membership/1 with invalid data returns error changeset" do
@@ -113,8 +113,7 @@ defmodule Teiserver.MatchMembershipLibTest do
       assert {:ok, %MatchMembership{} = match_membership} =
                Game.update_match_membership(match_membership, update_attrs())
 
-      assert match_membership.party_id == "some updated party_id"
-      assert match_membership.party_id == "some updated party_id"
+      assert match_membership.party_id == "17b33fb6-89fe-4d70-b299-b1ad27a1a852"
     end
 
     test "update_match_membership/2 with invalid data returns error changeset" do

@@ -152,6 +152,13 @@ defmodule Teiserver.Game.MatchQueries do
   end
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
+  def _preload(query, :type) do
+    from(match in query,
+      left_join: types in assoc(match, :type),
+      preload: [type: types]
+    )
+  end
+
   def _preload(query, :members) do
     from(match in query,
       left_join: members in assoc(match, :members),
@@ -163,6 +170,13 @@ defmodule Teiserver.Game.MatchQueries do
     from(match in query,
       left_join: settings in assoc(match, :settings),
       preload: [settings: settings]
+    )
+  end
+
+  def _preload(query, :choices) do
+    from(match in query,
+      left_join: choices in assoc(match, :choices),
+      preload: [choices: choices]
     )
   end
 end

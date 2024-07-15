@@ -2,14 +2,6 @@ defmodule Teiserver.Helpers.QueryHelper do
   @moduledoc false
   import Ecto.Query, warn: false
 
-  @spec offset_query(Ecto.Query.t(), nil | non_neg_integer()) :: Ecto.Query.t()
-  def offset_query(query, nil), do: query
-
-  def offset_query(query, amount) do
-    query
-    |> offset(^amount)
-  end
-
   @spec limit_query(Ecto.Query.t(), non_neg_integer() | :infinity) :: Ecto.Query.t()
   def limit_query(query, :infinity), do: query
   def limit_query(query, nil), do: query

@@ -1,11 +1,11 @@
 defmodule Teiserver.Fixtures.GameFixtures do
   @moduledoc false
+  alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Game
-  alias Teiserver.Game.{Lobby, Match, MatchType, MatchMembership, MatchSettingType, MatchSetting}
+  alias Teiserver.Game.{Lobby, Match, MatchType, MatchMembership, MatchSettingType, MatchSetting, UserChoice, UserChoiceType}
   import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
   import Teiserver.Fixtures.ConnectionFixtures, only: [client_fixture: 0]
 
-  @spec lobby_fixture() :: Lobby.t()
   @spec lobby_fixture(map) :: Lobby.t()
   def lobby_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -47,7 +47,6 @@ defmodule Teiserver.Fixtures.GameFixtures do
     {host_conn, host_user, lobby_id}
   end
 
-  @spec match_type_fixture() :: MatchType.t()
   @spec match_type_fixture(map) :: MatchType.t()
   def match_type_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -61,7 +60,6 @@ defmodule Teiserver.Fixtures.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec unstarted_match_fixture() :: Match.t()
   @spec unstarted_match_fixture(map) :: Match.t()
   def unstarted_match_fixture(data \\ %{}) do
     Match.changeset(
@@ -77,7 +75,6 @@ defmodule Teiserver.Fixtures.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec incomplete_match_fixture() :: Match.t()
   @spec incomplete_match_fixture(map) :: Match.t()
   def incomplete_match_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -106,7 +103,6 @@ defmodule Teiserver.Fixtures.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec completed_match_fixture() :: Match.t()
   @spec completed_match_fixture(map) :: Match.t()
   def completed_match_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -139,11 +135,8 @@ defmodule Teiserver.Fixtures.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec match_membership_fixture() :: Match.t()
   @spec match_membership_fixture(map) :: Match.t()
   def match_membership_fixture(data \\ %{}) do
-    r = :rand.uniform(999_999_999)
-
     MatchMembership.changeset(
       %MatchMembership{},
       %{
@@ -151,14 +144,13 @@ defmodule Teiserver.Fixtures.GameFixtures do
         match_id: data["match_id"] || completed_match_fixture().id,
         team_number: data["team_number"] || 1,
         win?: data["win?"] || false,
-        party_id: data["party_id"] || "party_id_#{r}",
+        party_id: data["party_id"] || nil,
         left_after_seconds: data[""] || 123
       }
     )
     |> Teiserver.Repo.insert!()
   end
 
-  @spec match_setting_type_fixture() :: Match.t()
   @spec match_setting_type_fixture(map) :: Match.t()
   def match_setting_type_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -183,6 +175,36 @@ defmodule Teiserver.Fixtures.GameFixtures do
         type_id: data["type_id"] || match_setting_type_fixture().id,
         match_id: data["match_id"] || completed_match_fixture().id,
         value: data["value"] || "value_#{r}"
+      }
+    )
+    |> Teiserver.Repo.insert!()
+  end
+
+  @spec user_choice_type_fixture(map) :: Match.t()
+  def user_choice_type_fixture(data \\ %{}) do
+    r = :rand.uniform(999_999_999)
+
+    UserChoiceType.changeset(
+      %UserChoiceType{},
+      %{
+        name: data["name"] || "user_choice_type_#{r}"
+      }
+    )
+    |> Teiserver.Repo.insert!()
+  end
+
+  @spec user_choice_fixture() :: Match.t()
+  @spec user_choice_fixture(map) :: Match.t()
+  def user_choice_fixture(data \\ %{}) do
+    r = :rand.uniform(999_999_999)
+
+    UserChoice.changeset(
+      %UserChoice{},
+      %{
+        type_id: data[:type_id] || user_choice_type_fixture().id,
+        match_id: data[:match_id] || completed_match_fixture().id,
+        user_id: data[:user_id] || AccountFixtures.user_fixture().id,
+        value: data[:value] || "value_#{r}"
       }
     )
     |> Teiserver.Repo.insert!()

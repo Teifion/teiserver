@@ -32,6 +32,14 @@ defmodule Teiserver.MatchQueriesTest do
             id: [Teiserver.uuid(), Teiserver.uuid()],
             id: Teiserver.uuid(),
             name: "Some name",
+            ended_normally?: true,
+            processed?: true,
+            duration_gt: 100,
+            duration_lt: 999,
+            started_after: Timex.now(),
+            started_before: Timex.now(),
+            ended_after: Timex.now(),
+            ended_before: Timex.now(),
             inserted_after: Timex.now(),
             inserted_before: Timex.now()
           ],
@@ -41,7 +49,8 @@ defmodule Teiserver.MatchQueriesTest do
             "Newest first",
             "Oldest first"
           ],
-          preload: []
+          preload: [],
+          limit: 10
         )
 
       assert all_values != @empty_query

@@ -123,7 +123,7 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:win?, :boolean, default: nil, null: true)
 
       add(:left_after_seconds, :integer)
-      add(:party_id, :string)
+      add(:party_id, :uuid)
     end
 
     create_if_not_exists(index(:game_match_memberships, [:match_id], prefix: prefix))
@@ -144,6 +144,29 @@ defmodule Teiserver.Migrations.Postgres.V01 do
     end
 
     create_if_not_exists(index(:game_match_settings, [:match_id], prefix: prefix))
+
+    create_if_not_exists table(:game_user_choice_types) do
+      add(:name, :string)
+    end
+
+    create_if_not_exists table(:game_user_choices, primary_key: false) do
+      add(:type_id, references(:game_user_choice_types, on_delete: :nothing), primary_key: true)
+
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
+      add(:value, :string)
+    end
+
+    create_if_not_exists(index(:game_user_choices, [:match_id], prefix: prefix))
+    create_if_not_exists(index(:game_user_choices, [:user_id], prefix: prefix))
 
     # Communications
     create_if_not_exists table(:communication_rooms, prefix: prefix) do
