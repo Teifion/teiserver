@@ -6,6 +6,14 @@ defmodule Connections.ClientLibTest do
   alias Teiserver.Fixtures.ConnectionFixtures
 
   describe "ClientLib" do
+    test "topic" do
+      {_conn, user} = ConnectionFixtures.client_fixture()
+      client = Connections.get_client(user.id)
+
+      assert Connections.client_topic(user.id) == Connections.client_topic(user)
+      assert Connections.client_topic(user.id) == Connections.client_topic(client)
+    end
+
     test "server lifecycle" do
       {_conn, user} = ConnectionFixtures.client_fixture()
 
@@ -114,6 +122,15 @@ defmodule Connections.ClientLibTest do
       # No messages either, client should be the same
       msgs = TestConn.get(conn)
       assert msgs == []
+    end
+
+    test "disconnect_user" do
+      {_conn1, user} = ConnectionFixtures.client_fixture()
+      {_conn2, _user} = ConnectionFixtures.client_fixture(user)
+      assert Connections.client_exists?(user.id)
+
+      Connections.disconnect_user(user.id)
+      refute Connections.client_exists?(user.id)
     end
   end
 end

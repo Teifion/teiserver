@@ -4,7 +4,7 @@ defmodule ApiTest do
   use Teiserver.Case, async: true
 
   alias Phoenix.PubSub
-  alias Teiserver.Api
+  alias Teiserver.{Api, Connections}
   alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Account.User
 
@@ -104,7 +104,7 @@ defmodule ApiTest do
       user = AccountFixtures.user_fixture()
       conn = TestConn.new()
 
-      client_ids = Teiserver.Connections.list_client_ids()
+      client_ids = Connections.list_client_ids()
       refute Enum.member?(client_ids, user.id)
 
       assert TestConn.get(conn) == []
@@ -113,7 +113,7 @@ defmodule ApiTest do
       # Check we're subbed to the right stuff
       PubSub.broadcast(
         Teiserver.PubSub,
-        Teiserver.Connections.client_topic(user.id),
+        Connections.client_topic(user.id),
         "client_topic"
       )
 
@@ -126,8 +126,10 @@ defmodule ApiTest do
       assert TestConn.get(conn) == ["client_topic", "user_messaging_topic"]
 
       # Check we're counted as logged in
-      client_ids = Teiserver.Connections.list_client_ids()
+      client_ids = Connections.list_client_ids()
       assert Enum.member?(client_ids, user.id)
+
+      assert Connections.list_client_ids() == Connections.list_local_client_ids()
     end
   end
 
