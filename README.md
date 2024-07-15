@@ -56,3 +56,9 @@ defmodule MyApp.Repo.Migrations.AddTeiserverTables do
   end
 end
 ```
+
+Finally, update your config to link the repo:
+```
+config :teiserver,
+  repo: MyApp.Repo
+```
