@@ -276,6 +276,7 @@ defmodule Teiserver.MixProject do
       # Oban has these and seems to do a really nice job so we're going to use them too
       # bench: "run bench/bench_helper.exs",
       release: [
+        "format --check-formatted",
         "cmd git tag v#{@version}",
         "cmd git push",
         "cmd git push --tags",

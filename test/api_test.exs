@@ -129,7 +129,7 @@ defmodule ApiTest do
       client_ids = Connections.list_client_ids()
       assert Enum.member?(client_ids, user.id)
 
-      assert Connections.list_client_ids() == Connections.list_local_client_ids()
+      assert Enum.sort(Connections.list_client_ids()) == Enum.sort(Connections.list_local_client_ids())
     end
   end
 
