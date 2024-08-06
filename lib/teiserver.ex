@@ -84,6 +84,14 @@ defmodule Teiserver do
     to_string(Application.get_env(:teiserver, :node_name) || Node.self())
   end
 
+  # Server settings
+  @spec get_server_setting_value(String.t()) :: String.t() | integer() | boolean() | nil
+  defdelegate get_server_setting_value(key), to: Teiserver.Settings.ServerSettingLib
+
+  @spec get_user_setting_value(user_id(), String.t()) ::
+          String.t() | integer() | boolean() | nil
+  defdelegate get_user_setting_value(user_id, key), to: Teiserver.Settings.UserSettingLib
+
   # PubSub delegation
   @doc false
   @spec broadcast(String.t(), map()) :: :ok
