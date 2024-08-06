@@ -47,6 +47,20 @@ Sent whenever the client leaves a lobby; if you are subscribed to this topic you
 }
 ```
 
+### Disconnected client - `:client_connected`
+Sent when the client connects when previously having had no connections
+
+- `:client` - A `Teiserver.Connections.Client` of the client values
+- `:user_id` - The ID of the user (which should also be present in the topic)
+
+```elixir
+%{
+  event: :client_connected,
+  client: Client.t(),
+  user_id: User.id()
+}
+```
+
 ### Disconnected client - `:client_disconnected`
 Sent when the client has no more connections
 
