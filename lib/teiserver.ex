@@ -79,7 +79,6 @@ defmodule Teiserver do
     to_string(Application.get_env(:teiserver, :node_name) || Node.self())
   end
 
-
   alias Teiserver.{Account, Communication, Connections, Game}
 
   alias Account.{
