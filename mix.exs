@@ -246,7 +246,6 @@ defmodule Teiserver.MixProject do
       {:timex, "~> 3.7.5"},
       {:typedstruct, "~> 0.5.2", runtime: false},
       {:horde, "~> 0.9"},
-      {:uuid, "~> 1.1"},
       {:cachex, "~> 3.6"},
 
       # Dev and Test stuff

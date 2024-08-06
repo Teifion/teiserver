@@ -9,10 +9,11 @@
 - Added more options for connecting clients (currently just `bot?`)
 - Added support for Angen to provide guest accounts
 - Added caching for some db calls
-- Changed server settings to use `text` type behind the scenes and added ability to validate themz
+- Changed server settings to use `text` type behind the scenes and added ability to validate them
 - Added `player_count` as a property to matches
 - Added concept of user choices to represent pre-game choices made by users (e.g. in-game faction)
 - Removed clustering code so it can be handled by the application using Teiserver as a library
+- Moved everything from `Teiserver.Api` to `Teiserver`
 
 ## v0.0.4
 - Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries
