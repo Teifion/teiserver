@@ -248,6 +248,10 @@ defmodule Teiserver do
   @spec get_user_by_name(String.t()) :: User.t() | nil
   defdelegate get_user_by_name(name), to: UserLib
 
+  @doc section: :user
+  @spec get_user_by_email(String.t()) :: User.t() | nil
+  defdelegate get_user_by_email(email), to: UserLib
+
   ### Connections
   # Client
   @doc section: :client

@@ -34,11 +34,12 @@ defmodule Teiserver.Game.Match do
 
     field(:game_name, :string)
     field(:game_version, :string)
+    field(:team_count, :integer)
+    field(:team_size, :integer)
+    field(:player_count, :integer)
 
     # Outcome
     field(:winning_team, :integer)
-    field(:team_count, :integer)
-    field(:team_size, :integer)
     field(:processed?, :boolean, default: false)
     field(:ended_normally?, :boolean)
 
@@ -47,8 +48,9 @@ defmodule Teiserver.Game.Match do
     field(:match_ended_at, :utc_datetime)
 
     # These will be something queried enough it's worth storing as it's own value
+    # it is also possible we will want to count the duration as something other than
+    # time passed between start and end, e.g. ignoring time spent paused
     field(:match_duration_seconds, :integer)
-    field(:player_count, :integer)
 
     # Memberships
     field(:lobby_id, Ecto.UUID)
@@ -113,7 +115,7 @@ defmodule Teiserver.Game.Match do
     struct
     |> cast(
       attrs,
-      ~w(name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds player_count host_id type_id lobby_id)a
+      ~w(id name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds player_count host_id type_id lobby_id)a
     )
     |> validate_required(~w(public? rated? host_id)a)
   end

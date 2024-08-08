@@ -265,4 +265,11 @@ defmodule Teiserver.Account.UserQueries do
       preload: [extra_data: extra_datas]
     )
   end
+
+  def _preload(query, :smurf_of) do
+    from(user in query,
+      left_join: smurf_ofs in assoc(user, :smurf_of),
+      preload: [smurf_of: smurf_ofs]
+    )
+  end
 end
