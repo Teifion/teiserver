@@ -104,6 +104,14 @@ defmodule Teiserver.Game.MatchQueries do
     )
   end
 
+  def _where(query, :name_like, name) do
+    uname = "%" <> name <> "%"
+
+    from(users in query,
+      where: ilike(users.name, ^uname)
+    )
+  end
+
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
@@ -152,31 +160,63 @@ defmodule Teiserver.Game.MatchQueries do
   end
 
   @spec _preload(Ecto.Query.t(), any) :: Ecto.Query.t()
+  def _preload(query, :host) do
+    from(matches in query,
+      left_join: hosts in assoc(matches, :host),
+      preload: [host: hosts]
+    )
+  end
+
   def _preload(query, :type) do
-    from(match in query,
-      left_join: types in assoc(match, :type),
+    from(matches in query,
+      left_join: types in assoc(matches, :type),
       preload: [type: types]
     )
   end
 
   def _preload(query, :members) do
-    from(match in query,
-      left_join: members in assoc(match, :members),
+    from(matches in query,
+      left_join: members in assoc(matches, :members),
       preload: [members: members]
     )
   end
 
+  def _preload(query, :members_with_users) do
+    from(matches in query,
+      left_join: memberships in assoc(matches, :members),
+      left_join: users in assoc(memberships, :user),
+      preload: [members: {memberships, user: users}]
+    )
+  end
+
   def _preload(query, :settings) do
-    from(match in query,
-      left_join: settings in assoc(match, :settings),
+    from(matches in query,
+      left_join: settings in assoc(matches, :settings),
       preload: [settings: settings]
     )
   end
 
+  def _preload(query, :settings_with_types) do
+    from(matches in query,
+      left_join: settings in assoc(matches, :settings),
+      left_join: types in assoc(settings, :type),
+      preload: [settings: {settings, type: types}]
+    )
+  end
+
   def _preload(query, :choices) do
-    from(match in query,
-      left_join: choices in assoc(match, :choices),
+    from(matches in query,
+      left_join: choices in assoc(matches, :choices),
       preload: [choices: choices]
+    )
+  end
+
+  def _preload(query, :choices_with_users_and_types) do
+    from(matches in query,
+      left_join: choices in assoc(matches, :choices),
+      left_join: types in assoc(choices, :type),
+      left_join: users in assoc(choices, :user),
+      preload: [choices: {choices, type: types, user: users}]
     )
   end
 end
