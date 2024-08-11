@@ -115,7 +115,7 @@ defmodule Teiserver.Game.Match do
     struct
     |> cast(
       attrs,
-      ~w(id name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds player_count host_id type_id lobby_id)a
+      ~w(name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds player_count host_id type_id lobby_id)a
     )
     |> validate_required(~w(public? rated? host_id)a)
   end
