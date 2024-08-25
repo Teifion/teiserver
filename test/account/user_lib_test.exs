@@ -106,6 +106,30 @@ defmodule Teiserver.UserLibTest do
       refute Account.valid_password?(user, "bad_password")
     end
 
+    test "restrict_user/2 and unrestrict_user/2" do
+      user = AccountFixtures.user_fixture()
+
+      # As a string
+      Account.UserLib.restrict_user(user, "OneRestriction")
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction"]
+
+      # As a list
+      Account.UserLib.restrict_user(user, ["TwoRestriction"])
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction", "TwoRestriction"]
+
+      # Two at once, one is an overlap
+      Account.UserLib.restrict_user(user, ["TwoRestriction", "ThreeRestriction"])
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction", "TwoRestriction", "ThreeRestriction"]
+
+      # Now remove
+      Account.UserLib.unrestrict_user(user, ["TwoRestriction", "ThreeRestriction"])
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction"]
+    end
+
     test "allow?/2" do
       # User must have all of the required permissions
       user = AccountFixtures.user_fixture(%{groups: ["perm1", "perm2"]})

@@ -192,6 +192,51 @@ defmodule Teiserver.Account.UserLib do
     |> maybe_decache_user()
   end
 
+  @doc """
+  Removes one or more restrictions from a user.
+
+  ## Examples
+
+      iex> unrestrict_user(user_or_user_id, ["r1", "r2"])
+      {:ok, %User{}}
+
+  """
+  @spec unrestrict_user(User.t() | User.id(), [String.t()] | String.t()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def unrestrict_user(user_or_user_id, restrictions) when is_binary(user_or_user_id),
+    do: unrestrict_user(get_user_by_id(user_or_user_id), restrictions)
+
+  def unrestrict_user(%User{} = user, restrictions_to_remove) do
+    restrictions_to_remove = List.wrap(restrictions_to_remove)
+
+    new_restrictions =
+      user.restrictions
+      |> Enum.filter(fn existing_restriction ->
+        not Enum.member?(restrictions_to_remove, existing_restriction)
+      end)
+
+    update_user(user, %{restrictions: new_restrictions})
+  end
+
+  @doc """
+  Adds one or more restrictions to a user
+
+  ## Examples
+
+      iex> remove_restrictions(user_or_user_id, ["r1", "r2"])
+      {:ok, %User{}}
+
+  """
+  @spec restrict_user(User.t() | User.id(), [String.t()] | String.t()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def restrict_user(user_or_user_id, restrictions) when is_binary(user_or_user_id),
+    do: restrict_user(get_user_by_id(user_or_user_id), restrictions)
+
+  def restrict_user(%User{} = user, restrictions) do
+    new_restrictions = Enum.uniq(user.restrictions ++ List.wrap(restrictions))
+    update_user(user, %{restrictions: new_restrictions})
+  end
+
   # Clears the cache for a user after a successful database option
   @spec maybe_decache_user(any()) :: any()
   defp maybe_decache_user({:ok, user}) do
