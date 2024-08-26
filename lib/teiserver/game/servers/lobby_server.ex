@@ -5,7 +5,7 @@ defmodule Teiserver.Game.LobbyServer do
   """
   use GenServer
   require Logger
-  alias Teiserver.{Connections, Account}
+  alias Teiserver.{Connections, Account, Game}
   alias Teiserver.Game.{Lobby, LobbyLib, LobbySummary}
   alias Teiserver.Connections.{Client, ClientLib}
   alias Teiserver.Helpers.MapHelper
@@ -83,33 +83,10 @@ defmodule Teiserver.Game.LobbyServer do
     end
   end
 
-  def handle_cast({:cycle_lobby, match_id}, state) do
-    new_state =
-      update_lobby(state, %{
-        match_id: match_id,
-        match_ongoing?: false,
-        match_type: nil
-      })
+  def handle_cast(:cycle_lobby, state) do
+    new_state = do_cycle_lobby(state)
 
-    :telemetry.execute(
-      [:teiserver, :lobby, :cycle],
-      %{},
-      %{match_id: match_id, lobby_id: state.lobby_id}
-    )
-
-    # We specifically reference the original state here
-    if state.match_id != nil and state.lobby.match_ongoing? do
-      Teiserver.broadcast(
-        state.lobby_topic,
-        %{
-          event: :match_end,
-          match_id: state.match_id,
-          lobby_id: state.lobby_id
-        }
-      )
-    end
-
-    {:noreply, %{new_state | match_id: match_id}}
+    {:noreply, new_state}
   end
 
   def handle_cast(:lobby_start_match, state) do
@@ -132,6 +109,34 @@ defmodule Teiserver.Game.LobbyServer do
       %{},
       %{match_id: state.match_id, lobby_id: state.lobby_id}
     )
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:lobby_end_match, reason}, state) do
+    new_state =
+      update_lobby(state, %{
+        match_ongoing?: true
+      })
+
+    Teiserver.broadcast(
+      state.lobby_topic,
+      %{
+        event: :match_end,
+        match_id: state.match_id,
+        lobby_id: state.lobby_id,
+        reason: reason
+      }
+    )
+
+    :telemetry.execute(
+      [:teiserver, :lobby, :end_match],
+      %{reason: reason},
+      %{match_id: state.match_id, lobby_id: state.lobby_id}
+    )
+
+    # Cycle at the end of the match
+    new_state = do_cycle_lobby(new_state)
 
     {:noreply, new_state}
   end
@@ -207,6 +212,34 @@ defmodule Teiserver.Game.LobbyServer do
   @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts[:data], [])
+  end
+
+  @spec do_cycle_lobby(State.t()) :: State.t()
+  defp do_cycle_lobby(state) do
+    {:ok, match} =
+      Game.create_match(%{
+        public?: true,
+        rated?: true,
+        host_id: state.host_id,
+        processed?: false,
+        lobby_opened_at: Timex.now(),
+        lobby_id: state.lobby_id
+      })
+
+    new_state =
+      update_lobby(state, %{
+        match_id: match.id,
+        match_ongoing?: false,
+        match_type: nil
+      })
+
+    :telemetry.execute(
+      [:teiserver, :lobby, :cycle],
+      %{},
+      %{match_id: match.id, lobby_id: new_state.lobby_id}
+    )
+
+    %{new_state | match_id: match.id}
   end
 
   @spec can_add_client({Teiserver.user_id(), String.t()}, State.t()) ::

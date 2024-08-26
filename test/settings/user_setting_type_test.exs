@@ -67,5 +67,13 @@ defmodule Teiserver.UserSettingTypeTest do
 
       assert Settings.get_user_setting_type(key) == type
     end
+
+    test "list types" do
+      result = Settings.list_user_setting_types(["timezone"])
+      assert Enum.count(result) == 1
+
+      result = Settings.list_user_setting_types(["not a type"])
+      assert Enum.empty?(result)
+    end
   end
 end

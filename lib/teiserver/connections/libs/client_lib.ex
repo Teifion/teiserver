@@ -183,9 +183,17 @@ defmodule Teiserver.Connections.ClientLib do
   will stop itself rather than going into a disconnected state.
   """
   @spec disconnect_single_connection(Teiserver.user_id()) :: :ok
-  def disconnect_single_connection(user_id) do
-    cast_client(user_id, {:purposeful_disconnect, self()})
-    send(self(), :disconnect)
+  def disconnect_single_connection(user_id) when is_binary(user_id) do
+    disconnect_single_connection(user_id, self())
+  end
+
+  @doc """
+  Same as `disconnect_single_connection/1` except you can define the pid which is disconnected
+  """
+  @spec disconnect_single_connection(Teiserver.user_id(), pid()) :: :ok
+  def disconnect_single_connection(user_id, pid) when is_binary(user_id) do
+    cast_client(user_id, {:purposeful_disconnect, pid})
+    send(pid, :disconnect)
   end
 
   # Process stuff

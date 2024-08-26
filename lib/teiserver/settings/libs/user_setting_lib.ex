@@ -124,22 +124,39 @@ defmodule Teiserver.Settings.UserSettingLib do
     type = UserSettingTypeLib.get_user_setting_type(key)
     raw_value = convert_to_raw_value(value, type.type)
 
-    case get_user_setting(user_id, key) do
-      nil ->
-        {:ok, _} =
-          create_user_setting(%{
-            user_id: user_id,
-            key: key,
-            value: raw_value
-          })
+    case value_is_valid?(type, value) do
+      :ok ->
+        case get_user_setting(user_id, key) do
+          nil ->
+            {:ok, _} =
+              create_user_setting(%{
+                user_id: user_id,
+                key: key,
+                value: raw_value
+              })
 
-        :ok
+            :ok
 
-      user_setting ->
-        {:ok, _} = update_user_setting(user_setting, %{"value" => raw_value})
-        Teiserver.invalidate_cache(:ts_user_setting_cache, lookup)
-        :ok
+          user_setting ->
+            {:ok, _} = update_user_setting(user_setting, %{"value" => raw_value})
+            Teiserver.invalidate_cache(:ts_user_setting_cache, lookup)
+            :ok
+        end
+
+      {:error, reason} ->
+        {:error, reason}
     end
+  end
+
+  @doc """
+
+  """
+  @spec value_is_valid?(ServerSettingType.t(), String.t() | non_neg_integer() | boolean() | nil) ::
+          :ok | {:error, String.t()}
+  def value_is_valid?(%{validator: nil}, _), do: :ok
+
+  def value_is_valid?(%{validator: validator_function}, value) do
+    validator_function.(value)
   end
 
   @spec convert_to_raw_value(String.t(), String.t()) :: String.t() | integer() | boolean() | nil

@@ -124,12 +124,46 @@ defmodule Connections.ClientLibTest do
       assert msgs == []
     end
 
-    test "disconnect_user" do
+    test "disconnect_user/1" do
       {_conn1, user} = ConnectionFixtures.client_fixture()
       {_conn2, _user} = ConnectionFixtures.client_fixture(user)
       assert Connections.client_exists?(user.id)
 
       Connections.disconnect_user(user.id)
+      refute Connections.client_exists?(user.id)
+    end
+
+    test "disconnect_single_connection/2" do
+      {conn1, user} = ConnectionFixtures.client_fixture()
+      {conn2, _user} = ConnectionFixtures.client_fixture(user)
+      assert Connections.client_exists?(user.id)
+
+      conn_list = Connections.call_client(user.id, :get_connections)
+      assert Enum.member?(conn_list, conn1)
+      assert Enum.member?(conn_list, conn2)
+
+      # Disconnect conn1
+      Connections.disconnect_single_connection(user.id, conn1)
+      assert Connections.client_exists?(user.id)
+
+      conn_list = Connections.call_client(user.id, :get_connections)
+      refute Enum.member?(conn_list, conn1)
+      assert Enum.member?(conn_list, conn2)
+
+      # Disconnect self, this should have no effect as we are not a connection
+      Connections.disconnect_single_connection(user.id, self())
+      assert Connections.client_exists?(user.id)
+
+      conn_list = Connections.call_client(user.id, :get_connections)
+      refute Enum.member?(conn_list, conn1)
+      assert Enum.member?(conn_list, conn2)
+
+      # Now get rid of conn2, this should result in the client destroying itself
+      Connections.disconnect_single_connection(user.id, conn2)
+
+      # Give it time to die
+      :timer.sleep(50)
+
       refute Connections.client_exists?(user.id)
     end
   end

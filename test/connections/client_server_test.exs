@@ -102,6 +102,13 @@ defmodule Connections.ClientServerTest do
     test "heartbeat destroy process" do
       {conn, user} = ConnectionFixtures.client_fixture()
 
+      # Ensure it's all here and is hunky-dory
+      client_pid = Connections.get_client_pid(user.id)
+      send(client_pid, :heartbeat)
+      :timer.sleep(100)
+
+      assert Connections.client_exists?(user.id)
+
       # Kill the connecting process
       TestConn.stop(conn)
 

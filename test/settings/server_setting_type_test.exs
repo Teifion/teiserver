@@ -67,5 +67,13 @@ defmodule Teiserver.ServerSettingTypeTest do
 
       assert Settings.get_server_setting_type(key) == type
     end
+
+    test "list types" do
+      result = Settings.list_server_setting_types(["login.user_rate_limit"])
+      assert Enum.count(result) == 1
+
+      result = Settings.list_server_setting_types(["not a type"])
+      assert Enum.empty?(result)
+    end
   end
 end

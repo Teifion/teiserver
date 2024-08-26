@@ -11,6 +11,7 @@ defmodule Teiserver.Settings.ServerSettingTypeLib do
   def list_server_setting_types(keys) do
     keys
     |> Enum.map(&get_server_setting_type/1)
+    |> Enum.reject(&(&1 == nil))
   end
 
   @spec list_server_setting_type_keys() :: [String.t()]

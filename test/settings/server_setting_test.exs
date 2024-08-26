@@ -157,5 +157,32 @@ defmodule Teiserver.ServerSettingTest do
       value = Settings.get_server_setting_value(type.key)
       assert value == true
     end
+
+    test "validator function" do
+      type =
+        SettingsFixtures.server_setting_type_fixture(%{
+          "type" => "string",
+          "validator" => fn v ->
+            if String.length(v) > 6, do: :ok, else: {:error, "string too short"}
+          end
+        })
+
+      _setting =
+        SettingsFixtures.server_setting_fixture(%{"type" => type, "value" => "123456789"})
+
+      value = Settings.get_server_setting_value(type.key)
+      assert value == "123456789"
+
+      result = Settings.set_server_setting_value(type.key, "abcdef")
+      assert result == {:error, "string too short"}
+
+      value = Settings.get_server_setting_value(type.key)
+      refute value == "abcdef"
+
+      result = Settings.set_server_setting_value(type.key, "abcdefdef")
+      assert result == :ok
+      value = Settings.get_server_setting_value(type.key)
+      assert value == "abcdefdef"
+    end
   end
 end

@@ -74,7 +74,11 @@ defmodule Account.UserTest do
       good_existing =
         User.changeset(
           user,
-          %{"existing" => "password", "password" => "password1"},
+          %{
+            "existing" => "password",
+            "password" => "password1",
+            "password_confirmation" => "password1"
+          },
           :change_password
         )
 

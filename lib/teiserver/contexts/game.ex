@@ -70,6 +70,10 @@ defmodule Teiserver.Game do
   defdelegate lobby_start_match(lobby_id), to: LobbyLib
 
   @doc section: :lobby
+  @spec lobby_end_match(Lobby.id(), String.t()) :: :ok
+  defdelegate lobby_end_match(lobby_id, reason \\ "normal"), to: LobbyLib
+
+  @doc section: :lobby
   @spec close_lobby(Lobby.id()) :: :ok
   defdelegate close_lobby(lobby_id), to: LobbyLib
 

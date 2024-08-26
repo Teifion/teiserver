@@ -3,6 +3,7 @@ defmodule Teiserver.Settings.ServerSettingLib do
   A library of functions for working with `Teiserver.Settings.ServerSetting`
   """
   use TeiserverMacros, :library
+  require Logger
 
   alias Teiserver.Settings.{
     ServerSetting,
@@ -118,8 +119,6 @@ defmodule Teiserver.Settings.ServerSettingLib do
   defp convert_from_raw_value(raw_value, "string"), do: raw_value
   defp convert_from_raw_value(raw_value, "integer") when is_integer(raw_value), do: raw_value
   defp convert_from_raw_value(raw_value, "integer"), do: String.to_integer(raw_value)
-  defp convert_from_raw_value(true, "boolean"), do: true
-  defp convert_from_raw_value(false, "boolean"), do: false
   defp convert_from_raw_value(raw_value, "boolean"), do: raw_value == "t"
   defp convert_from_raw_value(_, _), do: nil
 

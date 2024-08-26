@@ -1,5 +1,6 @@
 defmodule Teiserver.MatchMessageLibTest do
   @moduledoc false
+  alias Teiserver.Communication.MatchMessageLib
   alias Teiserver.Communication.MatchMessage
   use Teiserver.Case, async: true
 
@@ -41,6 +42,13 @@ defmodule Teiserver.MatchMessageLibTest do
 
   describe "match_message" do
     alias Teiserver.Communication.MatchMessage
+
+    test "topic" do
+      match = GameFixtures.incomplete_match_fixture()
+      topic = MatchMessageLib.match_messaging_topic(match)
+      assert topic == "Teiserver.Communication.Match.#{match.id}"
+      assert MatchMessageLib.match_messaging_topic(match.id) == topic
+    end
 
     test "match_message_query/1 returns query" do
       assert Communication.match_message_query([])

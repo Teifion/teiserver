@@ -116,20 +116,18 @@ end
 ```
 
 ## Data in
-Place in `lib/hellow_world_server/tcp_in.ex`, this will handle all the commands coming in.
+Place in `lib/hello_world_server/tcp_in.ex`, this will handle all the commands coming in.
 ```elixir
 defmodule HelloWorldServer.TcpIn do
-  alias Teiserver.Api
-
   def data_in("ping" <> _data, state) do
     {state, "pong"}
   end
 
   def data_in("login " <> data, state) do
     [name, password] = String.split(data, " ")
-    case Api.maybe_authenticate_user_by_name(name, password) do
+    case Teiserver.maybe_authenticate_user_by_name(name, password) do
       {:ok, user} ->
-        Api.connect_user(user)
+        Teiserver.connect_user(user)
         {%{state | user_id: user.id}, "You are now logged in as '#{user.name}'"}
       {:error, :no_user} ->
         {state, "Login failed (no user)"}
@@ -145,7 +143,7 @@ defmodule HelloWorldServer.TcpIn do
     # this will do for the purposes of this example
     email = to_string(:rand.uniform())
     
-    case Api.register_user(name, email, password) do
+    case Teiserver.register_user(name, email, password) do
       {:ok, _user} ->
         {state, "User created, you can now login with 'login name password'"}
       {:error, _} ->
@@ -192,7 +190,7 @@ end
 ```
 
 ## Data out
-Place in `lib/hellow_world_server/tcp_out.ex`, this will handle sending data back to our users.
+Place in `lib/hello_world_server/tcp_out.ex`, this will handle sending data back to our users.
 ```elixir
 defmodule HelloWorldServer.TcpOut do
   def data_out(msg, state) do

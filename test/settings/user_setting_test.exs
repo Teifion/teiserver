@@ -177,6 +177,40 @@ defmodule Teiserver.UserSettingTest do
 
       value = Settings.get_user_setting_value(user_id, type.key)
       assert value == true
+      assert Settings.get_user_setting_value(user_id, type.key) == value
+    end
+
+    test "validator function" do
+      user_id = AccountFixtures.user_fixture().id
+
+      type =
+        SettingsFixtures.user_setting_type_fixture(%{
+          "type" => "string",
+          "validator" => fn v ->
+            if String.length(v) > 6, do: :ok, else: {:error, "string too short"}
+          end
+        })
+
+      _setting =
+        SettingsFixtures.user_setting_fixture(%{
+          "user_id" => user_id,
+          "type" => type,
+          "value" => "123456789"
+        })
+
+      value = Settings.get_user_setting_value(user_id, type.key)
+      assert value == "123456789"
+
+      result = Settings.set_user_setting_value(user_id, type.key, "abcdef")
+      assert result == {:error, "string too short"}
+
+      value = Settings.get_user_setting_value(user_id, type.key)
+      refute value == "abcdef"
+
+      result = Settings.set_user_setting_value(user_id, type.key, "abcdefdef")
+      assert result == :ok
+      value = Settings.get_user_setting_value(user_id, type.key)
+      assert value == "abcdefdef"
     end
   end
 end

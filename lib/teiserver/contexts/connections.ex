@@ -63,6 +63,10 @@ defmodule Teiserver.Connections do
   @spec disconnect_single_connection(Teiserver.user_id()) :: :ok
   defdelegate disconnect_single_connection(user_id), to: ClientLib
 
+  @doc section: :client
+  @spec disconnect_single_connection(Teiserver.user_id(), pid) :: :ok
+  defdelegate disconnect_single_connection(user_id, pid), to: ClientLib
+
   @doc false
   @spec client_exists?(Teiserver.user_id()) :: pid() | boolean
   defdelegate client_exists?(user_id), to: ClientLib

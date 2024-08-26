@@ -129,7 +129,8 @@ defmodule Teiserver.Game.MatchLib do
     end)
 
     # Tell the lobby server the match has ended
-    Game.cycle_lobby(match.lobby_id)
+    ending_reason = if outcome.ended_normally?, do: "normal", else: "abnormal"
+    Game.lobby_end_match(match.lobby_id, ending_reason)
 
     # Finally return the updated match
     updated_match

@@ -8,7 +8,7 @@ defmodule ApiTest do
   alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Account.User
 
-  describe "API functionality" do
+  describe "Teiserver API functionality" do
     test "maybe_authenticate_user_by_email/2" do
       user = AccountFixtures.user_fixture()
 

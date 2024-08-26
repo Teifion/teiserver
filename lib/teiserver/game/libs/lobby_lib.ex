@@ -202,9 +202,6 @@ defmodule Teiserver.Game.LobbyLib do
     client = Connections.get_client(host_id)
 
     cond do
-      host_id == nil ->
-        {:error, "No host_id provided"}
-
       client == nil ->
         {:error, "Client is not connected"}
 
@@ -243,7 +240,8 @@ defmodule Teiserver.Game.LobbyLib do
   end
 
   @doc """
-  Used to cycle a lobby after a match has concluded.
+  Used to cycle a lobby to a new match; typically at the end of the match you would call `lobby_end_match/1`, this function allows you to cycle a lobby for a different reason
+  should you need to.
 
   ## Examples
 
@@ -255,19 +253,7 @@ defmodule Teiserver.Game.LobbyLib do
   """
   @spec cycle_lobby(Lobby.id()) :: :ok
   def cycle_lobby(lobby_id) when is_binary(lobby_id) do
-    host_id = get_lobby_attribute(lobby_id, :host_id)
-
-    {:ok, match} =
-      Teiserver.Game.create_match(%{
-        public?: true,
-        rated?: true,
-        host_id: host_id,
-        processed?: false,
-        lobby_opened_at: Timex.now(),
-        lobby_id: lobby_id
-      })
-
-    cast_lobby(lobby_id, {:cycle_lobby, match.id})
+    cast_lobby(lobby_id, :cycle_lobby)
   end
 
   @doc """

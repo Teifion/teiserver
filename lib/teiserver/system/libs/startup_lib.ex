@@ -27,5 +27,31 @@ defmodule Teiserver.System.StartupLib do
       description:
         "The upper bound on how many failed attempts a given user can have before their logins are blocked."
     })
+
+    Settings.add_user_setting_type(%{
+      key: "language",
+      label: "Language",
+      section: "interface",
+      type: "string",
+      permissions: nil,
+      choices: ["English", "American", "Spanish", "Lojban", "Bork bork"],
+      default: "English",
+      description: "The language used in the interface"
+    })
+
+    Settings.add_user_setting_type(%{
+      key: "timezone",
+      label: "Timezone",
+      section: "interface",
+      type: "integer",
+      permissions: nil,
+      default: 0,
+      description: "The timezone to convert all Times to.",
+      validator: fn v ->
+        if -12 <= v and v <= 14,
+          do: :ok,
+          else: {:error, "Timezone must be within -12 and +14 hours of UTC"}
+      end
+    })
   end
 end
