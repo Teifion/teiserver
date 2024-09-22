@@ -80,7 +80,8 @@ defmodule Teiserver.Fixtures.GameFixtures do
         rated?: data["rated?"] || true,
         host_id: data["host_id"] || user_fixture().id,
         processed?: false,
-        lobby_opened_at: data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5)
+        lobby_opened_at:
+          data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5)
       }
     )
     |> Teiserver.Repo.insert!()
@@ -105,8 +106,10 @@ defmodule Teiserver.Fixtures.GameFixtures do
         team_size: data["team_size"] || 2,
         processed?: false,
         game_type: data["game_type"] || "match_game_type_#{r}",
-        lobby_opened_at: data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5),
-        match_started_at: data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3),
+        lobby_opened_at:
+          data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5),
+        match_started_at:
+          data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3),
         host_id: data["host_id"] || user_fixture().id,
         type_id: data["type_id"] || match_type_fixture().id
       }
@@ -118,7 +121,9 @@ defmodule Teiserver.Fixtures.GameFixtures do
   def completed_match_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
 
-    match_started_at = data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3)
+    match_started_at =
+      data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3)
+
     match_ended_at = data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3)
 
     Match.changeset(
@@ -135,7 +140,8 @@ defmodule Teiserver.Fixtures.GameFixtures do
         team_size: data["team_size"] || 2,
         processed?: data["processed?"] || false,
         game_type: data["game_type"] || "match_game_type_#{r}",
-        lobby_opened_at: data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5),
+        lobby_opened_at:
+          data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5),
         match_started_at: match_started_at,
         match_ended_at: match_ended_at,
         match_duration_seconds: DateTime.diff(match_ended_at, match_started_at, :second),
