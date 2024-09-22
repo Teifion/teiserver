@@ -38,8 +38,8 @@ defmodule Teiserver.UserQueriesTest do
             name_or_email: "name_or_email",
             name_like: "name_like",
             basic_search: "basic_search",
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now(),
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now(),
             has_group: "has_group",
             not_has_group: "not_has_group",
             has_permission: "has_permission",
@@ -51,10 +51,10 @@ defmodule Teiserver.UserQueriesTest do
             smurf_of: "Non-smurf",
             behaviour_score_gt: 123,
             behaviour_score_lt: 123,
-            last_played_after: Timex.now(),
-            last_played_before: Timex.now(),
-            last_login_after: Timex.now(),
-            last_login_before: Timex.now()
+            last_played_after: DateTime.utc_now(),
+            last_played_before: DateTime.utc_now(),
+            last_login_after: DateTime.utc_now(),
+            last_login_before: DateTime.utc_now()
           ],
           order_by: [
             "Name (A-Z)",

@@ -35,10 +35,10 @@ defmodule Teiserver.UserSettingQueriesTest do
             key: "key1",
             value: ["value1", "value2"],
             value: "value1",
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now(),
-            updated_after: Timex.now(),
-            updated_before: Timex.now()
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now(),
+            updated_after: DateTime.utc_now(),
+            updated_before: DateTime.utc_now()
           ],
           order_by: [
             "Newest first",

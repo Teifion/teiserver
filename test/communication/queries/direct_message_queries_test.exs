@@ -37,8 +37,8 @@ defmodule Teiserver.DirectMessageQueriesTest do
             to_id: Teiserver.uuid(),
             to_or_from_id: [Teiserver.uuid(), Teiserver.uuid()],
             to_or_from_id: Teiserver.uuid(),
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now()
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now()
           ],
           order_by: [
             "Newest first",

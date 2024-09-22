@@ -16,7 +16,7 @@ defmodule Teiserver.MatchMessageLibTest do
   defp valid_attrs do
     %{
       content: "some content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       match_id: GameFixtures.incomplete_match_fixture().id
     }
@@ -25,7 +25,7 @@ defmodule Teiserver.MatchMessageLibTest do
   defp update_attrs do
     %{
       content: "some updated content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       match_id: GameFixtures.incomplete_match_fixture().id
     }

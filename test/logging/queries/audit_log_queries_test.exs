@@ -42,10 +42,10 @@ defmodule Teiserver.AuditLogQueriesTest do
             detail_greater_than: {"key", "value"},
             detail_less_than: {"key", "value"},
             detail_not: {"key", "value"},
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now(),
-            updated_after: Timex.now(),
-            updated_before: Timex.now()
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now(),
+            updated_after: DateTime.utc_now(),
+            updated_before: DateTime.utc_now()
           ],
           order_by: [
             "Newest first",

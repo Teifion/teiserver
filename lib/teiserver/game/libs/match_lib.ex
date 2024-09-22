@@ -45,7 +45,7 @@ defmodule Teiserver.Game.MatchLib do
         game_version: lobby.game_version,
         team_count: team_count,
         team_size: team_size,
-        match_started_at: Timex.now(),
+        match_started_at: DateTime.utc_now(),
         player_count: Enum.count(clients),
         type_id: type_id
       })
@@ -82,54 +82,59 @@ defmodule Teiserver.Game.MatchLib do
   @doc """
   Ends an ongoing match and updates memberships accordingly.
 
-  Second argument is a map of the outcomes for the match with the following keys:
-  * `:winning_team` - The team_number of the winning team
-  * `:ended_normally?` - A boolean indicating if the match ended normally
-  * `:players` - A map of player data with the keys being the user_id of the player and the value being a map of their specific outcome
+  Second argument is a (string keyed) map of the outcomes for the match with the following keys:
+  * `winning_team` - The team_number of the winning team
+  * `ended_normally?` - A boolean indicating if the match ended normally
+  * `players` - A map of player data with the keys being the user_id of the player and the value being a map of their specific outcome
 
   Player outcomes are expected to map like so:
-  Required:
+  Required
 
   Optional:
-  * `:left_after_seconds` - The number of seconds after the start the player left if early. If not included it is assumed the player remained until the end.
+  * `left_after_seconds` - The number of seconds after the start the player left if early. If not included it is assumed the player remained until the end.
 
   ## Examples
 
-      iex> end_match(123, %{winning_team: 1, ended_normally?: true, player_data: %{123: }})
-      %Match{}
-
+    iex> end_match(123, %{
+      "winning_team" => 1, "ended_normally?" => true, "players" => %{
+        "c3bf3539-fcf2-4409-ad68-1a5994aaa10f": %{"left_after_seconds": 123},
+        "13739a7f-f39d-47a5-85cc-73652372dad0": %{},
+      }
+    })
+    %Match{}
   """
   @spec end_match(Match.id(), map()) :: Match.t()
   def end_match(match_id, outcome) when is_binary(match_id) do
     match = get_match!(match_id)
-    now = Timex.now()
+    now = DateTime.utc_now()
 
-    duration_seconds = Timex.diff(match.match_started_at, now, :second)
+    duration_seconds = DateTime.diff(match.match_started_at, now, :second)
 
     {:ok, updated_match} =
       update_match(match, %{
-        winning_team: outcome.winning_team,
-        ended_normally?: outcome.ended_normally?,
+        winning_team: outcome["winning_team"],
+        ended_normally?: outcome["ended_normally?"],
         match_ended_at: now,
         match_duration_seconds: duration_seconds
       })
 
     Game.list_match_memberships(where: [match_id: match.id])
     |> Enum.each(fn mm ->
-      player_outcome = outcome.players[mm.user_id]
+      # If no player data is included we don't want to break anything!
+      player_outcome = Map.get(outcome["players"], mm.user_id, %{})
 
-      win? = mm.team_number == outcome.winning_team
+      win? = mm.team_number == outcome["winning_team"]
 
       attrs = %{
         win?: win?,
-        left_after_seconds: Map.get(player_outcome, :left_after_seconds)
+        left_after_seconds: Map.get(player_outcome, "left_after_seconds")
       }
 
       Game.update_match_membership(mm, attrs)
     end)
 
     # Tell the lobby server the match has ended
-    ending_reason = if outcome.ended_normally?, do: "normal", else: "abnormal"
+    ending_reason = if outcome["ended_normally?"], do: "normal", else: "abnormal"
     Game.lobby_end_match(match.lobby_id, ending_reason)
 
     # Finally return the updated match

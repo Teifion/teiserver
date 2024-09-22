@@ -9,7 +9,7 @@ defmodule Teiserver.DirectMessageLibTest do
   defp valid_attrs do
     %{
       content: "some content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       to_id: AccountFixtures.user_fixture().id
     }
@@ -18,7 +18,7 @@ defmodule Teiserver.DirectMessageLibTest do
   defp update_attrs do
     %{
       content: "some updated content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       to_id: AccountFixtures.user_fixture().id
     }

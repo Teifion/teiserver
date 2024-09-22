@@ -196,7 +196,6 @@ defmodule Teiserver.Game do
   defdelegate get_match!(match_id, query_args \\ []), to: MatchLib
 
   @doc section: :match
-  @spec get_match(Match.id()) :: Match.t() | nil
   @spec get_match(Match.id(), Teiserver.query_args()) :: Match.t() | nil
   defdelegate get_match(match_id, query_args \\ []), to: MatchLib
 

@@ -127,7 +127,7 @@ defmodule Teiserver.Connections.ClientServer do
 
   @impl true
   def handle_info(:heartbeat, %State{client: %{connected?: false}} = state) do
-    seconds_since_disconnect = Timex.diff(Timex.now(), state.client.last_disconnected, :second)
+    seconds_since_disconnect = DateTime.diff(DateTime.utc_now(), state.client.last_disconnected, :second)
 
     if seconds_since_disconnect > @client_destroy_timeout_seconds do
       ClientLib.stop_client_server(state.user_id)
@@ -158,7 +158,7 @@ defmodule Teiserver.Connections.ClientServer do
       new_connections = List.delete(state.connections, pid)
 
       if Enum.empty?(new_connections) do
-        new_client = %{state.client | connected?: false, last_disconnected: Timex.now()}
+        new_client = %{state.client | connected?: false, last_disconnected: DateTime.utc_now()}
 
         Teiserver.broadcast(state.client_topic, %{
           event: :client_disconnected,

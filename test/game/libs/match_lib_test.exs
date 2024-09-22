@@ -189,12 +189,12 @@ defmodule Teiserver.MatchLibAsyncTest do
       :timer.sleep(100)
 
       outcome = %{
-        winning_team: 1,
-        ended_normally?: true,
-        players: %{
+        "winning_team" => 1,
+        "ended_normally?" => true,
+        "players" => %{
           u1.id => %{},
           u2.id => %{},
-          u3.id => %{left_after_seconds: 1},
+          u3.id => %{"left_after_seconds" => 1},
           u4.id => %{}
         }
       }

@@ -27,7 +27,7 @@ defmodule Teiserver.Fixtures.CommunicationFixtures do
       %RoomMessage{},
       %{
         content: data[:content] || "room_message_content_#{r}",
-        inserted_at: data[:inserted_at] || Timex.now(),
+        inserted_at: data[:inserted_at] || DateTime.utc_now(),
         sender_id: data[:sender_id] || user_fixture().id,
         room_id: data[:room_id] || room_fixture().id
       }
@@ -44,7 +44,7 @@ defmodule Teiserver.Fixtures.CommunicationFixtures do
       %DirectMessage{},
       %{
         content: data[:content] || "room_message_content_#{r}",
-        inserted_at: data[:inserted_at] || Timex.now(),
+        inserted_at: data[:inserted_at] || DateTime.utc_now(),
         delivered?: data[:delivered?] || false,
         read?: data[:read?] || false,
         sender_id: data[:sender_id] || user_fixture().id,
@@ -63,7 +63,7 @@ defmodule Teiserver.Fixtures.CommunicationFixtures do
       %MatchMessage{},
       %{
         content: data[:content] || "match_message_content_#{r}",
-        inserted_at: data[:inserted_at] || Timex.now(),
+        inserted_at: data[:inserted_at] || DateTime.utc_now(),
         sender_id: data[:sender_id] || user_fixture().id,
         match_id: data[:match_id] || incomplete_match_fixture().id
       }

@@ -243,7 +243,6 @@ defmodule Teiserver.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:argon2_elixir, "~> 4.0"},
-      {:timex, "~> 3.7.5"},
       {:typedstruct, "~> 0.5.2", runtime: false},
       {:horde, "~> 0.9"},
       {:cachex, "~> 3.6"},

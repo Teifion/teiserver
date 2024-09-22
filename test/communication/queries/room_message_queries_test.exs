@@ -35,8 +35,8 @@ defmodule Teiserver.RoomMessageQueriesTest do
             sender_id: Teiserver.uuid(),
             room_id: [1, 2],
             room_id: 1,
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now()
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now()
           ],
           order_by: [
             "Newest first",

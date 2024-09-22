@@ -222,7 +222,7 @@ defmodule Teiserver.Game.LobbyServer do
         rated?: true,
         host_id: state.host_id,
         processed?: false,
-        lobby_opened_at: Timex.now(),
+        lobby_opened_at: DateTime.utc_now(),
         lobby_id: state.lobby_id
       })
 

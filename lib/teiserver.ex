@@ -342,6 +342,10 @@ defmodule Teiserver do
   @spec end_match(Match.id(), map()) :: Match.t()
   defdelegate end_match(match_id, outcome), to: MatchLib
 
+  @doc section: :match
+  @spec get_match(Match.id(), Teiserver.query_args()) :: Match.t() | nil
+  defdelegate get_match(match_id, query_args \\ []), to: MatchLib
+
   ### Communication
   # MatchMessage
   @doc section: :match_message

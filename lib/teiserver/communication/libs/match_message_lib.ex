@@ -112,7 +112,7 @@ defmodule Teiserver.Communication.MatchMessageLib do
           sender_id: sender_id,
           match_id: match_id,
           content: content,
-          inserted_at: Timex.now()
+          inserted_at: DateTime.utc_now()
         },
         attrs
       )

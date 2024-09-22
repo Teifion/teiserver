@@ -37,12 +37,12 @@ defmodule Teiserver.MatchQueriesTest do
             duration_gt: 100,
             duration_lt: 999,
             name_like: "abc",
-            started_after: Timex.now(),
-            started_before: Timex.now(),
-            ended_after: Timex.now(),
-            ended_before: Timex.now(),
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now()
+            started_after: DateTime.utc_now(),
+            started_before: DateTime.utc_now(),
+            ended_after: DateTime.utc_now(),
+            ended_before: DateTime.utc_now(),
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now()
           ],
           order_by: [
             "Name (A-Z)",
