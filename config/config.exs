@@ -13,7 +13,7 @@ config :teiserver, Teiserver.Test.Repo,
   priv: "test/support/postgres",
   url:
     System.get_env("DATABASE_URL") ||
-      "postgres://teiserver_test:123456789@localhost/teiserver_test"
+      "postgres://teiserver_test:postgres@localhost/teiserver_test"
 
 config :teiserver,
   # Overridden by application
