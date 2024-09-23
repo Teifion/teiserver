@@ -89,4 +89,6 @@ jobs:
 
     # Step: Execute the tests.
     - name: Run tests
+      env:
+        DATABASE_URL: postgres://teiserver_test:123456789@localhost/teiserver_test
       run: mix test.ci
