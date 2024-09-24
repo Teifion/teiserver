@@ -195,27 +195,27 @@ defmodule Teiserver.Game.LobbyLib do
       {:ok, 456}
 
       iex> open_lobby(456, "Name")
-      {:error, "Client is not connected"}
+      {:error, :client_disconnected}
   """
-  @spec open_lobby(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, String.t()}
+  @spec open_lobby(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, :client_disconnected, :already_in_lobby, :no_name}
   def open_lobby(host_id, name) when is_binary(host_id) do
     client = Connections.get_client(host_id)
 
     cond do
       client == nil ->
-        {:error, "Client is not connected"}
+        {:error, :client_disconnected}
 
       client.connected? == false ->
-        {:error, "Client is disconnected"}
+        {:error, :client_disconnected}
 
       client.lobby_id != nil ->
-        {:error, "Already in a lobby"}
+        {:error, :already_in_lobby}
 
       name == nil ->
-        {:error, "No name supplied"}
+        {:error, :no_name}
 
       String.trim(name) == "" ->
-        {:error, "No name supplied"}
+        {:error, :no_name}
 
       # All checks are good, lets try to create the lobby!
       true ->
@@ -333,13 +333,12 @@ defmodule Teiserver.Game.LobbyLib do
   @doc """
   Adds a client to the lobby
   """
-  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: {boolean(), String.t() | nil}
-  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t()) ::
-          {boolean(), String.t() | nil}
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t() | nil) ::
+          true | {false, :no_lobby | :existing_member | :client_disconnected | :already_in_a_lobby | :incorrect_password | :lobby_is_locked}
   def can_add_client_to_lobby(user_id, lobby_id, password \\ nil) do
     case call_lobby(lobby_id, {:can_add_client, user_id, password}) do
       nil ->
-        {false, "No lobby"}
+        {false, :no_lobby}
 
       result ->
         result

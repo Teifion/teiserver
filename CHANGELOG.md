@@ -14,6 +14,7 @@
 - Removed clustering code so it can be handled by the application using Teiserver as a library
 - Moved everything from `Teiserver.Api` to `Teiserver`
 - Dropped Timex
+- Swapped string error messages to atom error messages
 
 ## v0.0.4
 - Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries

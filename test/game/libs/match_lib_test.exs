@@ -118,9 +118,9 @@ defmodule Teiserver.MatchLibAsyncTest do
       {_, u4} = ConnectionFixtures.client_fixture()
       u5 = AccountFixtures.user_fixture()
 
-      assert Game.can_add_client_to_lobby(u1.id, Teiserver.uuid()) == {false, "No lobby"}
-      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {true, nil}
-      assert Game.can_add_client_to_lobby(u5.id, lobby_id) == {false, "Client is not connected"}
+      assert Game.can_add_client_to_lobby(u1.id, Teiserver.uuid()) == {false, :no_lobby}
+      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == true
+      assert Game.can_add_client_to_lobby(u5.id, lobby_id) == {false, :client_disconnected}
 
       Game.add_client_to_lobby(u1.id, lobby_id)
       Game.add_client_to_lobby(u2.id, lobby_id)
@@ -128,11 +128,11 @@ defmodule Teiserver.MatchLibAsyncTest do
       Game.add_client_to_lobby(u4.id, lobby_id)
 
       # Just to check, if we try to add the now it says no
-      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {false, "Existing member"}
+      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {false, :existing_member}
 
       # And trying to add them anyway won't generate a problem
       resp = Game.add_client_to_lobby(u1.id, lobby_id)
-      assert resp == {:error, "Existing member"}
+      assert resp == {:error, :existing_member}
 
       lobby = Game.get_lobby(lobby_id)
 
@@ -168,7 +168,7 @@ defmodule Teiserver.MatchLibAsyncTest do
       settings = Game.get_match_settings_map(match.id)
       assert settings == %{}
 
-      started_match = Game.start_match(lobby.id)
+      {:ok, started_match} = Game.start_match(lobby.id)
       refute started_match.match_started_at == nil
       assert started_match.match_ended_at == nil
 

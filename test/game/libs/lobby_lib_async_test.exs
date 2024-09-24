@@ -19,7 +19,7 @@ defmodule Teiserver.Game.LobbyLibAsyncTest do
     test "open_lobby" do
       # This client won't exist, thus it should fail
       assert Game.open_lobby(Teiserver.uuid(), "no-host-lobby") ==
-               {:error, "Client is not connected"}
+               {:error, :client_disconnected}
     end
   end
 end

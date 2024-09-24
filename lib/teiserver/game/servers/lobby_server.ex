@@ -40,7 +40,7 @@ defmodule Teiserver.Game.LobbyServer do
       {false, reason} ->
         {:reply, {:error, reason}, state}
 
-      {true, _} ->
+      true ->
         :telemetry.execute(
           [:teiserver, :lobby, :add_client],
           %{},
@@ -243,41 +243,41 @@ defmodule Teiserver.Game.LobbyServer do
   end
 
   @spec can_add_client({Teiserver.user_id(), String.t()}, State.t()) ::
-          {boolean(), String.t() | nil}
+          true | {false, :existing_member | :client_disconnected | :already_in_a_lobby}
   defp can_add_client({user_id, password}, %{lobby: lobby} = _state) do
     cond do
       Enum.member?(lobby.members, user_id) ->
-        {false, "Existing member"}
+        {false, :existing_member}
 
       true ->
         client = Connections.get_client(user_id)
 
         cond do
           client == nil ->
-            {false, "Client is not connected"}
+            {false, :client_disconnected}
 
           client.connected? == false ->
-            {false, "Client is disconnected"}
+            {false, :client_disconnected}
 
           client.lobby_id != nil ->
-            {false, "Already in a lobby"}
+            {false, :already_in_a_lobby}
 
           # Moderator short-circuit
           Account.allow?(user_id, "moderator") ->
-            {true, nil}
+            true
 
           # Approved player short-circuit
           Enum.member?(lobby.approved_members, user_id) ->
-            {true, nil}
+            true
 
           lobby.password && lobby.password != password ->
-            {false, "Incorrect password"}
+            {false, :incorrect_password}
 
           lobby.locked? ->
-            {false, "Lobby is locked"}
+            {false, :lobby_is_locked}
 
           true ->
-            {true, nil}
+            true
         end
     end
   end
