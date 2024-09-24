@@ -297,12 +297,8 @@ defmodule Teiserver do
   defdelegate list_lobby_ids, to: LobbyLib
 
   @doc section: :lobby
-  @spec stream_lobby_summaries() :: Enumerable.t(LobbySummary.t())
-  defdelegate stream_lobby_summaries(), to: LobbyLib
-
-  @doc section: :lobby
   @spec stream_lobby_summaries(map) :: Enumerable.t(LobbySummary.t())
-  defdelegate stream_lobby_summaries(filters), to: LobbyLib
+  defdelegate stream_lobby_summaries(filters \\ %{}), to: LobbyLib
 
   @doc section: :lobby
   @spec open_lobby(user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, String.t()}
@@ -317,13 +313,16 @@ defmodule Teiserver do
   defdelegate close_lobby(lobby_id), to: LobbyLib
 
   @doc section: :lobby
-  @spec can_add_client_to_lobby(user_id(), Lobby.id()) :: {boolean(), String.t() | nil}
-  defdelegate can_add_client_to_lobby(user_id, lobby_id), to: LobbyLib
-
-  @doc section: :lobby
-  @spec can_add_client_to_lobby(user_id(), Lobby.id(), String.t()) ::
-          {boolean(), String.t() | nil}
-  defdelegate can_add_client_to_lobby(user_id, lobby_id, password), to: LobbyLib
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t() | nil) ::
+          true
+          | {false,
+             :no_lobby
+             | :existing_member
+             | :client_disconnected
+             | :already_in_a_lobby
+             | :incorrect_password
+             | :lobby_is_locked}
+  defdelegate can_add_client_to_lobby(user_id, lobby_id, password \\ nil), to: LobbyLib
 
   @doc section: :lobby
   @spec add_client_to_lobby(user_id(), Lobby.id()) :: :ok | {:error, String.t()}
@@ -335,7 +334,8 @@ defmodule Teiserver do
 
   # Match
   @doc section: :match
-  @spec start_match(Teiserver.lobby_id()) :: Match.t()
+  @spec start_match(Lobby.id()) ::
+          {:ok, Match.t()} | {:error, :no_players, :match_already_started}
   defdelegate start_match(lobby_id), to: MatchLib
 
   @doc section: :match

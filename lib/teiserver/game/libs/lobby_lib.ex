@@ -83,21 +83,29 @@ defmodule Teiserver.Game.LobbyLib do
   end
 
   @doc """
+  Returns a stream of lobby summaries based on the filters; the filters are supplied as a string keyed map.
 
+  "match_ongoing?" => boolean
+  "require_any_tags" => [String]
+  "require_all_tags" => [String]
+  "exclude_tags" => [String]
+  "passworded?" => boolean
+  "locked?" => boolean
+  "public?" => boolean
+  TODO: "match_type" => Not implemented yet
+  "rated?" => boolean
+  "game_version" => string, equality match
+  "game_name" => string, equality match
+  "min_player_count" => integer (inclusive)
+  "max_player_count" => integer (inclusive)
   """
-  @spec stream_lobby_summaries() :: Enumerable.t(LobbySummary.t())
-  def stream_lobby_summaries() do
-    list_lobby_ids()
-    |> Stream.map(&get_lobby_summary/1)
-    |> Stream.reject(&(&1 == nil))
-  end
-
   @spec stream_lobby_summaries(map) :: Enumerable.t(LobbySummary.t())
-  def stream_lobby_summaries(filters) do
+  def stream_lobby_summaries(filters \\ %{}) do
     ids = filters["ids"] || list_lobby_ids()
 
     ids
     |> Stream.map(&get_lobby_summary/1)
+    |> Stream.reject(&(&1 == nil))
     |> Stream.filter(fn l -> include_lobby?(l, filters) end)
   end
 
@@ -197,7 +205,8 @@ defmodule Teiserver.Game.LobbyLib do
       iex> open_lobby(456, "Name")
       {:error, :client_disconnected}
   """
-  @spec open_lobby(Teiserver.user_id(), Lobby.name()) :: {:ok, Lobby.id()} | {:error, :client_disconnected, :already_in_lobby, :no_name}
+  @spec open_lobby(Teiserver.user_id(), Lobby.name()) ::
+          {:ok, Lobby.id()} | {:error, :client_disconnected, :already_in_lobby, :no_name}
   def open_lobby(host_id, name) when is_binary(host_id) do
     client = Connections.get_client(host_id)
 
@@ -334,7 +343,14 @@ defmodule Teiserver.Game.LobbyLib do
   Adds a client to the lobby
   """
   @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t() | nil) ::
-          true | {false, :no_lobby | :existing_member | :client_disconnected | :already_in_a_lobby | :incorrect_password | :lobby_is_locked}
+          true
+          | {false,
+             :no_lobby
+             | :existing_member
+             | :client_disconnected
+             | :already_in_a_lobby
+             | :incorrect_password
+             | :lobby_is_locked}
   def can_add_client_to_lobby(user_id, lobby_id, password \\ nil) do
     case call_lobby(lobby_id, {:can_add_client, user_id, password}) do
       nil ->

@@ -10,7 +10,8 @@ defmodule Teiserver.Game.MatchLib do
   Given a lobby_id, will update the match, memberships and settings for that lobby
   and then update the Lobby itself to show the lobby is now in progress.
   """
-  @spec start_match(Lobby.id()) :: {:ok, Match.t()} | {:error, :no_players}
+  @spec start_match(Lobby.id()) ::
+          {:ok, Match.t()} | {:error, :no_players, :match_already_started}
   def start_match(lobby_id) do
     lobby = Game.get_lobby(lobby_id)
 
@@ -19,10 +20,15 @@ defmodule Teiserver.Game.MatchLib do
       |> Connections.get_client_list()
       |> Enum.filter(fn c -> c.player? end)
 
-    if Enum.empty?(players) do
-      {:error, :no_players}
-    else
-      {:ok, do_start_match(lobby, players)}
+    cond do
+      lobby.match_ongoing? ->
+        {:error, :match_already_started}
+
+      Enum.empty?(players) ->
+        {:error, :no_players}
+
+      true ->
+        {:ok, do_start_match(lobby, players)}
     end
   end
 

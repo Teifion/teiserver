@@ -68,6 +68,18 @@ defmodule Teiserver.Game.MatchQueries do
     )
   end
 
+  def _where(query, :started?, true) do
+    from(matches in query,
+      where: not is_nil(matches.match_started_at)
+    )
+  end
+
+  def _where(query, :started?, false) do
+    from(matches in query,
+      where: is_nil(matches.match_started_at)
+    )
+  end
+
   def _where(query, :started_after, timestamp) do
     from(matches in query,
       where: matches.match_started_at >= ^timestamp
