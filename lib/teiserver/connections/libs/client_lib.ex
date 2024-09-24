@@ -81,16 +81,17 @@ defmodule Teiserver.Connections.ClientLib do
       [%Client{}, %Client{}]
 
       iex> get_client_list([456])
-      [nil]
+      []
 
   """
-  @spec get_client_list([Teiserver.user_id()]) :: [Client.t() | nil]
+  @spec get_client_list([Teiserver.user_id()]) :: [Client.t()]
   def get_client_list(user_ids) do
     user_ids
     |> Enum.uniq()
     |> Enum.map(fn user_id ->
       call_client(user_id, :get_client_state)
     end)
+    |> Enum.reject(&(&1 == nil))
   end
 
   @doc """

@@ -40,7 +40,7 @@ defmodule Teiserver.Connections do
   defdelegate get_client(user_id), to: ClientLib
 
   @doc section: :client
-  @spec get_client_list([Teiserver.user_id()]) :: [Client.t() | nil]
+  @spec get_client_list([Teiserver.user_id()]) :: [Client.t()]
   defdelegate get_client_list(user_ids), to: ClientLib
 
   @doc section: :client
