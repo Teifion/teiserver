@@ -70,16 +70,24 @@ defmodule Teiserver.Game do
   defdelegate lobby_start_match(lobby_id), to: LobbyLib
 
   @doc section: :lobby
+  @spec lobby_end_match(Lobby.id(), String.t()) :: :ok
+  defdelegate lobby_end_match(lobby_id, reason \\ "normal"), to: LobbyLib
+
+  @doc section: :lobby
   @spec close_lobby(Lobby.id()) :: :ok
   defdelegate close_lobby(lobby_id), to: LobbyLib
 
   @doc section: :lobby
-  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: {boolean(), String.t() | nil}
-  defdelegate can_add_client_to_lobby(user_id, lobby_id), to: LobbyLib
-
-  @doc section: :lobby
-  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t()) :: {boolean(), String.t() | nil}
-  defdelegate can_add_client_to_lobby(user_id, lobby_id, password), to: LobbyLib
+  @spec can_add_client_to_lobby(Teiserver.user_id(), Lobby.id(), String.t() | nil) ::
+          true
+          | {false,
+             :no_lobby
+             | :existing_member
+             | :client_disconnected
+             | :already_in_a_lobby
+             | :incorrect_password
+             | :lobby_is_locked}
+  defdelegate can_add_client_to_lobby(user_id, lobby_id, password \\ nil), to: LobbyLib
 
   @doc section: :lobby
   @spec add_client_to_lobby(Teiserver.user_id(), Lobby.id()) :: :ok | {:error, String.t()}
@@ -191,7 +199,6 @@ defmodule Teiserver.Game do
   defdelegate get_match!(match_id, query_args \\ []), to: MatchLib
 
   @doc section: :match
-  @spec get_match(Match.id()) :: Match.t() | nil
   @spec get_match(Match.id(), Teiserver.query_args()) :: Match.t() | nil
   defdelegate get_match(match_id, query_args \\ []), to: MatchLib
 
@@ -291,8 +298,8 @@ defmodule Teiserver.Game do
   defdelegate create_match_setting_type(attrs), to: MatchSettingTypeLib
 
   @doc section: :match_setting_type
-  @spec get_or_create_match_setting_type(String.t()) :: MatchSettingType.id()
-  defdelegate get_or_create_match_setting_type(name), to: MatchSettingTypeLib
+  @spec get_or_create_match_setting_type_id(String.t()) :: MatchSettingType.id()
+  defdelegate get_or_create_match_setting_type_id(name), to: MatchSettingTypeLib
 
   @doc section: :match_setting_type
   @spec update_match_setting_type(MatchSettingType, map) ::
@@ -360,6 +367,118 @@ defmodule Teiserver.Game do
   @spec change_match_setting(MatchSetting.t()) :: Ecto.Changeset.t()
   @spec change_match_setting(MatchSetting.t(), map) :: Ecto.Changeset.t()
   defdelegate change_match_setting(match_setting, attrs \\ %{}), to: MatchSettingLib
+
+  # UserChoiceTypes
+  alias Teiserver.Game.{UserChoiceType, UserChoiceTypeLib, UserChoiceTypeQueries}
+
+  @doc false
+  @spec user_choice_type_query(Teiserver.query_args()) :: Ecto.Query.t()
+  defdelegate user_choice_type_query(args), to: UserChoiceTypeQueries
+
+  @doc section: :user_choice_type
+  @spec list_user_choice_types(Teiserver.query_args()) :: [UserChoiceType.t()]
+  defdelegate list_user_choice_types(args), to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec get_user_choice_type!(UserChoiceType.id()) :: UserChoiceType.t()
+  @spec get_user_choice_type!(UserChoiceType.id(), Teiserver.query_args()) ::
+          UserChoiceType.t()
+  defdelegate get_user_choice_type!(user_choice_type_id, query_args \\ []),
+    to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec get_user_choice_type(UserChoiceType.id()) :: UserChoiceType.t() | nil
+  @spec get_user_choice_type(UserChoiceType.id(), Teiserver.query_args()) ::
+          UserChoiceType.t() | nil
+  defdelegate get_user_choice_type(user_choice_type_id, query_args \\ []),
+    to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec create_user_choice_type(map) ::
+          {:ok, UserChoiceType.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate create_user_choice_type(attrs), to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec get_or_create_user_choice_type_id(String.t()) :: UserChoiceType.id()
+  defdelegate get_or_create_user_choice_type_id(name), to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec update_user_choice_type(UserChoiceType, map) ::
+          {:ok, UserChoiceType.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate update_user_choice_type(user_choice_type, attrs), to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec delete_user_choice_type(UserChoiceType.t()) ::
+          {:ok, UserChoiceType.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate delete_user_choice_type(user_choice_type), to: UserChoiceTypeLib
+
+  @doc section: :user_choice_type
+  @spec change_user_choice_type(UserChoiceType.t()) :: Ecto.Changeset.t()
+  @spec change_user_choice_type(UserChoiceType.t(), map) :: Ecto.Changeset.t()
+  defdelegate change_user_choice_type(user_choice_type, attrs \\ %{}), to: UserChoiceTypeLib
+
+  # UserChoices
+  alias Teiserver.Game.{UserChoice, UserChoiceLib, UserChoiceQueries}
+
+  @doc false
+  @spec user_choice_query(Teiserver.query_args()) :: Ecto.Query.t()
+  defdelegate user_choice_query(args), to: UserChoiceQueries
+
+  @doc section: :user_choice
+  @spec list_user_choices(Teiserver.query_args()) :: [UserChoice.t()]
+  defdelegate list_user_choices(args), to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec get_user_choices_map(Teiserver.match_id(), Teiserver.user_id()) :: %{
+          String.t() => String.t()
+        }
+  defdelegate get_user_choices_map(match_id, user_id), to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec get_user_choice!(
+          Teiserver.match_id(),
+          Teiserver.user_id(),
+          UserChoiceType.id(),
+          Teiserver.query_args()
+        ) ::
+          UserChoice.t()
+  defdelegate get_user_choice!(match_id, user_id, setting_type_id, query_args \\ []),
+    to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec get_user_choice(
+          Teiserver.match_id(),
+          Teiserver.user_id(),
+          UserChoiceType.id(),
+          Teiserver.query_args()
+        ) ::
+          UserChoice.t() | nil
+  defdelegate get_user_choice(match_id, user_id, setting_type_id, query_args \\ []),
+    to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec create_user_choice(map) :: {:ok, UserChoice.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate create_user_choice(attrs), to: UserChoiceLib
+
+  @doc section: :user_choices
+  @spec create_many_user_choices([map]) ::
+          {:ok, UserChoice.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate create_many_user_choices(attr_list), to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec update_user_choice(UserChoice, map) ::
+          {:ok, UserChoice.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate update_user_choice(user_choice, attrs), to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec delete_user_choice(UserChoice.t()) ::
+          {:ok, UserChoice.t()} | {:error, Ecto.Changeset.t()}
+  defdelegate delete_user_choice(user_choice), to: UserChoiceLib
+
+  @doc section: :user_choice
+  @spec change_user_choice(UserChoice.t()) :: Ecto.Changeset.t()
+  @spec change_user_choice(UserChoice.t(), map) :: Ecto.Changeset.t()
+  defdelegate change_user_choice(user_choice, attrs \\ %{}), to: UserChoiceLib
 
   # Match results/stats/extra data
   # Game data file stuff (e.g. unit data if added by devs)

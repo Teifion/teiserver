@@ -4,7 +4,7 @@ defmodule Teiserver.MatchSettingLibTest do
   alias Teiserver.Game
   use Teiserver.Case, async: true
 
-  alias Teiserver.{GameFixtures}
+  alias Teiserver.Fixtures.{GameFixtures}
 
   defp valid_attrs do
     %{

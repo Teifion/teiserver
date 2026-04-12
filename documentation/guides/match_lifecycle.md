@@ -1,8 +1,6 @@
 # Match lifecycle
 The main purpose of Teiserver is to facilitate running a game; as a result the Lobby and Match systems are one of the core features and have a lot of customisation and flexibility.
 
-In every case where the `Game` context is used there is a similar or identical function in `Api`.
-
 ### Overview
 There are multiple stages to a match taking place, they will typically follow the below diagram.
 ```mermaid
@@ -36,7 +34,7 @@ To remove a client from a lobby you will need to call `Teiserver.Game.remove_cli
 - The lobby state will be updated to remove this user from the member, spectator and player lists as appropriate
 
 ### Client updates
-Typically a client will update via `Teiserver.Connections.update_client/2` but if you want to update the lobby details of a client you should use `Teiserver.Connections.update_client_in_lobby/2`.
+Typically a client will update via `Teiserver.Connections.update_client/3` but if you want to update the lobby details of a client you should use `Teiserver.Connections.update_client_in_lobby/3`.
 
 The standard `update_client` only contacts the ClientServer to update values but with the `update_client_in_lobby` function the ClientServer will check with the LobbyServer before updating any details to ensure it is allowed to.
 
@@ -48,7 +46,7 @@ The standard `update_client` only contacts the ClientServer to update values but
 Lobbies have a key `:game_settings` which holds key-value map of the settings chosen for the upcoming match. These can be changed at any time prior to the match starting.
 
 ## Match start
-When the match is started and the users move into playing the game itself (which does not take place on the middleware server) a call needs to be made to `Api` or `Game` `start_match/1` (delegated to `Teiserver.Game.MatchLib.start_match/1`).
+When the match is started and the users move into playing the game itself (which does not take place on the middleware server) a call needs to be made to `Teiserver` or `Game` `start_match/1` (delegated to `Teiserver.Game.MatchLib.start_match/1`).
 
 This will update the previously added Match object with the relevant information from the Lobby. It will create `Teiserver.Game.MatchMembership` objects for each player, create the relevant `Teiserver.Game.MatchSetting` objects (along with types) and update the Lobby to show the match as ongoing.
 
@@ -56,13 +54,13 @@ This will update the previously added Match object with the relevant information
 While the game is ongoing the server is not directly involved except for anything the host wishes to relay to the server such as public chat or game telemetry events.
 
 ## Match end
-At the conclusion of the match players should be returned to the lobby interface and the `Api` or `Game` `end_match/2` (delegated to `Teiserver.Game.MatchLib.end_match/2`) should be called.
+At the conclusion of the match players should be returned to the lobby interface, you end it with and the `Teiserver` or `Game` `end_match/2` (delegated to `Teiserver.Game.MatchLib.end_match/2`) should be called.
 
 This will update both the Match object and MatchMembership objects with the relevant data.
 
 ## Post game
 ### Close
-In some cases you will want the lobby to close in which case `Api` or `Game` `close_lobby/1` (delegated to `Teiserver.Game.LobbyLib.close_lobby/1`) should be called. This will remove everybody from the lobby and stop the lobby process.
+In some cases you will want the lobby to close in which case `Teiserver` or `Game` `close_lobby/1` (delegated to `Teiserver.Game.LobbyLib.close_lobby/1`) should be called. This will remove everybody from the lobby and stop the lobby process.
 
 ### Cycle
-If you wish to keep the lobby in existence you should call `Api` or `Game` `cycle_lobby/1` (delegated to `Teiserver.Game.LobbyLib.cycle_lobby/1`) which will create a new empty Match object for the new upcoming match.
+If you wish to keep the lobby in existence you should call `Teiserver` or `Game` `cycle_lobby/1` (delegated to `Teiserver.Game.LobbyLib.cycle_lobby/1`) which will create a new empty Match object for the new upcoming match.

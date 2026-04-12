@@ -22,7 +22,6 @@ defmodule Teiserver.Game.Match do
   * `:ended_normally?` - True if the match was ended in a normal manner, false if ended in an abnormal manner (e.g. crashed)
   * `:match_duration_seconds` - The duration of the game in seconds as indicated by the game host
   * `:host` - The user account hosting the lobby
-
   """
   use TeiserverMacros, :schema
 
@@ -35,11 +34,12 @@ defmodule Teiserver.Game.Match do
 
     field(:game_name, :string)
     field(:game_version, :string)
+    field(:team_count, :integer)
+    field(:team_size, :integer)
+    field(:player_count, :integer)
 
     # Outcome
     field(:winning_team, :integer)
-    field(:team_count, :integer)
-    field(:team_size, :integer)
     field(:processed?, :boolean, default: false)
     field(:ended_normally?, :boolean)
 
@@ -47,14 +47,19 @@ defmodule Teiserver.Game.Match do
     field(:match_started_at, :utc_datetime)
     field(:match_ended_at, :utc_datetime)
 
-    # This will be something queried enough it's worth storing as it's own value
+    # These will be something queried enough it's worth storing as it's own value
+    # it is also possible we will want to count the duration as something other than
+    # time passed between start and end, e.g. ignoring time spent paused
     field(:match_duration_seconds, :integer)
 
     # Memberships
+    field(:lobby_id, Ecto.UUID)
     belongs_to(:host, Teiserver.Account.User, type: Ecto.UUID)
     belongs_to(:type, Teiserver.Game.MatchType)
+
     has_many(:members, Teiserver.Game.MatchMembership)
-    has_many(:match_settings, Teiserver.Game.MatchSetting)
+    has_many(:settings, Teiserver.Game.MatchSetting)
+    has_many(:choices, Teiserver.Game.UserChoice)
 
     # Relationships we expect to add
     # belongs_to :queue, Teiserver.Game.MatchmakingQueue
@@ -62,7 +67,7 @@ defmodule Teiserver.Game.Match do
     # has_many :rating_logs, Teiserver.Game.RatingLog
     # belongs_to :lobby_policy, Teiserver.Game.LobbyPolicy
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: Ecto.UUID.t()
@@ -90,11 +95,15 @@ defmodule Teiserver.Game.Match do
 
           # This will be something queried enough it's worth storing as it's own value
           match_duration_seconds: non_neg_integer(),
+          player_count: non_neg_integer(),
           host_id: Teiserver.user_id(),
+          lobby_id: Teiserver.lobby_id(),
           host: Teiserver.Account.User.t(),
           type_id: Teiserver.Game.MatchType.id(),
           type: Teiserver.Game.MatchType.t(),
-          members: list
+          members: list,
+          settings: list,
+          choices: list
         }
 
   @doc """
@@ -106,7 +115,7 @@ defmodule Teiserver.Game.Match do
     struct
     |> cast(
       attrs,
-      ~w(name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds host_id type_id)a
+      ~w(name tags public? rated? game_name game_version winning_team team_count team_size processed? lobby_opened_at match_started_at match_ended_at ended_normally? match_duration_seconds player_count host_id type_id lobby_id)a
     )
     |> validate_required(~w(public? rated? host_id)a)
   end

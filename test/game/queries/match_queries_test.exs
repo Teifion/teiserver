@@ -32,8 +32,17 @@ defmodule Teiserver.MatchQueriesTest do
             id: [Teiserver.uuid(), Teiserver.uuid()],
             id: Teiserver.uuid(),
             name: "Some name",
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now()
+            ended_normally?: true,
+            processed?: true,
+            duration_gt: 100,
+            duration_lt: 999,
+            name_like: "abc",
+            started_after: DateTime.utc_now(),
+            started_before: DateTime.utc_now(),
+            ended_after: DateTime.utc_now(),
+            ended_before: DateTime.utc_now(),
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now()
           ],
           order_by: [
             "Name (A-Z)",
@@ -41,7 +50,22 @@ defmodule Teiserver.MatchQueriesTest do
             "Newest first",
             "Oldest first"
           ],
-          preload: []
+          preload:
+            ~w(host type members_with_users settings_with_types choices_with_users_and_types)a,
+          limit: 10
+        )
+
+      assert all_values != @empty_query
+      Repo.all(all_values)
+
+      # Some preloads we missed last time because they conflict with the others
+      all_values =
+        MatchQueries.match_query(
+          where: [
+            id: Teiserver.uuid()
+          ],
+          preload: ~w(members settings choices)a,
+          limit: 10
         )
 
       assert all_values != @empty_query

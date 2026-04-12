@@ -33,13 +33,6 @@ The `social_score` given to users registered using `Teiserver.Account.UserLib.re
 ## default_min_user_password_length - Default: 6
 The minimum length for a user password.
 
-# Clustering
-## `teiserver_clustering` - Default: true
-When enabled Teiserver will attempt to handle the clustering of nodes using a database table. Turning it off will mean this behaves like any other application and you can either not cluster it or use things like `libcluster` as you desire. See `Teiserver.System.ClusterManager` for more details.
-
-## `teiserver_clustering_post_join_functions` - Default: []
-When teiserver_clustering is enabled, this will be a list of functions called by the genserver handling the join once it has joined the cluster. See `Teiserver.System.ClusterManager` for more details.
-
 # Function overrides
 Teiserver implements some defaults you may want to overwrite.
 
@@ -50,14 +43,16 @@ Allows you to overwrite `Teiserver.Game.MatchTypeLib.default_calculate_match_typ
 Allows you to overwrite `Teiserver.Account.User.default_calculate_user_permissions/1`. This is used to generate the list of permissions held by a user. By default it mirrors their groups.
 
 ## `fn_lobby_name_acceptor`
-A function used to determine if a lobby name is acceptable. Defaults to `Teiserver.Game.LobbyLib.default_lobby_name_acceptable/1` which always returns true.
+A function used to determine if a lobby name is acceptable. Defaults to `Teiserver.Game.LobbyLib.default_lobby_name_acceptable?/1` which always returns true.
 
 ## `fn_user_name_acceptor`
-A function used to determine if a lobby name is acceptable. Defaults to `Teiserver.Account.UserLib.default_user_name_acceptable/1` which always returns true.
+A function used to determine if a lobby name is acceptable. Defaults to `Teiserver.Account.UserLib.default_user_name_acceptable?/1` which always returns true.
 
 ## `fn_uuid_generator`
 The function used to generate UUIDs. Defaults to `&Ecto.UUID.generate/0`.
 
+# Function extensions
+Teiserver has a number of functions which you will likely want to extend.
 
 # Complete example config
 ```elixir
@@ -65,7 +60,6 @@ config :teiserver,
   repo: HelloWorldServer.Repo,
   client_destroy_timeout_seconds: 300,
   lobby_join_method: :simple,
-  teiserver_clustering: true,
 
   # Users
   default_behaviour_score: 10_000,

@@ -9,9 +9,8 @@ defmodule Teiserver.Settings.ServerSettingQueries do
     query = from(server_settings in ServerSetting)
 
     query
-    |> do_where(id: args[:id])
+    |> do_where(key: args[:key])
     |> do_where(args[:where])
-    |> do_preload(args[:preload])
     |> do_order_by(args[:order_by])
     |> QueryHelper.query_select(args[:select])
     |> QueryHelper.limit_query(args[:limit] || 50)
@@ -31,21 +30,27 @@ defmodule Teiserver.Settings.ServerSettingQueries do
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :id, id) do
+  def _where(query, :key, key_list) when is_list(key_list) do
     from(server_settings in query,
-      where: server_settings.id == ^id
+      where: server_settings.key in ^key_list
     )
   end
 
-  def _where(query, :id_in, id_list) do
+  def _where(query, :key, key) do
     from(server_settings in query,
-      where: server_settings.id in ^id_list
+      where: server_settings.key == ^key
     )
   end
 
-  def _where(query, :name, name) do
+  def _where(query, :value, value_list) when is_list(value_list) do
     from(server_settings in query,
-      where: server_settings.name == ^name
+      where: server_settings.value in ^value_list
+    )
+  end
+
+  def _where(query, :value, value) do
+    from(server_settings in query,
+      where: server_settings.value == ^value
     )
   end
 
@@ -61,10 +66,22 @@ defmodule Teiserver.Settings.ServerSettingQueries do
     )
   end
 
+  def _where(query, :updated_after, timestamp) do
+    from(server_settings in query,
+      where: server_settings.updated_at >= ^timestamp
+    )
+  end
+
+  def _where(query, :updated_before, timestamp) do
+    from(server_settings in query,
+      where: server_settings.updated_at < ^timestamp
+    )
+  end
+
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
-  defp do_order_by(query, params) when is_list(params) do
+  defp do_order_by(query, params) do
     params
     |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
@@ -73,18 +90,6 @@ defmodule Teiserver.Settings.ServerSettingQueries do
   end
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
-  def _order_by(query, "Name (A-Z)") do
-    from(server_settings in query,
-      order_by: [asc: server_settings.name]
-    )
-  end
-
-  def _order_by(query, "Name (Z-A)") do
-    from(server_settings in query,
-      order_by: [desc: server_settings.name]
-    )
-  end
-
   def _order_by(query, "Newest first") do
     from(server_settings in query,
       order_by: [desc: server_settings.inserted_at]
@@ -96,22 +101,4 @@ defmodule Teiserver.Settings.ServerSettingQueries do
       order_by: [asc: server_settings.inserted_at]
     )
   end
-
-  @spec do_preload(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
-  defp do_preload(query, nil), do: query
-
-  defp do_preload(query, _), do: query
-  # defp do_preload(query, preloads) do
-  #   preloads
-  #   |> List.wrap
-  #   |> Enum.reduce(query, fn key, query_acc ->
-  #     _preload(query_acc, key)
-  #   end)
-  # end
-
-  # def _preload(query, :relation) do
-  #   from server_setting in query,
-  #     left_join: relations in assoc(server_setting, :relation),
-  #     preload: [relation: relations]
-  # end
 end

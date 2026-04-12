@@ -40,28 +40,32 @@ defmodule Teiserver.Connections do
   defdelegate get_client(user_id), to: ClientLib
 
   @doc section: :client
-  @spec get_client_list([Teiserver.user_id()]) :: [Client.t() | nil]
+  @spec get_client_list([Teiserver.user_id()]) :: [Client.t()]
   defdelegate get_client_list(user_ids), to: ClientLib
 
   @doc section: :client
-  @spec update_client(Teiserver.user_id(), map, String.t()) :: Client.t() | nil
+  @spec update_client(Teiserver.user_id(), map, String.t()) :: :ok | nil
   defdelegate update_client(user_id, updates, reason), to: ClientLib
 
   @doc section: :client
-  @spec update_client_in_lobby(Teiserver.user_id(), map, String.t()) :: Client.t() | nil
+  @spec update_client_in_lobby(Teiserver.user_id(), map, String.t()) :: :ok | nil
   defdelegate update_client_in_lobby(user_id, updates, reason), to: ClientLib
 
   @doc section: :client
-  @spec update_client_full(Teiserver.user_id(), map, String.t()) :: Client.t() | nil
-  defdelegate update_client_full(user_id, updates, reason), to: ClientLib
-
-  @doc section: :client
-  @spec connect_user(Teiserver.user_id()) :: Client.t()
-  defdelegate connect_user(user_id), to: ClientLib
+  @spec connect_user(Teiserver.user_id(), list) :: Client.t()
+  defdelegate connect_user(user_id, opts \\ []), to: ClientLib
 
   @doc section: :client
   @spec disconnect_user(Teiserver.user_id()) :: :ok
   defdelegate disconnect_user(user_id), to: ClientLib
+
+  @doc section: :client
+  @spec disconnect_single_connection(Teiserver.user_id()) :: :ok
+  defdelegate disconnect_single_connection(user_id), to: ClientLib
+
+  @doc section: :client
+  @spec disconnect_single_connection(Teiserver.user_id(), pid) :: :ok
+  defdelegate disconnect_single_connection(user_id, pid), to: ClientLib
 
   @doc false
   @spec client_exists?(Teiserver.user_id()) :: pid() | boolean

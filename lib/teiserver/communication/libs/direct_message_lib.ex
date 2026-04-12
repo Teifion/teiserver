@@ -52,7 +52,7 @@ defmodule Teiserver.Communication.DirectMessageLib do
           sender_id: sender_id,
           to_id: to_id,
           content: content,
-          inserted_at: Timex.now()
+          inserted_at: DateTime.utc_now()
         },
         attrs
       )

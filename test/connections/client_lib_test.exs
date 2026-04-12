@@ -3,10 +3,17 @@ defmodule Connections.ClientLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Connections
-  alias Teiserver.Connections.ClientLib
-  alias Teiserver.{ConnectionFixtures}
+  alias Teiserver.Fixtures.ConnectionFixtures
 
   describe "ClientLib" do
+    test "topic" do
+      {_conn, user} = ConnectionFixtures.client_fixture()
+      client = Connections.get_client(user.id)
+
+      assert Connections.client_topic(user.id) == Connections.client_topic(user)
+      assert Connections.client_topic(user.id) == Connections.client_topic(client)
+    end
+
     test "server lifecycle" do
       {_conn, user} = ConnectionFixtures.client_fixture()
 
@@ -31,8 +38,8 @@ defmodule Connections.ClientLibTest do
       client = Connections.get_client(user.id)
       refute client.afk?
 
-      # Now update it
-      Connections.update_client(user.id, %{afk?: true, team_number: 123}, uuid)
+      # Now update it, the `total_number` key isn't a valid key
+      Connections.update_client(user.id, %{afk?: true, total_number: 123}, uuid)
 
       # Check the client has updated
       client = Connections.get_client(user.id)
@@ -56,7 +63,7 @@ defmodule Connections.ClientLibTest do
              ]
 
       # Now try to update with the same details, should result in no change
-      Connections.update_client(user.id, %{afk?: true, team_number: 123}, "test")
+      Connections.update_client(user.id, %{afk?: true}, "test")
 
       client = Connections.get_client(user.id)
       assert client.afk?
@@ -66,7 +73,7 @@ defmodule Connections.ClientLibTest do
       assert msgs == []
 
       # Now swap the value around to ensure we get a new update
-      Connections.update_client(user.id, %{afk?: false, team_number: 123}, "test2")
+      Connections.update_client(user.id, %{afk?: false}, "test2")
 
       client = Connections.get_client(user.id)
       refute client.afk?
@@ -78,70 +85,6 @@ defmodule Connections.ClientLibTest do
 
       refute update_msg.changes.afk?
       assert client.team_number == nil
-      assert update_msg.reason == "test2"
-    end
-
-    test "update_client_full" do
-      uuid = Teiserver.uuid()
-      {conn, user} = ConnectionFixtures.client_fixture()
-      TestConn.subscribe(conn, Connections.client_topic(user.id))
-
-      msgs = TestConn.get(conn)
-      assert msgs == []
-
-      # Check the client is as we expect
-      client = Connections.get_client(user.id)
-      refute client.afk?
-      assert client.team_number == nil
-
-      # Now update it
-      ClientLib.update_client_full(user.id, %{afk?: true, team_number: 123}, uuid)
-
-      # Check the client has updated
-      client = Connections.get_client(user.id)
-      assert client.afk?
-      assert client.team_number == 123
-
-      # Should have gotten a new message too
-      msgs = TestConn.get(conn)
-
-      assert msgs == [
-               %{
-                 topic: Connections.client_topic(user.id),
-                 event: :client_updated,
-                 changes: %{
-                   afk?: true,
-                   update_id: 1,
-                   team_number: 123
-                 },
-                 reason: uuid,
-                 user_id: user.id
-               }
-             ]
-
-      # Now try to update with the same details, should result in no change
-      ClientLib.update_client_full(user.id, %{afk?: true, team_number: 123}, "test")
-
-      client = Connections.get_client(user.id)
-      assert client.afk?
-      assert client.team_number == 123
-
-      msgs = TestConn.get(conn)
-      assert msgs == []
-
-      # Now swap the value around to ensure we get a new update
-      ClientLib.update_client_full(user.id, %{afk?: false, team_number: 456}, "test2")
-
-      client = Connections.get_client(user.id)
-      refute client.afk?
-      assert client.team_number == 456
-
-      msgs = TestConn.get(conn)
-      assert Enum.count(msgs) == 1
-      [update_msg] = msgs
-
-      refute update_msg.changes.afk?
-      assert client.team_number == 456
       assert update_msg.reason == "test2"
     end
 
@@ -179,6 +122,49 @@ defmodule Connections.ClientLibTest do
       # No messages either, client should be the same
       msgs = TestConn.get(conn)
       assert msgs == []
+    end
+
+    test "disconnect_user/1" do
+      {_conn1, user} = ConnectionFixtures.client_fixture()
+      {_conn2, _user} = ConnectionFixtures.client_fixture(user)
+      assert Connections.client_exists?(user.id)
+
+      Connections.disconnect_user(user.id)
+      refute Connections.client_exists?(user.id)
+    end
+
+    test "disconnect_single_connection/2" do
+      {conn1, user} = ConnectionFixtures.client_fixture()
+      {conn2, _user} = ConnectionFixtures.client_fixture(user)
+      assert Connections.client_exists?(user.id)
+
+      conn_list = Connections.call_client(user.id, :get_connections)
+      assert Enum.member?(conn_list, conn1)
+      assert Enum.member?(conn_list, conn2)
+
+      # Disconnect conn1
+      Connections.disconnect_single_connection(user.id, conn1)
+      assert Connections.client_exists?(user.id)
+
+      conn_list = Connections.call_client(user.id, :get_connections)
+      refute Enum.member?(conn_list, conn1)
+      assert Enum.member?(conn_list, conn2)
+
+      # Disconnect self, this should have no effect as we are not a connection
+      Connections.disconnect_single_connection(user.id, self())
+      assert Connections.client_exists?(user.id)
+
+      conn_list = Connections.call_client(user.id, :get_connections)
+      refute Enum.member?(conn_list, conn1)
+      assert Enum.member?(conn_list, conn2)
+
+      # Now get rid of conn2, this should result in the client destroying itself
+      Connections.disconnect_single_connection(user.id, conn2)
+
+      # Give it time to die
+      :timer.sleep(50)
+
+      refute Connections.client_exists?(user.id)
     end
   end
 end

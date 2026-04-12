@@ -5,16 +5,16 @@ defmodule Teiserver.Game.LobbyServer do
   """
   use GenServer
   require Logger
-  alias Teiserver.{Connections, Account}
+  alias Teiserver.{Connections, Account, Game}
   alias Teiserver.Game.{Lobby, LobbyLib, LobbySummary}
-  alias Teiserver.Connections.ClientLib
+  alias Teiserver.Connections.{Client, ClientLib}
   alias Teiserver.Helpers.MapHelper
 
   @heartbeat_frequency_ms 5_000
 
   defmodule State do
     @moduledoc false
-    defstruct [:lobby, :lobby_id, :host_id, :match_id, :lobby_topic, :match_topic, :update_id]
+    defstruct [:lobby, :lobby_id, :host_id, :match_id, :lobby_topic, :update_id]
   end
 
   @impl true
@@ -34,17 +34,19 @@ defmodule Teiserver.Game.LobbyServer do
     {:reply, can_add_client({user_id, password}, state), state}
   end
 
-  def handle_call({:client_update_request, %{id: _user_id} = changes}, _from, state) do
-    {:reply, changes, state}
-  end
-
   # Attempts to add a client to the lobby
   def handle_call({:add_client, user_id}, _from, state) do
     case can_add_client({user_id, state.lobby.password}, state) do
       {false, reason} ->
         {:reply, {:error, reason}, state}
 
-      {true, _} ->
+      true ->
+        :telemetry.execute(
+          [:teiserver, :lobby, :add_client],
+          %{},
+          %{user_id: user_id, lobby_id: state.lobby_id}
+        )
+
         {shared_secret, new_state} = do_add_client(user_id, state)
         {:reply, {:ok, shared_secret, state.lobby}, new_state}
     end
@@ -61,8 +63,19 @@ defmodule Teiserver.Game.LobbyServer do
     {:noreply, new_state}
   end
 
+  def handle_cast({:client_update_request, new_client, diffs, reason}, state) do
+    state = client_update_request(state, new_client, diffs, reason)
+    {:noreply, state}
+  end
+
   def handle_cast({:remove_client, user_id}, state) do
     if Enum.member?(state.lobby.members, user_id) do
+      :telemetry.execute(
+        [:teiserver, :lobby, :remove_client],
+        %{},
+        %{lobby_id: state.lobby_id, user_id: user_id}
+      )
+
       new_state = do_remove_client(user_id, state)
       {:noreply, new_state}
     else
@@ -70,18 +83,10 @@ defmodule Teiserver.Game.LobbyServer do
     end
   end
 
-  def handle_cast({:cycle_lobby, match_id}, state) do
-    match_topic = nil
-    # match_topic = Game.match_topic(match.id)
+  def handle_cast(:cycle_lobby, state) do
+    new_state = do_cycle_lobby(state)
 
-    new_state =
-      update_lobby(state, %{
-        match_id: match_id,
-        match_ongoing?: false,
-        match_type: nil
-      })
-
-    {:noreply, %{new_state | match_id: match_id, match_topic: match_topic}}
+    {:noreply, new_state}
   end
 
   def handle_cast(:lobby_start_match, state) do
@@ -89,6 +94,49 @@ defmodule Teiserver.Game.LobbyServer do
       update_lobby(state, %{
         match_ongoing?: true
       })
+
+    Teiserver.broadcast(
+      state.lobby_topic,
+      %{
+        event: :match_start,
+        match_id: state.match_id,
+        lobby_id: state.lobby_id
+      }
+    )
+
+    :telemetry.execute(
+      [:teiserver, :lobby, :start_match],
+      %{},
+      %{match_id: state.match_id, lobby_id: state.lobby_id}
+    )
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:lobby_end_match, reason}, state) do
+    new_state =
+      update_lobby(state, %{
+        match_ongoing?: true
+      })
+
+    Teiserver.broadcast(
+      state.lobby_topic,
+      %{
+        event: :match_end,
+        match_id: state.match_id,
+        lobby_id: state.lobby_id,
+        reason: reason
+      }
+    )
+
+    :telemetry.execute(
+      [:teiserver, :lobby, :end_match],
+      %{reason: reason},
+      %{match_id: state.match_id, lobby_id: state.lobby_id}
+    )
+
+    # Cycle at the end of the match
+    new_state = do_cycle_lobby(new_state)
 
     {:noreply, new_state}
   end
@@ -119,7 +167,8 @@ defmodule Teiserver.Game.LobbyServer do
   end
 
   def handle_info(
-        %{topic: "Teiserver.Connections.Client" <> _, event: :client_updated, user_id: user_id} = msg,
+        %{topic: "Teiserver.Connections.Client" <> _, event: :client_updated, user_id: user_id} =
+          msg,
         state
       ) do
     lobby = state.lobby
@@ -146,7 +195,7 @@ defmodule Teiserver.Game.LobbyServer do
           %{}
       end
 
-    if changes == %{} do
+    if Enum.empty?(changes) do
       {:noreply, state}
     else
       new_state = update_lobby(state, changes)
@@ -165,48 +214,89 @@ defmodule Teiserver.Game.LobbyServer do
     GenServer.start_link(__MODULE__, opts[:data], [])
   end
 
-  @spec can_add_client({Teiserver.user_id(), String.t()}, State.t()) :: {boolean(), String.t() | nil}
+  @spec do_cycle_lobby(State.t()) :: State.t()
+  defp do_cycle_lobby(state) do
+    {:ok, match} =
+      Game.create_match(%{
+        public?: true,
+        rated?: true,
+        host_id: state.host_id,
+        processed?: false,
+        lobby_opened_at: DateTime.utc_now(),
+        lobby_id: state.lobby_id
+      })
+
+    new_state =
+      update_lobby(state, %{
+        match_id: match.id,
+        match_ongoing?: false,
+        match_type: nil
+      })
+
+    :telemetry.execute(
+      [:teiserver, :lobby, :cycle],
+      %{},
+      %{match_id: match.id, lobby_id: new_state.lobby_id}
+    )
+
+    %{new_state | match_id: match.id}
+  end
+
+  @spec can_add_client({Teiserver.user_id(), String.t()}, State.t()) ::
+          true | {false, :existing_member | :client_disconnected | :already_in_a_lobby}
   defp can_add_client({user_id, password}, %{lobby: lobby} = _state) do
     cond do
       Enum.member?(lobby.members, user_id) ->
-        {false, "Existing member"}
+        {false, :existing_member}
 
       true ->
         client = Connections.get_client(user_id)
 
         cond do
           client == nil ->
-            {false, "Client is not connected"}
+            {false, :client_disconnected}
 
           client.connected? == false ->
-            {false, "Client is disconnected"}
+            {false, :client_disconnected}
 
           client.lobby_id != nil ->
-            {false, "Already in a lobby"}
+            {false, :already_in_a_lobby}
 
           # Moderator short-circuit
           Account.allow?(user_id, "moderator") ->
-            {true, nil}
+            true
 
           # Approved player short-circuit
           Enum.member?(lobby.approved_members, user_id) ->
-            {true, nil}
+            true
 
           lobby.password && lobby.password != password ->
-            {false, "Incorrect password"}
+            {false, :incorrect_password}
 
           lobby.locked? ->
-            {false, "Lobby is locked"}
+            {false, :lobby_is_locked}
 
           true ->
-            {true, nil}
+            true
         end
     end
   end
 
+  @spec client_update_request(State.t(), Client.t(), map(), State.t()) :: State.t()
+  defp client_update_request(state, new_client, _diffs, reason) do
+    # Currently we just say yes so we pass-through the client
+    resulting_client = new_client
+
+    # Assuming there are still some changes, send them over to be implemented!
+    ClientLib.do_update_client_in_lobby(new_client.id, resulting_client, reason)
+
+    state
+  end
+
   @spec update_lobby(State.t(), map()) :: State.t()
   def update_lobby(state, changes) do
-    new_lobby = state.lobby
+    new_lobby =
+      state.lobby
       |> struct(changes)
       |> apply_calculated_changes
 
@@ -217,7 +307,7 @@ defmodule Teiserver.Game.LobbyServer do
   defp do_update_lobby(%State{} = state, %Lobby{} = new_lobby) do
     diffs = MapHelper.map_diffs(state.lobby, new_lobby)
 
-    if diffs == %{} do
+    if Enum.empty?(diffs) do
       # Nothing changed, we don't do anything
       state
     else
@@ -243,7 +333,7 @@ defmodule Teiserver.Game.LobbyServer do
   @spec apply_calculated_changes(Lobby.t()) :: Lobby.t()
   defp apply_calculated_changes(lobby_state) do
     changes = %{
-      passworded?: (lobby_state.password != nil && lobby_state.password != "")
+      passworded?: lobby_state.password != nil && lobby_state.password != ""
     }
 
     struct(lobby_state, changes)
@@ -253,16 +343,20 @@ defmodule Teiserver.Game.LobbyServer do
   defp do_add_client(user_id, state) do
     shared_secret = Teiserver.Account.generate_password()
 
-    ClientLib.update_client_full(user_id, %{
-      lobby_id: state.lobby_id,
-      ready?: false,
-      player?: false,
-      player_number: nil,
-      team_number: nil,
-      player_colour: nil,
-      sync: nil,
-      lobby_host?: false
-    }, "joined_lobby")
+    ClientLib.update_client(
+      user_id,
+      %{
+        lobby_id: state.lobby_id,
+        ready?: false,
+        player?: false,
+        player_number: nil,
+        team_number: nil,
+        player_colour: nil,
+        sync: nil,
+        lobby_host?: false
+      },
+      "joined_lobby"
+    )
 
     client = ClientLib.get_client(user_id)
 
@@ -278,26 +372,31 @@ defmodule Teiserver.Game.LobbyServer do
 
     Connections.subscribe_to_client(user_id)
 
-    {shared_secret, update_lobby(state, %{
-      members: [user_id | state.lobby.members],
-      spectators: [user_id | state.lobby.spectators]
-    })}
+    {shared_secret,
+     update_lobby(state, %{
+       members: [user_id | state.lobby.members],
+       spectators: [user_id | state.lobby.spectators]
+     })}
   end
 
   @spec do_remove_client(Teiserver.user_id(), State.t()) :: State.t()
   defp do_remove_client(user_id, state) do
     Connections.unsubscribe_from_client(user_id)
 
-    ClientLib.update_client_full(user_id, %{
-      lobby_id: nil,
-      ready?: false,
-      player?: false,
-      player_number: nil,
-      team_number: nil,
-      player_colour: nil,
-      sync: nil,
-      lobby_host?: false
-    }, "left_lobby")
+    ClientLib.update_client(
+      user_id,
+      %{
+        lobby_id: nil,
+        ready?: false,
+        player?: false,
+        player_number: nil,
+        team_number: nil,
+        player_colour: nil,
+        sync: nil,
+        lobby_host?: false
+      },
+      "left_lobby"
+    )
 
     Teiserver.broadcast(
       state.lobby_topic,
@@ -343,8 +442,7 @@ defmodule Teiserver.Game.LobbyServer do
        host_id: lobby.host_id,
        match_id: nil,
        lobby: lobby,
-       lobby_topic: LobbyLib.lobby_topic(id),
-       match_topic: nil
+       lobby_topic: LobbyLib.lobby_topic(id)
      }}
   end
 end

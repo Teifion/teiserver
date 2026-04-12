@@ -27,7 +27,7 @@ defmodule Teiserver.Game.MatchTypeLib do
   Can be over-ridden using the config [fn_calculate_match_type](config.html#fn_calculate_match_type)
   """
   @spec default_calculate_match_type(Lobby.t()) :: String.t()
-  def default_calculate_match_type(lobby) do
+  def default_calculate_match_type(%Lobby{} = lobby) do
     if Enum.count(lobby.members) == 2 do
       "Duel"
     else
@@ -158,6 +158,19 @@ defmodule Teiserver.Game.MatchTypeLib do
   """
   @spec get_or_create_match_type(String.t()) :: MatchType.t()
   def get_or_create_match_type(match_type_name) do
+    case Cachex.get(:ts_match_type_lookup, match_type_name) do
+      {:ok, nil} ->
+        result = do_get_or_create_match_type(match_type_name)
+        Cachex.put(:ts_match_type_lookup, match_type_name, result)
+        result
+
+      {:ok, value} ->
+        value
+    end
+  end
+
+  @spec do_get_or_create_match_type(String.t()) :: MatchType.t()
+  defp do_get_or_create_match_type(match_type_name) do
     case get_match_type_by_name_or_id(match_type_name) do
       nil ->
         {:ok, match_type} = create_match_type(%{name: match_type_name})

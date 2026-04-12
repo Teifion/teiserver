@@ -57,7 +57,7 @@ defmodule Teiserver.Account.User do
 
     has_one(:extra_data, Teiserver.Account.ExtraUserData)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @type id :: Ecto.UUID.t()
@@ -95,7 +95,9 @@ defmodule Teiserver.Account.User do
       |> SchemaHelper.uniq_lists(~w(groups)a)
 
     # If password isn't included we won't be doing anything with it
-    if attrs["password"] == "" do
+    attr_password = Map.get(attrs, "password", Map.get(attrs, :password))
+
+    if attr_password == "" do
       user
       |> cast(
         attrs,
@@ -166,8 +168,10 @@ defmodule Teiserver.Account.User do
       attrs
       |> SchemaHelper.trim_strings([:email])
 
+    attr_password = Map.get(attrs, "password", Map.get(attrs, :password))
+
     cond do
-      attrs["password"] == nil or attrs["password"] == "" ->
+      attr_password == nil or attr_password == "" ->
         user
         |> cast(attrs, [:name, :email])
         |> validate_required([:name, :email])
@@ -176,7 +180,7 @@ defmodule Teiserver.Account.User do
           "Please enter your password to change your account details."
         )
 
-      valid_password?(attrs["password"], user.password) == false ->
+      valid_password?(attr_password, user.password) == false ->
         user
         |> cast(attrs, [:name, :email])
         |> validate_required([:name, :email])
@@ -194,8 +198,11 @@ defmodule Teiserver.Account.User do
   # we ask for the existing password to be submitted as a test
   # they have not left the computer unlocked or similar
   def changeset(user, attrs, :change_password) do
+    attr_existing = Map.get(attrs, "existing", Map.get(attrs, :existing))
+    attr_password = Map.get(attrs, "password", Map.get(attrs, :password))
+
     cond do
-      attrs["existing"] == nil or attrs["existing"] == "" ->
+      attr_existing == nil or attr_existing == "" ->
         user
         |> change_password(attrs)
         |> add_error(
@@ -203,7 +210,15 @@ defmodule Teiserver.Account.User do
           "Please enter your existing password to change your password."
         )
 
-      valid_password?(attrs["existing"], user.password) == false ->
+      attr_password != attrs["password_confirmation"] ->
+        user
+        |> change_password(attrs)
+        |> add_error(
+          :password_confirmation,
+          "Password and Confirmation password do not match."
+        )
+
+      valid_password?(attr_existing, user.password) == false ->
         user
         |> change_password(attrs)
         |> add_error(:existing, "Incorrect password")
@@ -257,7 +272,10 @@ defmodule Teiserver.Account.User do
     min_length = Application.get_env(:teiserver, :default_min_user_password_length, 6)
 
     changeset
-    |> validate_length(:password, min: min_length, message: "Passwords must be at least #{min_length} characters long")
+    |> validate_length(:password,
+      min: min_length,
+      message: "Passwords must be at least #{min_length} characters long"
+    )
   end
 
   @doc """

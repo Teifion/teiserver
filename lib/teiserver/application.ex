@@ -7,7 +7,7 @@ defmodule Teiserver.Application do
   def start(_type, _args) do
     children = [
       {Phoenix.PubSub, name: Teiserver.PubSub},
-      Teiserver.System.ClusterManagerSupervisor,
+      Teiserver.System.CacheClusterServer,
 
       # Servers not part of the general slew of things
       {Registry, [keys: :unique, members: :auto, name: Teiserver.ServerRegistry]},
@@ -27,7 +27,7 @@ defmodule Teiserver.Application do
       # Lobbies
       {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.LobbySupervisor},
       {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.LobbyRegistry]},
-      {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalLobbyRegistry]}
+      {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalLobbyRegistry]},
 
       # Matchmaking
       # {DynamicSupervisor, strategy: :one_for_one, name: Teiserver.MMSupervisor},
@@ -35,14 +35,18 @@ defmodule Teiserver.Application do
       # {Horde.Registry, [keys: :unique, members: :auto, name: Teiserver.MMMatchRegistry]},
       # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalMMQueueRegistry]},
       # {Registry, [keys: :unique, members: :auto, name: Teiserver.LocalMMMatchRegistry]}
+
+      # Caches
+      Teiserver.Caches.UserSettingCache,
+      Teiserver.Caches.ServerSettingCache,
+      Teiserver.Caches.LoginCountCache,
+      Teiserver.Caches.TypeLookupCache
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]
     start_result = Supervisor.start_link(children, opts)
 
-    if Application.get_env(:teiserver, :teiserver_clustering, true) do
-      Teiserver.System.ClusterManagerSupervisor.start_cluster_manager_supervisor_children()
-    end
+    Teiserver.System.StartupLib.perform()
 
     start_result
   end

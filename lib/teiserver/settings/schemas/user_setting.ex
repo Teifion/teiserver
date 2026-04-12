@@ -1,13 +1,17 @@
 defmodule Teiserver.Settings.UserSetting do
   @moduledoc """
   # User setting
-  A key/value storage of settings tied to users
+  A key/value storage of settings tied to users. They are backed by the database but cached so can be accessed easily. Each user has their own settings with types defined by `Teiserver.Settings.UserSettingType`.
+
+  The intended use case for User settings is anything where you want to store a key-value store against the user.
+
+  Not to be confused with `Teiserver.Game.UserChoice` which is a per-game "setting".
 
   ### Attributes
 
   * `:user_id` - A reference to the User in question
-  * `:key` - The key of the setting
-  * `:email` - The value of the setting
+  * `:key` - The key of the setting linking it to a `Teiserver.Settings.UserSettingType`
+  * `:value` - The value of the setting
   """
   use TeiserverMacros, :schema
 
@@ -16,8 +20,10 @@ defmodule Teiserver.Settings.UserSetting do
     field(:key, :string)
     field(:value, :string)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
+
+  @type key :: String.t()
 
   @type t :: %__MODULE__{
           id: non_neg_integer(),
@@ -29,6 +35,8 @@ defmodule Teiserver.Settings.UserSetting do
         }
 
   @doc false
+  @spec changeset(map()) :: Ecto.Changeset.t()
+  @spec changeset(map(), map()) :: Ecto.Changeset.t()
   def changeset(server_setting, attrs \\ %{}) do
     server_setting
     |> cast(attrs, ~w(user_id key value)a)

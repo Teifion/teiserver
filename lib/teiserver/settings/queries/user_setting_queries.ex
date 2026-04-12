@@ -9,7 +9,7 @@ defmodule Teiserver.Settings.UserSettingQueries do
     query = from(user_settings in UserSetting)
 
     query
-    |> do_where(id: args[:id])
+    |> do_where(key: args[:key])
     |> do_where(args[:where])
     |> do_preload(args[:preload])
     |> do_order_by(args[:order_by])
@@ -31,21 +31,39 @@ defmodule Teiserver.Settings.UserSettingQueries do
   def _where(query, _, ""), do: query
   def _where(query, _, nil), do: query
 
-  def _where(query, :id, id) do
+  def _where(query, :key, key_list) when is_list(key_list) do
     from(user_settings in query,
-      where: user_settings.id == ^id
+      where: user_settings.key in ^key_list
     )
   end
 
-  def _where(query, :id_in, id_list) do
+  def _where(query, :key, key) do
     from(user_settings in query,
-      where: user_settings.id in ^id_list
+      where: user_settings.key == ^key
     )
   end
 
-  def _where(query, :name, name) do
+  def _where(query, :user_id, user_id_list) when is_list(user_id_list) do
     from(user_settings in query,
-      where: user_settings.name == ^name
+      where: user_settings.user_id in ^user_id_list
+    )
+  end
+
+  def _where(query, :user_id, user_id) do
+    from(user_settings in query,
+      where: user_settings.user_id == ^user_id
+    )
+  end
+
+  def _where(query, :value, value_list) when is_list(value_list) do
+    from(user_settings in query,
+      where: user_settings.value in ^value_list
+    )
+  end
+
+  def _where(query, :value, value) do
+    from(user_settings in query,
+      where: user_settings.value == ^value
     )
   end
 
@@ -61,10 +79,22 @@ defmodule Teiserver.Settings.UserSettingQueries do
     )
   end
 
+  def _where(query, :updated_after, timestamp) do
+    from(user_settings in query,
+      where: user_settings.updated_at >= ^timestamp
+    )
+  end
+
+  def _where(query, :updated_before, timestamp) do
+    from(user_settings in query,
+      where: user_settings.updated_at < ^timestamp
+    )
+  end
+
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
-  defp do_order_by(query, params) when is_list(params) do
+  defp do_order_by(query, params) do
     params
     |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
@@ -73,18 +103,6 @@ defmodule Teiserver.Settings.UserSettingQueries do
   end
 
   @spec _order_by(Ecto.Query.t(), any()) :: Ecto.Query.t()
-  def _order_by(query, "Name (A-Z)") do
-    from(user_settings in query,
-      order_by: [asc: user_settings.name]
-    )
-  end
-
-  def _order_by(query, "Name (Z-A)") do
-    from(user_settings in query,
-      order_by: [desc: user_settings.name]
-    )
-  end
-
   def _order_by(query, "Newest first") do
     from(user_settings in query,
       order_by: [desc: user_settings.inserted_at]

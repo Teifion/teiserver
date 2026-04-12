@@ -9,9 +9,11 @@
   <a href="https://hexdocs.pm/teiserver"><img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat"></a>
   &nbsp;
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="Apache 2 License" src="https://img.shields.io/hexpm/l/teiserver"></a>
+  &nbsp;
+  <a href="https://github.com/Teifion/teiserver/actions/workflows/elixir.yml/badge.svg?branch=0.0.5"><img alt="Tests" src="https://github.com/Teifion/teiserver/actions/workflows/elixir.yml/badge.svg?branch=0.0.5"></a>  
 </p>
 
-_Note: This README is for the unreleased master branch, please reference the
+_Note: This README is for the unreleased main branch, please reference the
 [official documentation on hexdocs][hexdoc] for the latest stable release._
 
 [hexdoc]: https://hexdocs.pm/teiserver/Teiserver.html
@@ -20,7 +22,6 @@ _Note: This README is for the unreleased master branch, please reference the
 - User connectivity
 - User to User communications
 - Lobby system (planned)
-- Telemetry/Event logging (planned)
 - Community management tools (planned)
 - Steam integration (planned)
 
@@ -29,7 +30,7 @@ First add to your dependencies in `mix.exs`.
 ```elixir
 def deps do
   [
-    {:teiserver, "~> 0.0.3"}
+    {:teiserver, "~> 0.0.5"}
   ]
 end
 ```
@@ -56,9 +57,8 @@ defmodule MyApp.Repo.Migrations.AddTeiserverTables do
 end
 ```
 
-Add this to your Application supervision tree:
-```elixir
-children = [
-  {Teiserver, Application.get_env(:my_app, Teiserver)}
-]
+Finally, update your config to link the repo:
+```
+config :teiserver,
+  repo: MyApp.Repo
 ```

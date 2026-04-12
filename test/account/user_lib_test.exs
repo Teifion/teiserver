@@ -3,7 +3,7 @@ defmodule Teiserver.UserLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Account
-  alias Teiserver.AccountFixtures
+  alias Teiserver.Fixtures.AccountFixtures
 
   describe "users" do
     alias Teiserver.Account.User
@@ -88,6 +88,72 @@ defmodule Teiserver.UserLibTest do
       assert user == Account.get_user!(user.id)
     end
 
+    test "update_limited_user/2 with valid data updates the user" do
+      user = AccountFixtures.user_fixture()
+
+      assert {:ok, %User{} = user} =
+               Account.update_limited_user(user, Map.put(@update_attrs, :password, "password"))
+
+      assert user.name == "some updated name"
+      assert user.permissions == []
+      assert user.name == "some updated name"
+    end
+
+    test "update_limited_user/2 requires password" do
+      user = AccountFixtures.user_fixture()
+      assert {:error, %Ecto.Changeset{}} = Account.update_limited_user(user, @update_attrs)
+    end
+
+    test "update_limited_user/2 with invalid data returns error changeset" do
+      user = AccountFixtures.user_fixture()
+      assert {:error, %Ecto.Changeset{}} = Account.update_limited_user(user, @invalid_attrs)
+      assert user == Account.get_user!(user.id)
+    end
+
+    test "update_password/2 with valid data updates the user" do
+      user = AccountFixtures.user_fixture()
+
+      assert Account.User.valid_password?("password", user.password)
+      refute Account.User.valid_password?("pleaseword123", user.password)
+
+      assert {:ok, %User{} = user} =
+               Account.update_password(user, %{
+                 "password" => "pleaseword123",
+                 "password_confirmation" => "pleaseword123",
+                 "existing" => "password"
+               })
+
+      refute Account.User.valid_password?("password", user.password)
+      assert Account.User.valid_password?("pleaseword123", user.password)
+    end
+
+    test "update_password/2 with invalid data returns error changeset" do
+      user = AccountFixtures.user_fixture()
+      assert Account.User.valid_password?("password", user.password)
+
+      # No existing
+      assert {:error, %Ecto.Changeset{}} =
+               Account.update_password(user, %{
+                 "password" => "pleaseword123",
+                 "password_confirmation" => "pleaseword123"
+               })
+
+      # No confirm
+      assert {:error, %Ecto.Changeset{}} =
+               Account.update_password(user, %{
+                 "password" => "pleaseword123",
+                 "existing" => "password"
+               })
+
+      # Bad confirm
+      assert {:error, %Ecto.Changeset{}} =
+               Account.update_password(user, %{
+                 "password" => "pleaseword123",
+                 "password_confirmation" => "please",
+                 "existing" => "password"
+               })
+    end
+
     test "delete_user/1 deletes the user" do
       user = AccountFixtures.user_fixture()
       assert {:ok, %User{}} = Account.delete_user(user)
@@ -101,14 +167,38 @@ defmodule Teiserver.UserLibTest do
     end
 
     test "valid_password?/2" do
-      user = AccountFixtures.user_fixture(%{"password" => "password"})
+      user = AccountFixtures.user_fixture(%{password: "password"})
       assert Account.valid_password?(user, "password")
       refute Account.valid_password?(user, "bad_password")
     end
 
+    test "restrict_user/2 and unrestrict_user/2" do
+      user = AccountFixtures.user_fixture()
+
+      # As a string
+      Account.UserLib.restrict_user(user, "OneRestriction")
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction"]
+
+      # As a list
+      Account.UserLib.restrict_user(user, ["TwoRestriction"])
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction", "TwoRestriction"]
+
+      # Two at once, one is an overlap
+      Account.UserLib.restrict_user(user, ["TwoRestriction", "ThreeRestriction"])
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction", "TwoRestriction", "ThreeRestriction"]
+
+      # Now remove
+      Account.UserLib.unrestrict_user(user, ["TwoRestriction", "ThreeRestriction"])
+      user = Account.get_user!(user.id)
+      assert user.restrictions == ["OneRestriction"]
+    end
+
     test "allow?/2" do
       # User must have all of the required permissions
-      user = AccountFixtures.user_fixture(%{"groups" => ["perm1", "perm2"]})
+      user = AccountFixtures.user_fixture(%{groups: ["perm1", "perm2"]})
       assert Account.allow?(user, "perm1")
       assert Account.allow?(user.id, "perm1")
       assert Account.allow?(user.id, ["perm1"])
@@ -129,7 +219,7 @@ defmodule Teiserver.UserLibTest do
 
     test "refute?/2" do
       # Possessing any of the restrictions results in a true value
-      user = AccountFixtures.user_fixture(%{"restrictions" => ["restrict1", "restrict2"]})
+      user = AccountFixtures.user_fixture(%{restrictions: ["restrict1", "restrict2"]})
       assert Account.restricted?(user, "restrict1")
       assert Account.restricted?(user.id, "restrict1")
       assert Account.restricted?(user.id, ["restrict1"])
@@ -156,9 +246,26 @@ defmodule Teiserver.UserLibTest do
   end
 
   describe "user related functions" do
-    test "generate password" do
+    test "generate_password/0" do
       p = Account.generate_password()
       assert String.length(p) > 30
+    end
+
+    test "generate_guest_name/0" do
+      n = Account.generate_guest_name()
+      assert String.length(n) > 6
+      assert String.contains?(n, " ")
+    end
+
+    test "user_name_acceptable?/1" do
+      assert Account.user_name_acceptable?("test name")
+      assert Account.user_name_acceptable?("a bad word here")
+
+      acceptable_test = fn n -> not String.contains?(n, "bad word") end
+      Application.put_env(:teiserver, :fn_user_name_acceptor, acceptable_test)
+
+      assert Account.user_name_acceptable?("test name")
+      refute Account.user_name_acceptable?("a bad word here")
     end
   end
 end

@@ -35,8 +35,8 @@ defmodule Teiserver.MatchMessageQueriesTest do
             sender_id: Teiserver.uuid(),
             match_id: [Teiserver.uuid(), Teiserver.uuid()],
             match_id: Teiserver.uuid(),
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now()
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now()
           ],
           order_by: [
             "Newest first",

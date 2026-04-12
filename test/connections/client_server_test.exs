@@ -3,7 +3,7 @@ defmodule Connections.ClientServerTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Connections
-  alias Teiserver.{AccountFixtures, ConnectionFixtures}
+  alias Teiserver.Fixtures.{AccountFixtures, ConnectionFixtures}
 
   describe "Client server" do
     test "server lifecycle" do
@@ -102,11 +102,18 @@ defmodule Connections.ClientServerTest do
     test "heartbeat destroy process" do
       {conn, user} = ConnectionFixtures.client_fixture()
 
+      # Ensure it's all here and is hunky-dory
+      client_pid = Connections.get_client_pid(user.id)
+      send(client_pid, :heartbeat)
+      :timer.sleep(100)
+
+      assert Connections.client_exists?(user.id)
+
       # Kill the connecting process
       TestConn.stop(conn)
 
       # Set the last_disconnected to something okay
-      disconnected_at = Timex.now() |> Timex.shift(seconds: -100)
+      disconnected_at = DateTime.utc_now() |> DateTime.shift(second: -100)
       Connections.update_client(user.id, %{last_disconnected: disconnected_at}, "test-heartbeat")
 
       client = Connections.get_client(user.id)
@@ -120,7 +127,7 @@ defmodule Connections.ClientServerTest do
       assert Connections.client_exists?(user.id)
 
       # Set the last_disconnected to something much larger, it should result in the client process being destroyed
-      disconnected_at = Timex.now() |> Timex.shift(seconds: -1_000_000)
+      disconnected_at = DateTime.utc_now() |> DateTime.shift(second: -1_000_000)
       Connections.update_client(user.id, %{last_disconnected: disconnected_at}, "test-heartbeat2")
 
       client = Connections.get_client(user.id)

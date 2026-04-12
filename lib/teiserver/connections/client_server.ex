@@ -23,9 +23,6 @@ defmodule Teiserver.Connections.ClientServer do
     defstruct [:client, :user_id, :connections, :client_topic, :lobby_topic]
   end
 
-  @standard_data_keys ~w(connected? last_disconnected in_game? afk? party_id)a
-  @lobby_data_keys ~w(ready? player? player_number team_number player_colour sync lobby_host?)a
-
   @impl true
   def handle_call(:get_client_state, _from, state) do
     {:reply, state.client, state}
@@ -41,8 +38,20 @@ defmodule Teiserver.Connections.ClientServer do
     new_connections = Enum.uniq([conn_pid | state.connections])
 
     if state.client.connected? do
+      :telemetry.execute(
+        [:teiserver, :client, :connect],
+        %{type: :added_connection},
+        %{user_id: state.user_id}
+      )
+
       {:noreply, %State{state | connections: new_connections}}
     else
+      :telemetry.execute(
+        [:teiserver, :client, :connect],
+        %{type: :new_connection},
+        %{user_id: state.user_id}
+      )
+
       new_client = %{state.client | connected?: true}
 
       Teiserver.broadcast(state.client_topic, %{
@@ -56,42 +65,70 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   def handle_cast({:update_client, partial_client, reason}, state) do
-    partial_client = Map.take(partial_client, @standard_data_keys)
+    if Enum.empty?(partial_client) do
+      {:noreply, state}
+    else
+      :telemetry.execute(
+        [:teiserver, :client, :updated],
+        %{change_count: Enum.count(partial_client)},
+        %{user_id: state.user_id}
+      )
 
-    if partial_client != %{} do
       new_client = struct(state.client, partial_client)
       new_state = update_client(state, new_client, reason)
       {:noreply, new_state}
-    else
-      {:noreply, state}
     end
   end
 
   def handle_cast({:update_client_in_lobby, partial_client, reason}, state) do
-    partial_client =
-      partial_client
-      |> Map.take(@lobby_data_keys)
-      |> Map.put(:id, state.user_id)
-      |> LobbyLib.client_update_request(state.client.lobby_id)
-
-    if partial_client != %{} do
-      new_client = struct(state.client, partial_client)
-      new_state = update_client(state, new_client, reason)
-      {:noreply, new_state}
+    if Enum.empty?(partial_client) or state.client.lobby_id == nil do
+      {:noreply, state}
     else
+      new_client = struct(state.client, partial_client)
+      diffs = MapHelper.map_diffs(state.client, new_client)
+
+      if not Enum.empty?(diffs) do
+        LobbyLib.client_update_request(state.client.lobby_id, new_client, diffs, reason)
+      end
+
       {:noreply, state}
     end
   end
 
-  def handle_cast({:update_client_full, partial_client, reason}, state) do
-    new_client = struct(state.client, partial_client)
+  def handle_cast({:do_update_client_in_lobby, new_client, reason}, state) do
+    :telemetry.execute(
+      [:teiserver, :client, :updated_in_lobby],
+      %{},
+      %{user_id: state.user_id}
+    )
+
     new_state = update_client(state, new_client, reason)
     {:noreply, new_state}
   end
 
+  # Unlike with a normal :DOWN message, this is one where the person purposefully disconnects
+  # and thus we don't want to keep the client alive
+  def handle_cast({:purposeful_disconnect, pid}, state) do
+    new_state = lose_connection(pid, state)
+
+    :telemetry.execute(
+      [:teiserver, :client, :disconnect],
+      %{reason: :purposeful},
+      %{user_id: state.user_id}
+    )
+
+    if new_state.client.connected? do
+      {:noreply, new_state}
+    else
+      ClientLib.stop_client_server(state.user_id)
+      {:noreply, new_state}
+    end
+  end
+
   @impl true
   def handle_info(:heartbeat, %State{client: %{connected?: false}} = state) do
-    seconds_since_disconnect = Timex.diff(Timex.now(), state.client.last_disconnected, :second)
+    seconds_since_disconnect =
+      DateTime.diff(DateTime.utc_now(), state.client.last_disconnected, :second)
 
     if seconds_since_disconnect > @client_destroy_timeout_seconds do
       ClientLib.stop_client_server(state.user_id)
@@ -106,6 +143,12 @@ defmodule Teiserver.Connections.ClientServer do
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _normal}, state) do
+    :telemetry.execute(
+      [:teiserver, :client, :disconnect],
+      %{reason: :down_message},
+      %{user_id: state.user_id}
+    )
+
     new_state = lose_connection(pid, state)
     {:noreply, new_state}
   end
@@ -116,7 +159,7 @@ defmodule Teiserver.Connections.ClientServer do
       new_connections = List.delete(state.connections, pid)
 
       if Enum.empty?(new_connections) do
-        new_client = %{state.client | connected?: false, last_disconnected: Timex.now()}
+        new_client = %{state.client | connected?: false, last_disconnected: DateTime.utc_now()}
 
         Teiserver.broadcast(state.client_topic, %{
           event: :client_disconnected,
@@ -143,7 +186,7 @@ defmodule Teiserver.Connections.ClientServer do
   defp update_client(%State{} = state, %Client{} = new_client, reason) do
     diffs = MapHelper.map_diffs(state.client, new_client)
 
-    if diffs == %{} do
+    if Enum.empty?(diffs) do
       # Nothing changed, we don't do anything
       state
     else
@@ -175,16 +218,17 @@ defmodule Teiserver.Connections.ClientServer do
         )
       end
 
-      new_state = cond do
-        state.client.lobby_id == nil && new_client.lobby_id != nil ->
-          added_to_lobby(new_client.lobby_id, state)
+      new_state =
+        cond do
+          state.client.lobby_id == nil && new_client.lobby_id != nil ->
+            added_to_lobby(new_client.lobby_id, state)
 
-        state.client.lobby_id != nil && new_client.lobby_id == nil ->
-          removed_from_lobby(state.client.lobby_id, state)
+          state.client.lobby_id != nil && new_client.lobby_id == nil ->
+            removed_from_lobby(state.client.lobby_id, state)
 
-        true ->
-          state
-      end
+          true ->
+            state
+        end
 
       %{new_state | client: new_client}
     end
@@ -220,7 +264,7 @@ defmodule Teiserver.Connections.ClientServer do
 
   @impl true
   @spec init(map) :: {:ok, map}
-  def init(%{client: %Client{id: id} = client}) do
+  def init(%{client: %Client{id: id} = client, opts: opts}) do
     # Logger.metadata(request_id: "ClientServer##{id}")
     :timer.send_interval(@heartbeat_frequency_ms, :heartbeat)
 
@@ -236,6 +280,12 @@ defmodule Teiserver.Connections.ClientServer do
       id,
       id
     )
+
+    # Handle opts
+    client =
+      struct(client, %{
+        bot?: opts[:bot?] || false
+      })
 
     # After being created a client will typically have
     # a connection be added, it is possible in some cases

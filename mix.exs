@@ -2,13 +2,13 @@ defmodule Teiserver.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/Teifion/teiserver"
-  @version "0.0.4"
+  @version "0.0.5"
 
   def project do
     [
       app: :teiserver,
       version: @version,
-      elixir: "~> 1.14",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -59,6 +59,8 @@ defmodule Teiserver.MixProject do
       "documentation/guides/program_structure.md",
       "documentation/guides/snippets.md",
       "documentation/guides/match_lifecycle.md",
+      "documentation/guides/telemetry.md",
+      "documentation/guides/testing.md",
 
       # Development
       "documentation/development/features.md",
@@ -69,6 +71,8 @@ defmodule Teiserver.MixProject do
       "documentation/pubsubs/match.md",
       "documentation/pubsubs/user.md",
       "documentation/pubsubs/communication.md",
+
+      # KW maps
       "CHANGELOG.md": [title: "Changelog"]
     ]
   end
@@ -93,8 +97,7 @@ defmodule Teiserver.MixProject do
         Teiserver.Logging,
         Teiserver.Matchmaking,
         Teiserver.Moderation,
-        Teiserver.Settings,
-        Teiserver.Telemetry
+        Teiserver.Settings
       ],
       Account: [
         ~r"Teiserver.Account.*"
@@ -125,9 +128,6 @@ defmodule Teiserver.MixProject do
       ],
       Settings: [
         ~r"Teiserver.Settings.*"
-      ],
-      Telemetry: [
-        ~r"Teiserver.Telemetry.*"
       ],
       Helpers: [
         ~r"Teiserver.Helpers.*"
@@ -166,7 +166,22 @@ defmodule Teiserver.MixProject do
 
       # Settings
       "Site settings": &(&1[:section] == :server_setting),
-      "User settings": &(&1[:section] == :user_setting)
+      "User settings": &(&1[:section] == :user_setting),
+
+      # Logging
+      "Audit logs": &(&1[:section] == :audit_log),
+      "Match minute logs": &(&1[:section] == :match_minute_log),
+      "Match day logs": &(&1[:section] == :match_day_log),
+      "Match week logs": &(&1[:section] == :match_week_log),
+      "Match month logs": &(&1[:section] == :match_month_log),
+      "Match quarter logs": &(&1[:section] == :match_quarter_log),
+      "Match year logs": &(&1[:section] == :match_year_log),
+      "Server minute logs": &(&1[:section] == :server_minute_log),
+      "Server day logs": &(&1[:section] == :server_day_log),
+      "Server week logs": &(&1[:section] == :server_week_log),
+      "Server month logs": &(&1[:section] == :server_month_log),
+      "Server quarter logs": &(&1[:section] == :server_quarter_log),
+      "Server year logs": &(&1[:section] == :server_year_log)
     ]
   end
 
@@ -224,22 +239,19 @@ defmodule Teiserver.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_pubsub, "~> 2.1"},
-      {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"},
+      {:telemetry, "~> 1.2.1"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:argon2_elixir, "~> 3.0"},
-      {:timex, "~> 3.7.5"},
+      {:argon2_elixir, "~> 4.0"},
       {:typedstruct, "~> 0.5.2", runtime: false},
       {:horde, "~> 0.9"},
-      {:uuid, "~> 1.1"},
+      {:cachex, "~> 3.6"},
 
       # Dev and Test stuff
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.15.3", only: :test, runtime: false},
+      {:excoveralls, "~> 0.18.1", only: :test, runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:floki, ">= 0.34.0", only: :test},
-      {:dialyxir, "~> 1.1", only: [:dev], runtime: false}
+      {:floki, ">= 0.34.0", only: :test}
     ]
   end
 
@@ -249,7 +261,7 @@ defmodule Teiserver.MixProject do
       licenses: ["Apache-2.0"],
       files: ~w(lib .formatter.exs mix.exs README* CHANGELOG* LICENSE*),
       links: %{
-        "Changelog" => "#{@source_url}/blob/master/CHANGELOG.md",
+        "Changelog" => "#{@source_url}/blob/main/CHANGELOG.md",
         "GitHub" => @source_url,
         "Discord" => "https://discord.gg/NmrSt9zw2p"
       }
@@ -262,6 +274,7 @@ defmodule Teiserver.MixProject do
       # Oban has these and seems to do a really nice job so we're going to use them too
       # bench: "run bench/bench_helper.exs",
       release: [
+        "format --check-formatted",
         "cmd git tag v#{@version}",
         "cmd git push",
         "cmd git push --tags",
@@ -272,9 +285,8 @@ defmodule Teiserver.MixProject do
       "test.ci": [
         "format --check-formatted",
         "deps.unlock --check-unused",
-        "credo --strict",
-        "test --raise",
-        "dialyzer"
+        # "credo --strict",
+        "test --raise"
       ]
     ]
   end

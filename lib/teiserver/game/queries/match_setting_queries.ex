@@ -33,45 +33,45 @@ defmodule Teiserver.Game.MatchSettingQueries do
   def _where(query, _, nil), do: query
 
   def _where(query, :match_id, match_ids) when is_list(match_ids) do
-    from(match_settingss in query,
-      where: match_settingss.match_id in ^match_ids
+    from(match_settings in query,
+      where: match_settings.match_id in ^match_ids
     )
   end
 
   def _where(query, :match_id, match_id) do
-    from(match_settingss in query,
-      where: match_settingss.match_id == ^match_id
+    from(match_settings in query,
+      where: match_settings.match_id == ^match_id
     )
   end
 
   def _where(query, :type_id, type_ids) when is_list(type_ids) do
-    from(match_settingss in query,
-      where: match_settingss.type_id in ^type_ids
+    from(match_settings in query,
+      where: match_settings.type_id in ^type_ids
     )
   end
 
   def _where(query, :type_id, type_id) do
-    from(match_settingss in query,
-      where: match_settingss.type_id == ^type_id
+    from(match_settings in query,
+      where: match_settings.type_id == ^type_id
     )
   end
 
   def _where(query, :value, values) when is_list(values) do
-    from(match_settingss in query,
-      where: match_settingss.value in ^values
+    from(match_settings in query,
+      where: match_settings.value in ^values
     )
   end
 
   def _where(query, :value, value) do
-    from(match_settingss in query,
-      where: match_settingss.value == ^value
+    from(match_settings in query,
+      where: match_settings.value == ^value
     )
   end
 
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
-  defp do_order_by(query, params) when is_list(params) do
+  defp do_order_by(query, params) do
     params
     |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->

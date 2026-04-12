@@ -9,6 +9,7 @@
 ## Connections
 ### Clients
 - Tracking
+- Login attempt rate limiting
 
 ## Communication
 - Room messages

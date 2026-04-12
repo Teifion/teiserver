@@ -33,5 +33,7 @@ teiserver-*.tar
 .elixir_ls/*
 .idea
 
+mix.lock
+
 # Notes I put in for myself I don't want on github
 /zignore

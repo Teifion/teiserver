@@ -1,11 +1,22 @@
-defmodule Teiserver.GameFixtures do
+defmodule Teiserver.Fixtures.GameFixtures do
   @moduledoc false
+  alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Game
-  alias Teiserver.Game.{Lobby, Match, MatchType, MatchMembership, MatchSettingType, MatchSetting}
-  import Teiserver.AccountFixtures, only: [user_fixture: 0]
-  import Teiserver.ConnectionFixtures, only: [client_fixture: 0]
 
-  @spec lobby_fixture() :: Lobby.t()
+  alias Teiserver.Game.{
+    Lobby,
+    Match,
+    MatchType,
+    MatchMembership,
+    MatchSettingType,
+    MatchSetting,
+    UserChoice,
+    UserChoiceType
+  }
+
+  import Teiserver.Fixtures.AccountFixtures, only: [user_fixture: 0]
+  import Teiserver.Fixtures.ConnectionFixtures, only: [client_fixture: 0]
+
   @spec lobby_fixture(map) :: Lobby.t()
   def lobby_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -47,7 +58,6 @@ defmodule Teiserver.GameFixtures do
     {host_conn, host_user, lobby_id}
   end
 
-  @spec match_type_fixture() :: MatchType.t()
   @spec match_type_fixture(map) :: MatchType.t()
   def match_type_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -61,7 +71,6 @@ defmodule Teiserver.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec unstarted_match_fixture() :: Match.t()
   @spec unstarted_match_fixture(map) :: Match.t()
   def unstarted_match_fixture(data \\ %{}) do
     Match.changeset(
@@ -71,13 +80,13 @@ defmodule Teiserver.GameFixtures do
         rated?: data["rated?"] || true,
         host_id: data["host_id"] || user_fixture().id,
         processed?: false,
-        lobby_opened_at: data["lobby_opened_at"] || Timex.now() |> Timex.shift(minutes: -5)
+        lobby_opened_at:
+          data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5)
       }
     )
     |> Teiserver.Repo.insert!()
   end
 
-  @spec incomplete_match_fixture() :: Match.t()
   @spec incomplete_match_fixture(map) :: Match.t()
   def incomplete_match_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -97,8 +106,10 @@ defmodule Teiserver.GameFixtures do
         team_size: data["team_size"] || 2,
         processed?: false,
         game_type: data["game_type"] || "match_game_type_#{r}",
-        lobby_opened_at: data["lobby_opened_at"] || Timex.now() |> Timex.shift(minutes: -5),
-        match_started_at: data["match_started_at"] || Timex.now() |> Timex.shift(minutes: -3),
+        lobby_opened_at:
+          data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5),
+        match_started_at:
+          data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3),
         host_id: data["host_id"] || user_fixture().id,
         type_id: data["type_id"] || match_type_fixture().id
       }
@@ -106,13 +117,14 @@ defmodule Teiserver.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec completed_match_fixture() :: Match.t()
   @spec completed_match_fixture(map) :: Match.t()
   def completed_match_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
 
-    match_started_at = data["match_started_at"] || Timex.now() |> Timex.shift(minutes: -3)
-    match_ended_at = data["match_started_at"] || Timex.now() |> Timex.shift(minutes: -3)
+    match_started_at =
+      data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3)
+
+    match_ended_at = data["match_started_at"] || DateTime.utc_now() |> DateTime.shift(minute: -3)
 
     Match.changeset(
       %Match{},
@@ -128,10 +140,11 @@ defmodule Teiserver.GameFixtures do
         team_size: data["team_size"] || 2,
         processed?: data["processed?"] || false,
         game_type: data["game_type"] || "match_game_type_#{r}",
-        lobby_opened_at: data["lobby_opened_at"] || Timex.now() |> Timex.shift(minutes: -5),
+        lobby_opened_at:
+          data["lobby_opened_at"] || DateTime.utc_now() |> DateTime.shift(minute: -5),
         match_started_at: match_started_at,
         match_ended_at: match_ended_at,
-        match_duration_seconds: Timex.diff(match_ended_at, match_started_at, :second),
+        match_duration_seconds: DateTime.diff(match_ended_at, match_started_at, :second),
         host_id: data["host_id"] || user_fixture().id,
         type_id: data["type_id"] || match_type_fixture().id
       }
@@ -139,11 +152,8 @@ defmodule Teiserver.GameFixtures do
     |> Teiserver.Repo.insert!()
   end
 
-  @spec match_membership_fixture() :: Match.t()
   @spec match_membership_fixture(map) :: Match.t()
   def match_membership_fixture(data \\ %{}) do
-    r = :rand.uniform(999_999_999)
-
     MatchMembership.changeset(
       %MatchMembership{},
       %{
@@ -151,14 +161,13 @@ defmodule Teiserver.GameFixtures do
         match_id: data["match_id"] || completed_match_fixture().id,
         team_number: data["team_number"] || 1,
         win?: data["win?"] || false,
-        party_id: data["party_id"] || "party_id_#{r}",
+        party_id: data["party_id"] || nil,
         left_after_seconds: data[""] || 123
       }
     )
     |> Teiserver.Repo.insert!()
   end
 
-  @spec match_setting_type_fixture() :: Match.t()
   @spec match_setting_type_fixture(map) :: Match.t()
   def match_setting_type_fixture(data \\ %{}) do
     r = :rand.uniform(999_999_999)
@@ -183,6 +192,36 @@ defmodule Teiserver.GameFixtures do
         type_id: data["type_id"] || match_setting_type_fixture().id,
         match_id: data["match_id"] || completed_match_fixture().id,
         value: data["value"] || "value_#{r}"
+      }
+    )
+    |> Teiserver.Repo.insert!()
+  end
+
+  @spec user_choice_type_fixture(map) :: Match.t()
+  def user_choice_type_fixture(data \\ %{}) do
+    r = :rand.uniform(999_999_999)
+
+    UserChoiceType.changeset(
+      %UserChoiceType{},
+      %{
+        name: data["name"] || "user_choice_type_#{r}"
+      }
+    )
+    |> Teiserver.Repo.insert!()
+  end
+
+  @spec user_choice_fixture() :: Match.t()
+  @spec user_choice_fixture(map) :: Match.t()
+  def user_choice_fixture(data \\ %{}) do
+    r = :rand.uniform(999_999_999)
+
+    UserChoice.changeset(
+      %UserChoice{},
+      %{
+        type_id: data[:type_id] || user_choice_type_fixture().id,
+        match_id: data[:match_id] || completed_match_fixture().id,
+        user_id: data[:user_id] || AccountFixtures.user_fixture().id,
+        value: data[:value] || "value_#{r}"
       }
     )
     |> Teiserver.Repo.insert!()

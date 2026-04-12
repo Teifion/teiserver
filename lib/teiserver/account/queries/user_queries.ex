@@ -197,7 +197,7 @@ defmodule Teiserver.Account.UserQueries do
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
-  defp do_order_by(query, params) when is_list(params) do
+  defp do_order_by(query, params) do
     params
     |> List.wrap()
     |> Enum.reduce(query, fn key, query_acc ->
@@ -263,6 +263,13 @@ defmodule Teiserver.Account.UserQueries do
     from(user in query,
       left_join: extra_datas in assoc(user, :extra_data),
       preload: [extra_data: extra_datas]
+    )
+  end
+
+  def _preload(query, :smurf_of) do
+    from(user in query,
+      left_join: smurf_ofs in assoc(user, :smurf_of),
+      preload: [smurf_of: smurf_ofs]
     )
   end
 end

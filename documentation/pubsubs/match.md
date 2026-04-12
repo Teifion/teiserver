@@ -87,6 +87,28 @@ Note this will be sent in addition to normal client updated messages but by doin
 }
 ```
 
+### Match start - `:match_start`
+Indicates the match is starting. This will typically follow the `:lobby_updated` message where `match_ongoing?` is set to true.
+
+```elixir
+%{
+  event: :match_start,
+  match_id: Match.id(),
+  lobby_id: Lobby.id()
+}
+```
+
+### Match end - `:match_end`
+Indicates the match has ended. This will typically follow the `:lobby_updated` message where `match_ongoing?` is set to false.
+
+```elixir
+%{
+  event: :match_end,
+  match_id: Match.id(),
+  lobby_id: Lobby.id()
+}
+```
+
 ### Closed - `:lobby_closed`
 - `:lobby_id` - The id of the lobby closed
 

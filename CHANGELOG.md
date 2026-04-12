@@ -1,3 +1,21 @@
+## v0.0.5
+- Swapped to Elixir 1.17
+- Swapped `team_colour` for `player_colour`
+- Refactored the client update process
+- Added messaging around match start/end
+- Added User and Server runtime settings
+- Added Telemetry events
+- Added rate limiting of login attempts
+- Added more options for connecting clients (currently just `bot?`)
+- Added support for guest accounts
+- Added caching for some db calls
+- Added `player_count` as a property to matches
+- Added concept of user choices to represent pre-game choices made by users (e.g. in-game faction)
+- Removed clustering code so it can be handled by the application using Teiserver as a library
+- Moved everything from `Teiserver.Api` to `Teiserver`
+- Dropped Timex
+- Swapped string error messages to atom error messages
+
 ## v0.0.4
 - Added `Lobby`, `LobbySummary`, `MatchType`, `Match`, `MatchMembership`, `MatchSettingType`, `MatchSetting` schemas, libs and queries
 - Added pubsub events for clients connecting, disconnecting and process destruction

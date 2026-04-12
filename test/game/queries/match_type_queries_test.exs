@@ -38,7 +38,8 @@ defmodule Teiserver.MatchTypeQueriesTest do
             "Name (A-Z)",
             "Name (Z-A)"
           ],
-          preload: []
+          preload: [],
+          limit: :infinity
         )
 
       assert all_values != @empty_query

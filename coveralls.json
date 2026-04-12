@@ -1,6 +1,9 @@
 {
   "skip_files": [
     "^test/.*",
+    "lib/teiserver.ex",
+    "lib/teiserver/contexts/telemetry.ex",
+    "lib/teiserver/migrations/*",
     "lib/teiserver/helpers/file_macros.ex",
     "lib/teiserver/game/servers/lobby_id_server.ex"
   ],

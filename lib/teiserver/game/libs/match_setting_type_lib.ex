@@ -93,15 +93,28 @@ defmodule Teiserver.Game.MatchSettingTypeLib do
 
   ## Examples
 
-      iex> get_or_create_match_setting_type("existing")
+      iex> get_or_create_match_setting_type_id("existing")
       123
 
-      iex> get_or_create_match_setting_type("non-existing")
+      iex> get_or_create_match_setting_type_id("non-existing")
       1234
 
   """
-  @spec get_or_create_match_setting_type(String.t()) :: MatchSettingType.id()
-  def get_or_create_match_setting_type(name) do
+  @spec get_or_create_match_setting_type_id(String.t()) :: MatchSettingType.id()
+  def get_or_create_match_setting_type_id(name) do
+    case Cachex.get(:ts_match_setting_type_lookup, name) do
+      {:ok, nil} ->
+        result = do_get_or_create_match_setting_type_id(name)
+        Cachex.put(:ts_match_setting_type_lookup, name, result)
+        result
+
+      {:ok, value} ->
+        value
+    end
+  end
+
+  @spec do_get_or_create_match_setting_type_id(String.t()) :: MatchSettingType.id()
+  def do_get_or_create_match_setting_type_id(name) do
     name = String.trim(name)
 
     query =

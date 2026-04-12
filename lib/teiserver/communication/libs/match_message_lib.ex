@@ -50,7 +50,6 @@ defmodule Teiserver.Communication.MatchMessageLib do
     list_match_messages(where: [match_id: match_id], limit: limit, order_by: ["Newest first"])
   end
 
-
   @doc """
   Wraps `send_match_message/3` to send a message when in the lobby instead of the match
 
@@ -82,11 +81,11 @@ defmodule Teiserver.Communication.MatchMessageLib do
             match_message: match_message
           }
         )
+
         {:ok, match_message}
 
       err ->
         err
-
     end
   end
 
@@ -113,7 +112,7 @@ defmodule Teiserver.Communication.MatchMessageLib do
           sender_id: sender_id,
           match_id: match_id,
           content: content,
-          inserted_at: Timex.now()
+          inserted_at: DateTime.utc_now()
         },
         attrs
       )

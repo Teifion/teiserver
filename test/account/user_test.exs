@@ -2,7 +2,7 @@ defmodule Account.UserTest do
   @moduledoc false
   use Teiserver.Case, async: true
 
-  alias Teiserver.AccountFixtures
+  alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Account.User
 
   describe "User" do
@@ -74,7 +74,11 @@ defmodule Account.UserTest do
       good_existing =
         User.changeset(
           user,
-          %{"existing" => "password", "password" => "password1"},
+          %{
+            "existing" => "password",
+            "password" => "password1",
+            "password_confirmation" => "password1"
+          },
           :change_password
         )
 

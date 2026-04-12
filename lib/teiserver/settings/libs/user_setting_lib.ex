@@ -1,9 +1,9 @@
 defmodule Teiserver.Settings.UserSettingLib do
   @moduledoc """
-  Library of user_setting related functions.
+  A library of functions for working with `Teiserver.Settings.UserSetting`
   """
   use TeiserverMacros, :library
-  alias Teiserver.Settings.{UserSetting, UserSettingQueries}
+  alias Teiserver.Settings.{UserSetting, UserSettingQueries, UserSettingTypeLib}
 
   @doc """
   Returns the list of user_settings.
@@ -14,11 +14,11 @@ defmodule Teiserver.Settings.UserSettingLib do
       [%UserSetting{}, ...]
 
   """
-  @spec list_user_settings(Teiserver.query_args()) :: list
-  def list_user_settings(query_args \\ []) do
+  @spec list_user_settings(Teiserver.query_args()) :: [UserSetting.t()]
+  def list_user_settings(query_args) do
     query_args
     |> UserSettingQueries.user_setting_query()
-    |> Teiserver.Repo.all()
+    |> Repo.all()
   end
 
   @doc """
@@ -28,18 +28,17 @@ defmodule Teiserver.Settings.UserSettingLib do
 
   ## Examples
 
-      iex> get_user_setting!(123)
+      iex> get_user_setting!("userid", "key123")
       %UserSetting{}
 
-      iex> get_user_setting!(456)
+      iex> get_user_setting!("userid", "key456")
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user_setting!(non_neg_integer()) :: UserSetting.t()
-  def get_user_setting!(user_setting_id, query_args \\ []) do
-    (query_args ++ [id: user_setting_id])
-    |> UserSettingQueries.user_setting_query()
-    |> Teiserver.Repo.one!()
+  @spec get_user_setting!(Teiserver.user_id(), UserSetting.key()) :: UserSetting.t()
+  def get_user_setting!(user_id, key) do
+    UserSettingQueries.user_setting_query(where: [key: key, user_id: user_id], limit: 1)
+    |> Repo.one!()
   end
 
   @doc """
@@ -49,19 +48,122 @@ defmodule Teiserver.Settings.UserSettingLib do
 
   ## Examples
 
-      iex> get_user_setting(123)
+      iex> get_user_setting("userid", "key123")
       %UserSetting{}
 
-      iex> get_user_setting(456)
+      iex> get_user_setting("userid", "key456")
       nil
 
   """
-  @spec get_user_setting(non_neg_integer(), list) :: UserSetting.t() | nil
-  def get_user_setting(user_setting_id, query_args \\ []) do
-    (query_args ++ [id: user_setting_id])
-    |> UserSettingQueries.user_setting_query()
-    |> Teiserver.Repo.one()
+  @spec get_user_setting(Teiserver.user_id(), UserSetting.key()) :: UserSetting.t() | nil
+  def get_user_setting(user_id, key) do
+    UserSettingQueries.user_setting_query(where: [key: key, user_id: user_id], limit: 1)
+    |> Repo.one()
   end
+
+  @doc """
+  Gets the value of a user_setting.
+
+  Returns nil if the UserSetting does not exist.
+
+  ## Examples
+
+      iex> get_user_setting_value("key123")
+      "value"
+
+      iex> get_user_setting_value("key456")
+      nil
+
+  """
+  @spec get_user_setting_value(Teiserver.user_id(), String.t()) ::
+          String.t() | integer() | boolean() | nil
+  def get_user_setting_value(user_id, key) do
+    lookup = cache_key(user_id, key)
+
+    case Cachex.get(:ts_user_setting_cache, lookup) do
+      {:ok, nil} ->
+        setting = get_user_setting(user_id, key)
+        type = UserSettingTypeLib.get_user_setting_type(key)
+
+        value =
+          case setting do
+            nil ->
+              type.default
+
+            %{value: nil} ->
+              type.default
+
+            %{value: v} ->
+              v
+          end
+
+        value = convert_from_raw_value(value, type.type)
+
+        Cachex.put(:ts_user_setting_cache, lookup, value)
+        value
+
+      {:ok, value} ->
+        value
+    end
+  end
+
+  @spec convert_from_raw_value(String.t(), String.t()) :: String.t() | integer() | boolean() | nil
+  defp convert_from_raw_value(raw_value, "string"), do: raw_value
+  defp convert_from_raw_value(raw_value, "integer"), do: String.to_integer(raw_value)
+  defp convert_from_raw_value(raw_value, "boolean"), do: raw_value == "t"
+  defp convert_from_raw_value(_, _), do: nil
+
+  @spec set_user_setting_value(
+          Teiserver.user_id(),
+          String.t(),
+          String.t() | non_neg_integer() | boolean() | nil
+        ) :: :ok
+  def set_user_setting_value(user_id, key, value) do
+    lookup = cache_key(user_id, key)
+
+    type = UserSettingTypeLib.get_user_setting_type(key)
+    raw_value = convert_to_raw_value(value, type.type)
+
+    case value_is_valid?(type, value) do
+      :ok ->
+        case get_user_setting(user_id, key) do
+          nil ->
+            {:ok, _} =
+              create_user_setting(%{
+                user_id: user_id,
+                key: key,
+                value: raw_value
+              })
+
+            :ok
+
+          user_setting ->
+            {:ok, _} = update_user_setting(user_setting, %{"value" => raw_value})
+            Teiserver.invalidate_cache(:ts_user_setting_cache, lookup)
+            :ok
+        end
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @doc """
+
+  """
+  @spec value_is_valid?(ServerSettingType.t(), String.t() | non_neg_integer() | boolean() | nil) ::
+          :ok | {:error, String.t()}
+  def value_is_valid?(%{validator: nil}, _), do: :ok
+
+  def value_is_valid?(%{validator: validator_function}, value) do
+    validator_function.(value)
+  end
+
+  @spec convert_to_raw_value(String.t(), String.t()) :: String.t() | integer() | boolean() | nil
+  defp convert_to_raw_value(value, "string"), do: value
+  defp convert_to_raw_value(value, "integer"), do: to_string(value)
+  defp convert_to_raw_value(value, "boolean"), do: if(value, do: "t", else: "f")
+  defp convert_to_raw_value(_, _), do: nil
 
   @doc """
   Creates a user_setting.
@@ -76,10 +178,10 @@ defmodule Teiserver.Settings.UserSettingLib do
 
   """
   @spec create_user_setting(map) :: {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
-  def create_user_setting(attrs \\ %{}) do
+  def create_user_setting(attrs) do
     %UserSetting{}
     |> UserSetting.changeset(attrs)
-    |> Teiserver.Repo.insert()
+    |> Repo.insert()
   end
 
   @doc """
@@ -99,7 +201,7 @@ defmodule Teiserver.Settings.UserSettingLib do
   def update_user_setting(%UserSetting{} = user_setting, attrs) do
     user_setting
     |> UserSetting.changeset(attrs)
-    |> Teiserver.Repo.update()
+    |> Repo.update()
   end
 
   @doc """
@@ -117,7 +219,7 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec delete_user_setting(UserSetting.t()) ::
           {:ok, UserSetting.t()} | {:error, Ecto.Changeset.t()}
   def delete_user_setting(%UserSetting{} = user_setting) do
-    Teiserver.Repo.delete(user_setting)
+    Repo.delete(user_setting)
   end
 
   @doc """
@@ -132,5 +234,9 @@ defmodule Teiserver.Settings.UserSettingLib do
   @spec change_user_setting(UserSetting.t(), map) :: Ecto.Changeset.t()
   def change_user_setting(%UserSetting{} = user_setting, attrs \\ %{}) do
     UserSetting.changeset(user_setting, attrs)
+  end
+
+  defp cache_key(user_id, key) do
+    "#{user_id}$#{key}"
   end
 end

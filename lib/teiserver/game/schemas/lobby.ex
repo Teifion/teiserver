@@ -24,6 +24,7 @@ defmodule Teiserver.Game.Lobby do
   * `:game_name` - String of the game name
   * `:game_version` - String of the game version
   * `:game_settings` - Map of the settings to be used in starting the game
+  * `:user_settings` - Map of the settings to be used for each player, each key is a player id and the value is a key-value map of setting type to value
   * `:players` - List of user_ids as players, source of truth is still client state
   * `:spectators` - List of user_ids spectating, source of truth is still client state
   * `:members` - Total list of all user_ids who are members of the lobby
@@ -69,6 +70,7 @@ defmodule Teiserver.Game.Lobby do
 
     # Game stuff
     field(:game_settings, map(), default: %{})
+    field(:user_settings, map(), default: %{})
 
     field(:players, [Teiserver.user_id()], default: [])
     field(:spectators, [Teiserver.user_id()], default: [])

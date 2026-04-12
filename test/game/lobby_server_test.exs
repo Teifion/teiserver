@@ -3,7 +3,7 @@ defmodule Teiserver.Game.LobbyServerTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.{Game, Connections}
-  alias Teiserver.ConnectionFixtures
+  alias Teiserver.Fixtures.ConnectionFixtures
 
   describe "Lobby server" do
     test "server lifecycle" do
@@ -26,15 +26,15 @@ defmodule Teiserver.Game.LobbyServerTest do
       [m] = TestConn.get(listener)
 
       assert m == %{
-        topic: topic,
-        update_id: 1,
-        event: :lobby_updated,
-        changes: %{
-          host_data: nil,
-          update_id: 1
-        },
-        lobby_id: lobby_id
-      }
+               topic: topic,
+               update_id: 1,
+               event: :lobby_updated,
+               changes: %{
+                 host_data: nil,
+                 update_id: 1
+               },
+               lobby_id: lobby_id
+             }
 
       # Now destroy the client process
       Connections.stop_client_server(user.id)

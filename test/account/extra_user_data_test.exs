@@ -2,7 +2,7 @@ defmodule Account.ExtraUserDataTest do
   @moduledoc false
   use Teiserver.Case, async: true
 
-  alias Teiserver.AccountFixtures
+  alias Teiserver.Fixtures.AccountFixtures
   alias Teiserver.Account.ExtraUserData
 
   describe "ExtraUserData" do

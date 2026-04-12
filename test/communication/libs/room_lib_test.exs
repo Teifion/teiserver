@@ -3,7 +3,7 @@ defmodule Teiserver.RoomLibTest do
   use Teiserver.Case, async: true
 
   alias Teiserver.Communication
-  alias Teiserver.CommunicationFixtures
+  alias Teiserver.Fixtures.CommunicationFixtures
 
   describe "room" do
     alias Teiserver.Communication.Room

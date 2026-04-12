@@ -6,11 +6,11 @@ This is not a rigid document, it is (especially at this stage) liable to change.
 * `v0.0.2` - Client features (Connections)
 * `v0.0.3` - Chat and Messaging (Communication)
 * `v0.0.4` - Lobbies (Lobby and Game)
-* `v0.0.5` - Logging and Event telemetry (Telemetry and Logging)
+* `v0.0.5` - Site and User Settings, plus internal Telemetry (Settings, Telemetry)
 * `v0.0.6` - Player relationships (Account and Community)
 * `v0.0.7` - Moderation (Moderation and Account)
 * `v0.0.8` - Parties (Community)
-* `v0.0.9` - Site and User Settings (Settings)
+* `v0.0.9` - tbd
 * `v0.1` - Stability, tests and better examples on how to use it
 
 At v0.1 I want the server to be in a state where developers can start to make use of it.
@@ -40,12 +40,6 @@ At v0.1 I want the server to be in a state where developers can start to make us
 - Settings
   - Site settings
   - User settings
-
-- Telemetry
-  - In game events
-  - Server events
-  - Lobby events
-  - User events
 
 ## Planned/intended features
 - Administration

@@ -87,6 +87,10 @@ defmodule Teiserver.Account do
   defdelegate allow?(user_or_user_id, permission_or_permissions), to: UserLib
 
   @doc section: :user
+  @spec generate_guest_name() :: String.t()
+  defdelegate generate_guest_name(), to: UserLib
+
+  @doc section: :user
   @spec restricted?(Teiserver.user_id() | User.t(), [String.t()] | String.t()) :: boolean
   defdelegate restricted?(user_or_user_id, permission_or_permissions), to: UserLib
 

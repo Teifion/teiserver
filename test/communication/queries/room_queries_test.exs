@@ -32,8 +32,8 @@ defmodule Teiserver.RoomQueriesTest do
             id: [1, 2],
             id: 1,
             name: "Some name",
-            inserted_after: Timex.now(),
-            inserted_before: Timex.now()
+            inserted_after: DateTime.utc_now(),
+            inserted_before: DateTime.utc_now()
           ],
           order_by: [
             "Name (A-Z)",

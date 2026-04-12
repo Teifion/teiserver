@@ -5,12 +5,12 @@ defmodule Teiserver.RoomMessageLibTest do
 
   alias Teiserver.Communication
   alias Phoenix.PubSub
-  alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
+  alias Teiserver.Fixtures.{CommunicationFixtures, AccountFixtures, ConnectionFixtures}
 
   defp valid_attrs do
     %{
       content: "some content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       room_id: CommunicationFixtures.room_fixture().id
     }
@@ -19,7 +19,7 @@ defmodule Teiserver.RoomMessageLibTest do
   defp update_attrs do
     %{
       content: "some updated content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       room_id: CommunicationFixtures.room_fixture().id
     }

@@ -4,7 +4,7 @@ defmodule Teiserver.MatchLibAsyncTest do
   use Teiserver.Case, async: false
 
   alias Teiserver.{Game, Connections}
-  alias Teiserver.{GameFixtures, AccountFixtures, ConnectionFixtures}
+  alias Teiserver.Fixtures.{GameFixtures, AccountFixtures, ConnectionFixtures}
 
   defp valid_attrs do
     %{
@@ -118,15 +118,21 @@ defmodule Teiserver.MatchLibAsyncTest do
       {_, u4} = ConnectionFixtures.client_fixture()
       u5 = AccountFixtures.user_fixture()
 
-      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {true, nil}
-      assert Game.can_add_client_to_lobby(u5.id, lobby_id) == {false, "Client is not connected"}
+      assert Game.can_add_client_to_lobby(u1.id, Teiserver.uuid()) == {false, :no_lobby}
+      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == true
+      assert Game.can_add_client_to_lobby(u5.id, lobby_id) == {false, :client_disconnected}
 
       Game.add_client_to_lobby(u1.id, lobby_id)
       Game.add_client_to_lobby(u2.id, lobby_id)
       Game.add_client_to_lobby(u3.id, lobby_id)
       Game.add_client_to_lobby(u4.id, lobby_id)
 
-      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {false, "Existing member"}
+      # Just to check, if we try to add the now it says no
+      assert Game.can_add_client_to_lobby(u1.id, lobby_id) == {false, :existing_member}
+
+      # And trying to add them anyway won't generate a problem
+      resp = Game.add_client_to_lobby(u1.id, lobby_id)
+      assert resp == {:error, :existing_member}
 
       lobby = Game.get_lobby(lobby_id)
 
@@ -136,13 +142,10 @@ defmodule Teiserver.MatchLibAsyncTest do
       assert lobby.players == []
 
       # Update the clients by making them players and putting them on teams
-      Connections.update_client_in_lobby(u1.id, %{player_number: 1, team_number: 1, player?: true}, "test")
-
-      Connections.update_client_in_lobby(u2.id, %{player_number: 2, team_number: 1, player?: true}, "test")
-
-      Connections.update_client_in_lobby(u3.id, %{player_number: 3, team_number: 2, player?: true}, "test")
-
-      Connections.update_client_in_lobby(u4.id, %{player_number: 4, team_number: 2, player?: true}, "test")
+      Connections.update_client(u1.id, %{player_number: 1, team_number: 1, player?: true}, "test")
+      Connections.update_client(u2.id, %{player_number: 2, team_number: 1, player?: true}, "test")
+      Connections.update_client(u3.id, %{player_number: 3, team_number: 2, player?: true}, "test")
+      Connections.update_client(u4.id, %{player_number: 4, team_number: 2, player?: true}, "test")
 
       # Give the lobby time to read and update
       :timer.sleep(100)
@@ -165,7 +168,7 @@ defmodule Teiserver.MatchLibAsyncTest do
       settings = Game.get_match_settings_map(match.id)
       assert settings == %{}
 
-      started_match = Game.start_match(lobby.id)
+      {:ok, started_match} = Game.start_match(lobby.id)
       refute started_match.match_started_at == nil
       assert started_match.match_ended_at == nil
 
@@ -186,12 +189,12 @@ defmodule Teiserver.MatchLibAsyncTest do
       :timer.sleep(100)
 
       outcome = %{
-        winning_team: 1,
-        ended_normally?: true,
-        players: %{
+        "winning_team" => 1,
+        "ended_normally?" => true,
+        "players" => %{
           u1.id => %{},
           u2.id => %{},
-          u3.id => %{left_after_seconds: 1},
+          u3.id => %{"left_after_seconds" => 1},
           u4.id => %{}
         }
       }

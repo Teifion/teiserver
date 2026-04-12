@@ -73,6 +73,8 @@ defmodule Teiserver.Account.UserLib do
   @doc """
   Gets a single user by their user_id. If no user is found, returns `nil`.
 
+  Makes use of a Cache
+
   ## Examples
 
       iex> get_user_by_id(123)
@@ -83,6 +85,19 @@ defmodule Teiserver.Account.UserLib do
   """
   @spec get_user_by_id(Teiserver.user_id()) :: User.t() | nil
   def get_user_by_id(user_id) do
+    case Cachex.get(:ts_user_by_user_id_cache, user_id) do
+      {:ok, nil} ->
+        user = do_get_user_by_id(user_id)
+        Cachex.put(:ts_user_by_user_id_cache, user_id, user)
+        user
+
+      {:ok, value} ->
+        value
+    end
+  end
+
+  @spec do_get_user_by_id(Teiserver.user_id()) :: User.t() | nil
+  defp do_get_user_by_id(user_id) do
     UserQueries.user_query(id: user_id, limit: 1)
     |> Teiserver.Repo.one()
   end
@@ -174,7 +189,62 @@ defmodule Teiserver.Account.UserLib do
   def update_user(%User{} = user, attrs) do
     User.changeset(user, attrs, :full)
     |> Teiserver.Repo.update()
+    |> maybe_decache_user()
   end
+
+  @doc """
+  Removes one or more restrictions from a user.
+
+  ## Examples
+
+      iex> unrestrict_user(user_or_user_id, ["r1", "r2"])
+      {:ok, %User{}}
+
+  """
+  @spec unrestrict_user(User.t() | User.id(), [String.t()] | String.t()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def unrestrict_user(user_or_user_id, restrictions) when is_binary(user_or_user_id),
+    do: unrestrict_user(get_user_by_id(user_or_user_id), restrictions)
+
+  def unrestrict_user(%User{} = user, restrictions_to_remove) do
+    restrictions_to_remove = List.wrap(restrictions_to_remove)
+
+    new_restrictions =
+      user.restrictions
+      |> Enum.filter(fn existing_restriction ->
+        not Enum.member?(restrictions_to_remove, existing_restriction)
+      end)
+
+    update_user(user, %{restrictions: new_restrictions})
+  end
+
+  @doc """
+  Adds one or more restrictions to a user
+
+  ## Examples
+
+      iex> remove_restrictions(user_or_user_id, ["r1", "r2"])
+      {:ok, %User{}}
+
+  """
+  @spec restrict_user(User.t() | User.id(), [String.t()] | String.t()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def restrict_user(user_or_user_id, restrictions) when is_binary(user_or_user_id),
+    do: restrict_user(get_user_by_id(user_or_user_id), restrictions)
+
+  def restrict_user(%User{} = user, restrictions) do
+    new_restrictions = Enum.uniq(user.restrictions ++ List.wrap(restrictions))
+    update_user(user, %{restrictions: new_restrictions})
+  end
+
+  # Clears the cache for a user after a successful database option
+  @spec maybe_decache_user(any()) :: any()
+  defp maybe_decache_user({:ok, user}) do
+    Teiserver.invalidate_cache(:ts_user_by_user_id_cache, user.id)
+    {:ok, user}
+  end
+
+  defp maybe_decache_user(v), do: v
 
   @doc """
   Updates a user's password.
@@ -192,6 +262,7 @@ defmodule Teiserver.Account.UserLib do
   def update_password(%User{} = user, attrs) do
     User.changeset(user, attrs, :change_password)
     |> Teiserver.Repo.update()
+    |> maybe_decache_user()
   end
 
   @doc """
@@ -210,6 +281,7 @@ defmodule Teiserver.Account.UserLib do
   def update_limited_user(%User{} = user, attrs) do
     User.changeset(user, attrs, :user_form)
     |> Teiserver.Repo.update()
+    |> maybe_decache_user()
   end
 
   @doc """
@@ -227,6 +299,7 @@ defmodule Teiserver.Account.UserLib do
   @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def delete_user(%User{} = user) do
     Teiserver.Repo.delete(user)
+    |> maybe_decache_user()
   end
 
   @doc """
@@ -251,6 +324,73 @@ defmodule Teiserver.Account.UserLib do
   @spec valid_password?(User.t(), String.t()) :: boolean
   def valid_password?(user, plaintext_password) do
     User.valid_password?(plaintext_password, user.password)
+  end
+
+  @spec register_failed_login(User.id(), String.t() | nil, String.t() | atom) :: :ok
+  def register_failed_login(_, _, :rate_limit), do: :ok
+  def register_failed_login(nil, _, _), do: :ok
+
+  def register_failed_login(user_id, ip, reason) do
+    Cachex.incr(:ts_login_count_ip, ip)
+    Cachex.incr(:ts_login_count_user, user_id)
+
+    :telemetry.execute(
+      [:teiserver, :user, :failed_login],
+      %{reason: reason},
+      %{user_id: user_id, ip: ip}
+    )
+
+    Teiserver.Logging.create_audit_log(user_id, ip, "failed-login", %{reason: reason})
+
+    :ok
+  end
+
+  @doc """
+  Given a userid and optionally an IP, check if we have hit the maximum number of
+  login attempts for this user.
+  """
+  @spec allow_login_attempt?(User.id(), String.t() | nil) :: boolean
+  def allow_login_attempt?(userid, ip \\ nil) do
+    cond do
+      allow_ip_login_attempt?(ip) == false ->
+        false
+
+      allow_user_login_attempt?(userid) == false ->
+        false
+
+      true ->
+        true
+    end
+  end
+
+  @spec allow_ip_login_attempt?(String.t()) :: boolean
+  defp allow_ip_login_attempt?(nil), do: true
+
+  defp allow_ip_login_attempt?(ip) do
+    max_allowed_ip = Teiserver.Settings.get_server_setting_value("login.ip_rate_limit")
+
+    if max_allowed_ip == nil do
+      true
+    else
+      current_ip_count = Cachex.fetch!(:ts_login_count_ip, ip, fn -> 0 end)
+
+      # As long as we're below the max it's okay
+      current_ip_count <= max_allowed_ip
+    end
+  end
+
+  @spec allow_user_login_attempt?(User.id()) :: boolean
+  defp allow_user_login_attempt?(userid) do
+    max_allowed_user = Teiserver.Settings.get_server_setting_value("login.user_rate_limit")
+
+    if max_allowed_user == nil do
+      true
+    else
+      current_user_count = Cachex.fetch!(:ts_login_count_user, userid, fn -> 0 end)
+
+      # As long as we're below the max it's okay
+      current_user_count <= max_allowed_user
+    end
   end
 
   @doc """
@@ -336,5 +476,30 @@ defmodule Teiserver.Account.UserLib do
   @spec default_user_name_acceptable?(String.t()) :: boolean
   def default_user_name_acceptable?(_name) do
     true
+  end
+
+  @name_parts1 ~w(serene energised humble auspicious decisive exemplary cheerful determined playful spry springy)
+  @name_parts2 ~w(
+      maroon cherry rose ruby
+      amber carrot
+      lemon beige
+      mint lime cadmium
+      aqua cerulean
+      lavender indigo
+      magenta amethyst
+    )
+  @name_parts3 ~w(hamster gerbil cat dog falcon eagle mole fox tiger panda elephant lion cow dove whale dolphin squid dragon snake platypus badger)
+
+  @doc """
+  Generates a name for guests
+  """
+  @spec generate_guest_name() :: String.t()
+  def generate_guest_name() do
+    case :rand.uniform(3) do
+      1 -> [@name_parts1, @name_parts2]
+      2 -> [@name_parts1, @name_parts3]
+      3 -> [@name_parts2, @name_parts3]
+    end
+    |> Enum.map_join(" ", fn l -> Enum.random(l) |> String.capitalize() end)
   end
 end

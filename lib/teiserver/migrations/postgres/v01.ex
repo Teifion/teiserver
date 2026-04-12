@@ -12,14 +12,6 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     execute("CREATE EXTENSION IF NOT EXISTS citext")
 
-    # Clustering
-    create table(:teiserver_cluster_members, primary_key: false, prefix: prefix) do
-      add(:id, :uuid, primary_key: true, null: false)
-      add(:host, :string, null: false)
-
-      timestamps()
-    end
-
     # Accounts
     create_if_not_exists table(:account_users, primary_key: false, prefix: prefix) do
       add(:id, :uuid, primary_key: true, null: false)
@@ -45,10 +37,17 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
       add(:smurf_of_id, references(:account_users, on_delete: :nothing, type: :uuid))
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
-    # execute "CREATE INDEX IF NOT EXISTS lower_username ON #{prefix}.account_users (LOWER(name))"
+    if prefix do
+      execute(
+        "CREATE INDEX IF NOT EXISTS lower_username ON #{prefix}.account_users (LOWER(name))"
+      )
+    else
+      execute("CREATE INDEX IF NOT EXISTS lower_username ON account_users (LOWER(name))")
+    end
+
     create_if_not_exists(unique_index(:account_users, [:email], prefix: prefix))
 
     create_if_not_exists table(:account_extra_user_data, primary_key: false, prefix: prefix) do
@@ -59,6 +58,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
       add(:data, :jsonb)
     end
+
+    create_if_not_exists(unique_index(:account_extra_user_data, [:user_id], prefix: prefix))
 
     # Game
     create_if_not_exists table(:game_match_types, prefix: prefix) do
@@ -71,6 +72,8 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:tags, :jsonb)
       add(:public?, :boolean)
       add(:rated?, :boolean)
+
+      add(:lobby_id, :uuid)
 
       add(:game_name, :string)
       add(:game_version, :string)
@@ -86,12 +89,15 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:match_ended_at, :utc_datetime)
 
       add(:match_duration_seconds, :integer)
+      add(:player_count, :integer)
 
       add(:host_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:type_id, references(:game_match_types, on_delete: :nothing))
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
+
+    create_if_not_exists(index(:game_matches, [:match_started_at], prefix: prefix))
 
     create_if_not_exists table(:game_match_memberships, primary_key: false) do
       add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid),
@@ -109,8 +115,10 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:win?, :boolean, default: nil, null: true)
 
       add(:left_after_seconds, :integer)
-      add(:party_id, :string)
+      add(:party_id, :uuid)
     end
+
+    create_if_not_exists(index(:game_match_memberships, [:match_id], prefix: prefix))
 
     create_if_not_exists table(:game_match_setting_types) do
       add(:name, :string)
@@ -127,10 +135,35 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:value, :string)
     end
 
+    create_if_not_exists(index(:game_match_settings, [:match_id], prefix: prefix))
+
+    create_if_not_exists table(:game_user_choice_types) do
+      add(:name, :string)
+    end
+
+    create_if_not_exists table(:game_user_choices, primary_key: false) do
+      add(:type_id, references(:game_user_choice_types, on_delete: :nothing), primary_key: true)
+
+      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
+      add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid),
+        primary_key: true,
+        type: :uuid
+      )
+
+      add(:value, :string)
+    end
+
+    create_if_not_exists(index(:game_user_choices, [:match_id], prefix: prefix))
+    create_if_not_exists(index(:game_user_choices, [:user_id], prefix: prefix))
+
     # Communications
     create_if_not_exists table(:communication_rooms, prefix: prefix) do
       add(:name, :string)
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists table(:communication_room_messages, prefix: prefix) do
@@ -140,6 +173,9 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:sender_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:room_id, references(:communication_rooms, on_delete: :nothing))
     end
+
+    create_if_not_exists(index(:communication_room_messages, [:sender_id], prefix: prefix))
+    create_if_not_exists(index(:communication_room_messages, [:room_id], prefix: prefix))
 
     create_if_not_exists table(:communication_direct_messages, prefix: prefix) do
       add(:content, :text)
@@ -151,6 +187,9 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:to_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
     end
 
+    create_if_not_exists(index(:communication_direct_messages, [:sender_id], prefix: prefix))
+    create_if_not_exists(index(:communication_direct_messages, [:to_id], prefix: prefix))
+
     create_if_not_exists table(:communication_match_messages, prefix: prefix) do
       add(:content, :text)
       add(:inserted_at, :utc_datetime)
@@ -159,20 +198,14 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:match_id, references(:game_matches, on_delete: :nothing, type: :uuid), type: :uuid)
     end
 
+    create_if_not_exists(index(:communication_match_messages, [:match_id], prefix: prefix))
+
     # Settings
     create_if_not_exists table(:settings_server_settings, primary_key: false, prefix: prefix) do
       add(:key, :string, primary_key: true)
-      add(:value, :string)
+      add(:value, :text)
 
-      timestamps()
-    end
-
-    create_if_not_exists table(:settings_user_setting_type, prefix: prefix) do
-      add(:key, :string)
-      add(:value, :string)
-      add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
-
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create_if_not_exists table(:settings_user_settings, prefix: prefix) do
@@ -180,12 +213,13 @@ defmodule Teiserver.Migrations.Postgres.V01 do
       add(:value, :string)
       add(:user_id, references(:account_users, on_delete: :nothing, type: :uuid), type: :uuid)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
-    create(index(:settings_user_settings, [:user_id], prefix: prefix))
+    create_if_not_exists(index(:settings_user_settings, [:user_id], prefix: prefix))
   end
 
+  @spec down(map) :: any
   def down(%{prefix: prefix, quoted_prefix: _quoted}) do
     # Comms
     drop_if_exists(table(:communication_room_messages, prefix: prefix))
@@ -202,15 +236,11 @@ defmodule Teiserver.Migrations.Postgres.V01 do
 
     # Config
     drop_if_exists(table(:settings_server_settings, prefix: prefix))
-    drop_if_exists(table(:settings_user_setting_type, prefix: prefix))
     drop_if_exists(table(:settings_user_settings, prefix: prefix))
 
     # Accounts
     drop_if_exists(table(:account_extra_user_data, prefix: prefix))
     drop_if_exists(table(:account_users, prefix: prefix))
-
-    # System
-    drop_if_exists(table(:teiserver_cluster_members, prefix: prefix))
 
     execute("DROP EXTENSION IF EXISTS citext")
   end

@@ -1,15 +1,22 @@
 defmodule Teiserver.MatchMessageLibTest do
   @moduledoc false
+  alias Teiserver.Communication.MatchMessageLib
   alias Teiserver.Communication.MatchMessage
   use Teiserver.Case, async: true
 
   alias Teiserver.Communication
-  alias Teiserver.{CommunicationFixtures, AccountFixtures, ConnectionFixtures, GameFixtures}
+
+  alias Teiserver.Fixtures.{
+    CommunicationFixtures,
+    AccountFixtures,
+    ConnectionFixtures,
+    GameFixtures
+  }
 
   defp valid_attrs do
     %{
       content: "some content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       match_id: GameFixtures.incomplete_match_fixture().id
     }
@@ -18,7 +25,7 @@ defmodule Teiserver.MatchMessageLibTest do
   defp update_attrs do
     %{
       content: "some updated content",
-      inserted_at: Timex.now(),
+      inserted_at: DateTime.utc_now(),
       sender_id: AccountFixtures.user_fixture().id,
       match_id: GameFixtures.incomplete_match_fixture().id
     }
@@ -35,6 +42,13 @@ defmodule Teiserver.MatchMessageLibTest do
 
   describe "match_message" do
     alias Teiserver.Communication.MatchMessage
+
+    test "topic" do
+      match = GameFixtures.incomplete_match_fixture()
+      topic = MatchMessageLib.match_messaging_topic(match)
+      assert topic == "Teiserver.Communication.Match.#{match.id}"
+      assert MatchMessageLib.match_messaging_topic(match.id) == topic
+    end
 
     test "match_message_query/1 returns query" do
       assert Communication.match_message_query([])
